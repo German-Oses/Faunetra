@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://a14571019d6a"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 72
+nombre_cientifico = "Lepidodactylus lugubris"
+nombre_comun = "Gecko de escamas lisas"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Reptil nocturno de islas polinésicas (Rapa Nui). Consumidor de mosquitos en zonas de sotobosque."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

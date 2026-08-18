@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://237bdf58ee3d"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 66
+nombre_cientifico = "Nothomyrcia fernandeziana"
+nombre_comun = "Luma de Juan Fernández"
+tipo = "planta"
+estado_conservacion = "CR"
+rol_ecologico = "Árbol endémico dominante de los bosques de Masatierra. Soporte estructural de epífitas únicas."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

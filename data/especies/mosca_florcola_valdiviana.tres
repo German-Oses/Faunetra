@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://d83c73776145"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 43
+nombre_cientifico = "Valdiviomyia ruficauda"
+nombre_comun = "Mosca florícola valdiviana"
+tipo = "invertebrado"
+estado_conservacion = "VU"
+rol_ecologico = "Díptero imitador de avispas. Polinizador clave del dosel profundo del bosque lluvioso."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

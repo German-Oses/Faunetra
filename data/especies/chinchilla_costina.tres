@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://ac8df52101e7"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 19
+nombre_cientifico = "Chinchilla lanigera"
+nombre_comun = "Chinchilla costina"
+tipo = "vertebrado"
+estado_conservacion = "EN"
+rol_ecologico = "Roedor especialista de laderas semiáridas expuestas al sol. Atractora de carnívoros medianos."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

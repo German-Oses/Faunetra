@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://af4c6a84e043"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 73
+nombre_cientifico = "Succinea pinguis"
+nombre_comun = "Caracol terrestre gordo"
+tipo = "invertebrado"
+estado_conservacion = "EN"
+rol_ecologico = "Pequeño consumidor primario de algas y microhongos superficiales sobre hojas nativas sanas."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

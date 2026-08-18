@@ -1,0 +1,32 @@
+[gd_scene format=4 uid="uid://4pqund3nukl7"]
+
+[ext_resource type="Texture2D" path="res://kenney_sketch-town/Tiles/grass_center_E.png" id="1_wtcfe"]
+[ext_resource type="Script" uid="uid://4tuwohff3ipf" path="res://entities/character_body_2d.gd" id="2_0e48y"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0e48y"]
+separation = Vector2i(29, 0)
+texture_region_size = Vector2i(242, 173)
+0:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_epypp"]
+texture = ExtResource("1_wtcfe")
+texture_region_size = Vector2i(256, 352)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_dtkuq"]
+tile_shape = 1
+tile_layout = 5
+tile_size = Vector2i(256, 128)
+sources/0 = SubResource("TileSetAtlasSource_0e48y")
+sources/2 = SubResource("TileSetAtlasSource_epypp")
+
+[node name="Node2D" type="Node2D" unique_id=1025577113]
+
+[node name="Node2D" type="Node2D" parent="." unique_id=1922140442]
+
+[node name="Layer 1" type="TileMapLayer" parent="Node2D" unique_id=953921220]
+tile_map_data = PackedByteArray("AAD//wAAAgAAAAAAAAD+/wAAAgAAAAAAAAABAAEAAgAAAAAAAAABAAIAAgAAAAAAAAACAAIAAgAAAAAAAAACAAEAAgAAAAAAAAACAAAAAgAAAAAAAAABAAAAAgAAAAAAAAAAAAIAAgAAAAAAAAAAAAEAAgAAAAAAAAAAAAAAAgAAAAAAAAAAAP//AgAAAAAAAAD//wEAAgAAAAAAAAD//wIAAgAAAAAAAAD+/wIAAgAAAAAAAAD+/wEAAgAAAAAAAAABAP//AgAAAAAAAAACAP//AgAAAAAAAAD/////AgAAAAAAAAD+////AgAAAAAAAAADAAMAAgAAAAAAAAADAAIAAgAAAAAAAAADAAEAAgAAAAAAAAACAAQAAgAAAAAAAAACAAMAAgAAAAAAAAABAAMAAgAAAAAAAAABAAQAAgAAAAAAAAAAAAMAAgAAAAAAAAAAAAQAAgAAAAAAAAD//wMAAgAAAAAAAAD//wQAAgAAAAAAAAD+/wMAAgAAAAAAAAD+/wQAAgAAAAAAAAADAP//AgAAAAAAAAADAAAAAgAAAAAAAAADAAQAAgAAAAAAAAA=")
+tile_set = SubResource("TileSet_dtkuq")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="Node2D/Layer 1" unique_id=1220951698]
+script = ExtResource("2_0e48y")

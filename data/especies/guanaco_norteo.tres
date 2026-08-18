@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://92f2a7581125"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 15
+nombre_cientifico = "Lama guanicoe"
+nombre_comun = "Guanaco norteño"
+tipo = "vertebrado"
+estado_conservacion = "VU"
+rol_ecologico = "Herbívoro generalista. Dispersor de semillas a larga distancia a través de sus bosteaderos virtuales."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://xjauei6plrh"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_6w0v7"]
+
+[resource]
+script = ExtResource("1_6w0v7")
+nombre_comun = "canela"
+tipo = "planta"
+estado_conservacion = "VU"
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://78ec79a5bdf8"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 79
+nombre_cientifico = "Pseudocyphellaria imshaugii"
+nombre_comun = "Liquen insular gigante"
+tipo = "hongo"
+estado_conservacion = "EN"
+rol_ecologico = "Macroliquen epífito complejo. Excelente indicador de la calidad del aire del archipiélago virtual."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

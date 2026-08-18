@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://b049623e900a"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 22
+nombre_cientifico = "Liolaemus curicensis"
+nombre_comun = "Lagartija de Curicó"
+tipo = "vertebrado"
+estado_conservacion = "VU"
+rol_ecologico = "Reptil endémico de altura central. Controla insectos en troncos caídos previamente restaurados."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://9147ab30e44b"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 47
+nombre_cientifico = "Luma apiculata"
+nombre_comun = "Arrayán"
+tipo = "planta"
+estado_conservacion = "LC"
+rol_ecologico = "Árbol de corteza anaranjada típica de riberas. Estabiliza los cauces de agua fluviales virtuales."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://35161b6ed9ab"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 26
+nombre_cientifico = "Eriosyce chilensis"
+nombre_comun = "Chilenito (Cactus)"
+tipo = "planta"
+estado_conservacion = "EN"
+rol_ecologico = "Cactácea litoral pequeña. Exige remoción estricta de flora invasora herbácea para prosperar."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

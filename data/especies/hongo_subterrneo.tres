@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://8eabda78c3ee"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 40
+nombre_cientifico = "Gautieria inapire"
+nombre_comun = "Hongo subterráneo"
+tipo = "hongo"
+estado_conservacion = "VU"
+rol_ecologico = "Hongo hipogeo (subterráneo). Alimento predilecto de pequeños roedores forestales nativos."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

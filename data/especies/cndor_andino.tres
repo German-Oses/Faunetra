@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://97215983121c"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 20
+nombre_cientifico = "Vultur gryphus"
+nombre_comun = "Cóndor andino"
+tipo = "vertebrado"
+estado_conservacion = "NT"
+rol_ecologico = "Carroñero tope. Limpia el ecosistema eliminando biomasa animal en descomposición del mapa."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

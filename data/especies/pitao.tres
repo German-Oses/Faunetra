@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://a1818148fbb7"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 37
+nombre_cientifico = "Pitavia punctata"
+nombre_comun = "Pitao"
+tipo = "planta"
+estado_conservacion = "EN"
+rol_ecologico = "Árbol endémico amenazado de la cordillera de la costa. Aumenta la biodiversidad de insectos asociados."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

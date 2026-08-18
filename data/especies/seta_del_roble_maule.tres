@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://af4e07ffb05a"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 30
+nombre_cientifico = "Cortinarius roblemaulicola"
+nombre_comun = "Seta del roble maule"
+tipo = "hongo"
+estado_conservacion = "EN"
+rol_ecologico = "Hongo ectomicorrícico. Intercambia nutrientes vitales con las raíces de los *Nothofagus* del bioma."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

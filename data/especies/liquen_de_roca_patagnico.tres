@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://3143f2c545eb"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 61
+nombre_cientifico = "Rhizoplaca melanophthalma"
+nombre_comun = "Liquen de roca patagónico"
+tipo = "hongo"
+estado_conservacion = "LC"
+rol_ecologico = "Liquen saxícola de crecimiento radial lento. Inicia la meteorización biológica de rocas desnudas."
+umbral_desbloqueo = 0
+id_bioma = 4
+metadata/_custom_type_script = "uid://hj44annjt7bk"

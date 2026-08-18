@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://ea7aff5b3bed"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 62
+nombre_cientifico = "Phrygilus patagonicus"
+nombre_comun = "Cometocino patagónico"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Ave paseriforme granívora e insectívora. Dispersor primario del sotobosque patagónico."
+umbral_desbloqueo = 0
+id_bioma = 4
+metadata/_custom_type_script = "uid://hj44annjt7bk"

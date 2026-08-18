@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://1c2a0570e833"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 45
+nombre_cientifico = "Enicognathus ferruganeus"
+nombre_comun = "Loro choroy"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Psitácido gregario ruidoso. Dispersa semillas de coníferas nativas rompiendo conos maduros."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

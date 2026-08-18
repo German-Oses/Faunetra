@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://9af656b54f5f"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 24
+nombre_cientifico = "Porlieria chilensis"
+nombre_comun = "Guayacán"
+tipo = "planta"
+estado_conservacion = "VU"
+rol_ecologico = "Árbol de madera extremadamente dura. Genera zonas densas de sombra que mitigan la evaporación."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

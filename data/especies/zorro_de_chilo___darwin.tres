@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://a27c23189a18"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 35
+nombre_cientifico = "Lycalopex fulvipes"
+nombre_comun = "Zorro de Chiloé / Darwin"
+tipo = "vertebrado"
+estado_conservacion = "EN"
+rol_ecologico = "Carnívoro endémico crítico. Se atrae manteniendo el bioma libre de perturbaciones antropogénicas."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

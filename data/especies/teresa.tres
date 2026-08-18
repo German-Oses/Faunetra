@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://fafce173435d"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 38
+nombre_cientifico = "Scutellaria valdiviana"
+nombre_comun = "Teresa"
+tipo = "planta"
+estado_conservacion = "EN"
+rol_ecologico = "Planta herbácea higrófila. Solo crece a la sombra húmeda y continua de árboles de gran envergadura."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

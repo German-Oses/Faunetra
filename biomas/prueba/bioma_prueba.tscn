@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://ndi62nkmg206"]
+
+[ext_resource type="Script" uid="uid://du4hlskyhg773" path="res://biomas/prueba/prueba.gd" id="1_qqetj"]
+
+[node name="BiomaPrueba" type="Node2D" unique_id=1866319129]
+script = ExtResource("1_qqetj")

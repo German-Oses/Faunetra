@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://f776f099c616"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 28
+nombre_cientifico = "Lynceus huentelauquensis"
+nombre_comun = "Camarón almeja"
+tipo = "invertebrado"
+estado_conservacion = "EN"
+rol_ecologico = "Crustáceo de charcos temporales. Aparece únicamente tras lluvias simuladas en suelos no compactados."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

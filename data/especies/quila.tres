@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://818055888d5c"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 46
+nombre_cientifico = "Chusquea quila"
+nombre_comun = "Quila"
+tipo = "planta"
+estado_conservacion = "LC"
+rol_ecologico = "Bambú nativo trepador. Forma matorrales densos que sirven de refugio físico al pudú."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

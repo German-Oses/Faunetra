@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://706a4cec853a"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 8
+nombre_cientifico = "Plegadis ridgwayi"
+nombre_comun = "Cuervo de pantano de la puna"
+tipo = "vertebrado"
+estado_conservacion = "NT"
+rol_ecologico = "Ave limícola de humedales de altura. Remueve el fango virtual permitiendo oxigenación."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

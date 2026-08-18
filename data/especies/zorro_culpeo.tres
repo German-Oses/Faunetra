@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://55504f644db2"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 21
+nombre_cientifico = "Lycalopex culpaeus"
+nombre_comun = "Zorro culpeo"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Depredador meso-carnívoro. Regulador biológico fundamental de poblaciones de roedores invasores."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

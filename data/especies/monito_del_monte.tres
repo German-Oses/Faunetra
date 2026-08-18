@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://38b8ed2524f0"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 18
+nombre_cientifico = "Dromiciops gliroides"
+nombre_comun = "Monito del monte"
+tipo = "vertebrado"
+estado_conservacion = "NT"
+rol_ecologico = "Fósil viviente, marsupial arborícola. Principal dispersor de semillas del quintral; activa cadenas tróficas."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

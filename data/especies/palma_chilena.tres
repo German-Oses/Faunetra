@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://6b92560e9b60"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 17
+nombre_cientifico = "Jubaea chilensis"
+nombre_comun = "Palma chilena"
+tipo = "planta"
+estado_conservacion = "EN"
+rol_ecologico = "Mega-especie estructuradora. Atrae avifauna de dosel y acumula PR masivos a largo plazo."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

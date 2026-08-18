@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://4737ff6e7e25"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 48
+nombre_cientifico = "Amomyrtus luma"
+nombre_comun = "Luma"
+tipo = "planta"
+estado_conservacion = "LC"
+rol_ecologico = "Mirtácea melífera estructural. Sus frutos sustentan a las poblaciones otoñales de aves del bosque."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

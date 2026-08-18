@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://cdb5f60f1a67"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 13
+nombre_cientifico = "Heleobia transitoria"
+nombre_comun = "Caracol de vertiente norte"
+tipo = "invertebrado"
+estado_conservacion = "CR"
+rol_ecologico = "Molusco dulceacuícola microscópico. Habita exclusivamente vertientes purificadas sin basura."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

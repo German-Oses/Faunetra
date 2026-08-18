@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://4e4a73e4bbd8"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 42
+nombre_cientifico = "Ixobrychus involucris"
+nombre_comun = "Huairavillo"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Ave garza pequeña de pajonales. Depredador especializado de pequeños peces e insectos acuáticos."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://5a44f72d8b55"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 52
+nombre_cientifico = "Pleurodema bufonina"
+nombre_comun = "Sapo de cuatro ojos del sur"
+tipo = "vertebrado"
+estado_conservacion = "NT"
+rol_ecologico = "Anfibio de alta resistencia al frío criogénico. Hiberna bajo rocas sueltas del mapa."
+umbral_desbloqueo = 0
+id_bioma = 4
+metadata/_custom_type_script = "uid://hj44annjt7bk"

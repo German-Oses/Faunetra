@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://b03e7caea7d3"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 31
+nombre_cientifico = "Cyanoliseus patagonus"
+nombre_comun = "Loro tricahue"
+tipo = "vertebrado"
+estado_conservacion = "VU"
+rol_ecologico = "Ave gregaria excavadora de túneles en barrancos arcillosos. Modifica hábitats de nidificación."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://cb219a0ba6cf"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 78
+nombre_cientifico = "Paschalococos disperta"
+nombre_comun = "Palma de Rapa Nui"
+tipo = "planta"
+estado_conservacion = "EX"
+rol_ecologico = "Palma extinta histórica de la isla. Desbloqueable conceptual en la 'Biopedia' tras hitos arqueológicos."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

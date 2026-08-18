@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://8a7f7965eb52"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 9
+nombre_cientifico = "Haageocereus australis"
+nombre_comun = "Cactus de la costa norte"
+tipo = "planta"
+estado_conservacion = "VU"
+rol_ecologico = "Cactus columnar endémico costero. Atrapa camanchaca virtual acelerando los Puntos de Restauración (PR)."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://2df6689e64fd"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 55
+nombre_cientifico = "Hymenophyllum dicranotrichum"
+nombre_comun = "Helecho película patagónico"
+tipo = "planta"
+estado_conservacion = "LC"
+rol_ecologico = "Helecho epífito de extrema delgadez. Requiere bosques maduros cerrados de sotobosque saturado."
+umbral_desbloqueo = 0
+id_bioma = 4
+metadata/_custom_type_script = "uid://hj44annjt7bk"

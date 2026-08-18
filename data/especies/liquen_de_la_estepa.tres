@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://14daecb66f88"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 60
+nombre_cientifico = "Platismatia glauca"
+nombre_comun = "Liquen de la estepa"
+tipo = "hongo"
+estado_conservacion = "LC"
+rol_ecologico = "Liquen folioso epífito. Fija nitrógeno atmosférico directamente al sustrato forestal."
+umbral_desbloqueo = 0
+id_bioma = 4
+metadata/_custom_type_script = "uid://hj44annjt7bk"

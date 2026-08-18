@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://7ceeba37a068"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 27
+nombre_cientifico = "Acanthogonatus hualpen"
+nombre_comun = "Araña de Hualpén"
+tipo = "invertebrado"
+estado_conservacion = "CR"
+rol_ecologico = "Arácnido depredador de suelo. Regula poblaciones de invertebrados fitófagos bajo la hojarasca."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

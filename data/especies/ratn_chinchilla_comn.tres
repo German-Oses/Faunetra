@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://6a4e9dcaa54f"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 23
+nombre_cientifico = "Abrocoma bennetti"
+nombre_comun = "Ratón chinchilla común"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Roedor cavador endémico de Chile central. Aireador de suelos arcillosos mediterráneos."
+umbral_desbloqueo = 0
+id_bioma = 2
+metadata/_custom_type_script = "uid://hj44annjt7bk"

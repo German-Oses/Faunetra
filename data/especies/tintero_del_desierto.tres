@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://c3e857f46443"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 11
+nombre_cientifico = "Montagnea arenaria"
+nombre_comun = "Tintero del desierto"
+tipo = "hongo"
+estado_conservacion = "LC"
+rol_ecologico = "Hongo gasteroide adaptado a la arena. Descompone materia orgánica seca en sustratos áridos."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

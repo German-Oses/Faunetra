@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://ec221d5788d5"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 51
+nombre_cientifico = "Leopardus geoffroyi"
+nombre_comun = "Gato montés argentino"
+tipo = "vertebrado"
+estado_conservacion = "NT"
+rol_ecologico = "Pequeño felino de la estepa densa. Caza activamente roedores de pradera virtuales."
+umbral_desbloqueo = 0
+id_bioma = 4
+metadata/_custom_type_script = "uid://hj44annjt7bk"

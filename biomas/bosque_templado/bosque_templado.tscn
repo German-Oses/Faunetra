@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://darnyur322f12"]
+
+[ext_resource type="Script" uid="uid://dc18w4npr47xe" path="res://biomas/bosque_templado/bosque_templado.gd" id="1_ovyb6"]
+
+[node name="BosqueTemplado" type="Node2D" unique_id=1646021491]
+script = ExtResource("1_ovyb6")
+
+[node name="Especies" type="Node2D" parent="." unique_id=1619621959]

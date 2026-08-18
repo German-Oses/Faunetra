@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://b7aab8d2ea88"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 70
+nombre_cientifico = "Chelanops pugil"
+nombre_comun = "Seudoescorpión insular"
+tipo = "invertebrado"
+estado_conservacion = "CR"
+rol_ecologico = "Microdepredador de cortezas. Controla ácaros y pequeños insectos fitófagos del dosel insular."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

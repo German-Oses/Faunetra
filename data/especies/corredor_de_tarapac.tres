@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://c2aa94168406"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 7
+nombre_cientifico = "Microlophus tarapacensis"
+nombre_comun = "Corredor de Tarapacá"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Reptil de zonas áridas extremas. Se siente atraído por terrenos con baja cobertura arbórea."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

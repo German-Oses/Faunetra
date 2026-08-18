@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://fc78b7cde566"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 41
+nombre_cientifico = "Parastacus pugnax"
+nombre_comun = "Camarón de vega"
+tipo = "invertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Excavador de napas freáticas. Crea 'chimeneas' que airean y enriquecan los suelos de vegas húmedas."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

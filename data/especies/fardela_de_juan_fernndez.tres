@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://d1229e1c1e05"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 65
+nombre_cientifico = "Pterodroma externa"
+nombre_comun = "Fardela de Juan Fernández"
+tipo = "vertebrado"
+estado_conservacion = "EN"
+rol_ecologico = "Ave marina pelágica excavadora de nidos subterraneos. Aporta nutrientes oceánicos vitales al suelo isleño."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

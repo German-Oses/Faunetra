@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://7a4f1fbbbda9"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 4
+nombre_cientifico = "Polylepis tarapacana"
+nombre_comun = "Queñoa de altura"
+tipo = "planta"
+estado_conservacion = "VU"
+rol_ecologico = "Árbol nodriza. Soporta heladas extremas; su plantación disminuye la degradación térmica del suelo."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

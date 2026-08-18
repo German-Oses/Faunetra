@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://a339c7694210"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 71
+nombre_cientifico = "Amphidoxa selkirki"
+nombre_comun = "Caracol terrestre de Selkirk"
+tipo = "invertebrado"
+estado_conservacion = "EN"
+rol_ecologico = "Gasterópodo endémico de la Isla Alejandro Selkirk. Altamente vulnerable a ratas invasoras."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

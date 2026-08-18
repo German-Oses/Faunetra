@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://102d5c9a9d1b"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 6
+nombre_cientifico = "Liolaemus constanzae"
+nombre_comun = "Lagartija de Constanza"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Insectívoro diurno. Controla microfauna invertebrada bajo piedras sanadas."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

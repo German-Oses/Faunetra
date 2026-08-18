@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://0f2015e15a75"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 80
+nombre_cientifico = "Hydrophis platurus"
+nombre_comun = "Serpiente marina pelágica"
+tipo = "vertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Reptil adaptado a la deriva de corrientes oceánicas cálidas en el mar patrimonial insular."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

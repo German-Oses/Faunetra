@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://18bb66de6942"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 39
+nombre_cientifico = "Libertia tricocca"
+nombre_comun = "Calle-calle de Nahuelbuta"
+tipo = "planta"
+estado_conservacion = "LC"
+rol_ecologico = "Monocotiledónea perenne. Ofrece microhábitats para el desove de anfibios nativos terrestres."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"

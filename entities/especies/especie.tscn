@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bpduxc71ddndd"]
+
+[ext_resource type="Script" uid="uid://d8c5ep0asahq" path="res://entities/especies/especie.gd" id="1_especie"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dtkuq"]
+size = Vector2(64, 64)
+
+[node name="Especie" type="Node2D" unique_id=1097816329]
+script = ExtResource("1_especie")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=685855157]
+
+[node name="Area2D" type="Area2D" parent="." unique_id=2045439089]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=599502705]
+shape = SubResource("RectangleShape2D_dtkuq")

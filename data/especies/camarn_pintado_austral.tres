@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://f51182acd3d0"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 58
+nombre_cientifico = "Campylonotus vagans"
+nombre_comun = "Camarón pintado austral"
+tipo = "invertebrado"
+estado_conservacion = "LC"
+rol_ecologico = "Invertebrado macrobentónico marino. Limpiador detrítico en zonas de estuarios virtuales."
+umbral_desbloqueo = 0
+id_bioma = 4
+metadata/_custom_type_script = "uid://hj44annjt7bk"

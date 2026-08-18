@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://839c8b8fd132"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 67
+nombre_cientifico = "Acaena masafuerana"
+nombre_comun = "Abrojo de Más Afuera"
+tipo = "planta"
+estado_conservacion = "CR"
+rol_ecologico = "Planta herbácea endémica de laderas altas expuestas a la erosión severa. Fijadora de suelos."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

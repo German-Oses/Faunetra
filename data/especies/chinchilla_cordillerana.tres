@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://3fd2363dd457"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 1
+nombre_cientifico = "Chinchilla chinchilla"
+nombre_comun = "Chinchilla cordillerana"
+tipo = "vertebrado"
+estado_conservacion = "CR"
+rol_ecologico = "Herbívoro especialista de roqueríos. Aparece al restaurar grietas rocosas estables."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://25eae000c3c4"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 76
+nombre_cientifico = "Peperomia skottsbergii"
+nombre_comun = "Peperomia de Skottsberg"
+tipo = "planta"
+estado_conservacion = "CR"
+rol_ecologico = "Hierba suculenta endémica umbrófila. Crece únicamente bajo condiciones de dosel cerrado e intacto."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

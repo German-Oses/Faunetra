@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://003fc6676dc9"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 16
+nombre_cientifico = "Sicyos bryoniifolius"
+nombre_comun = "Chayotillo del norte"
+tipo = "planta"
+estado_conservacion = "LC"
+rol_ecologico = "Enredadera trepadora herbácea. Provee cobertura visual rápida contra depredadores pequeños."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

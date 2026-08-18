@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://b0tflbhipxu4c"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_y16wm"]
+
+[resource]
+script = ExtResource("1_y16wm")
+nombre_comun = "german"
+tipo = "hongo"
+estado_conservacion = "NT"
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

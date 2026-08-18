@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://6bfd8ffaafd6"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 64
+nombre_cientifico = "Berberis microphylla"
+nombre_comun = "Calafate"
+tipo = "planta"
+estado_conservacion = "LC"
+rol_ecologico = "Arbusto espinoso productor de bayas. Atractor de aves frugívoras e insectos en primavera."
+umbral_desbloqueo = 0
+id_bioma = 4
+metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://3ac655e936d7"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 5
+nombre_cientifico = "Eriosyce rodentiophila"
+nombre_comun = "Sandillón de los Andes"
+tipo = "planta"
+estado_conservacion = "VU"
+rol_ecologico = "Cactus globoso retenedor de humedad. Actúa como reservorio pasivo de agua para insectos xerófitos."
+umbral_desbloqueo = 0
+id_bioma = 1
+metadata/_custom_type_script = "uid://hj44annjt7bk"

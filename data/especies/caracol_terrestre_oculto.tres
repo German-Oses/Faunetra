@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://f631be165c39"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 75
+nombre_cientifico = "Ptychodon oculta"
+nombre_comun = "Caracol terrestre oculto"
+tipo = "invertebrado"
+estado_conservacion = "EN"
+rol_ecologico = "Gasterópodo micro-fijador. Habita grietas oscuras en troncos podridos de especies nativas."
+umbral_desbloqueo = 0
+id_bioma = 5
+metadata/_custom_type_script = "uid://hj44annjt7bk"

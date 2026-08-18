@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://9b6a6fc4793b"]
+
+[ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+
+[resource]
+script = ExtResource("1_n7w5m")
+id_especie = 44
+nombre_cientifico = "Rhinoderma darwinii"
+nombre_comun = "Rana de Darwin"
+tipo = "vertebrado"
+estado_conservacion = "EN"
+rol_ecologico = "Anfibio con neomelia (crianza vocal masculina). Bioindicador absoluto de la pureza ambiental del bosque."
+umbral_desbloqueo = 0
+id_bioma = 3
+metadata/_custom_type_script = "uid://hj44annjt7bk"
