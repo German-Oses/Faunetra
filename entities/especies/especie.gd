@@ -18,7 +18,7 @@ func _ready() -> void:
 
 
 func interactuar() -> void:
-	especie_tocada.emit(data)
+	EventBus.especie_seleccionada.emit(data)
 
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:

@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bmlc5ksscthyb"]
+
+[ext_resource type="Script" uid="uid://tvplxxrtj3kc" path="res://ui/panel_trivia/panel_trivia.gd" id="1_djxu0"]
+
+[node name="PanelTrivia" type="Control" unique_id=1116353985]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_djxu0")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=179965502]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NombreLabel" type="Label" parent="." unique_id=1872642406]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="RolLabel" type="Label" parent="." unique_id=565774949]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="CerrarButton" type="Button" parent="." unique_id=1506336699]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0

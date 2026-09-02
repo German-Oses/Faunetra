@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://cqow47bch5ocs"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://drj5l6cuickqd" path="res://player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://bmlc5ksscthyb" path="res://ui/panel_trivia/PanelTrivia.tscn" id="3_panel"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="ContenedorBioma" type="Node2D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="PanelTrivia" parent="CanvasLayer" instance=ExtResource("3_panel")]

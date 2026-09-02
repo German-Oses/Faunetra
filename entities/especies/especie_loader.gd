@@ -2,7 +2,7 @@ class_name EspecieLoader
 extends RefCounted
 
 
-const RUTA_DATOS := "res://entities/especies/"
+const RUTA_DATOS := "res://data/especies/"
 const ESCENA_ESPECIE := preload("res://entities/especies/especie.tscn")
 
 static func cargar_especies_del_bioma(id_bioma: int) -> Array[EspecieData]:
@@ -21,7 +21,10 @@ static func cargar_especies_del_bioma(id_bioma: int) -> Array[EspecieData]:
 
 
 static func instanciar_especies(lista: Array[EspecieData], contenedor: Node2D, posiciones: Array[Vector2]) -> void:
-	for i in lista.size():
+	# Calculamos cuántas especies podemos instanciar como máximo (evita el out of bounds(que hayan especies que no pueden estar por tamaño)
+	var cantidad_a_instanciar = min(lista.size(), posiciones.size())
+	
+	for i in cantidad_a_instanciar:
 		var instancia := ESCENA_ESPECIE.instantiate() as especie
 		instancia.data = lista[i]
 		instancia.position = posiciones[i]
