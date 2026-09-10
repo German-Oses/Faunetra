@@ -1,0 +1,122 @@
+[
+  {
+    "id_trivia": "trivia_condor_01",
+    "id_especie": 20,
+    "nombre_especie": "Cóndor andino",
+    "id_bioma": 2,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "El Vigía de las Alturas",
+    "situacion_narrativa": "Durante un día helado en la Cordillera de los Andes, te encuentras en un mirador rocoso rodeado de picos nevados. De pronto, una inmensa silueta proyecta su sombra sobre las rocas: un Cóndor andino desciende planeando serenamente sin mover sus gigantescas alas.",
+    "pregunta": "¿Cuál es el rol ecológico fundamental del Cóndor andino en el ecosistema cordillerano y cómo beneficia a las demás especies?",
+    "pista_narrativa": "Piensa en lo que ocurriría si la materia orgánica animal no fuera limpiada rápidamente de las laderas de las montañas...",
+    "opciones": [
+      {
+        "texto": "Es un carroñero tope que consume restos de animales muertos, previniendo focos de infección y manteniendo limpia la bioma de la montaña.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Exacto! El Cóndor cumple una labor de sanidad ambiental insustituible. Al eliminar restos orgánicos, evita la proliferación de bacterias peligrosas en los ecosistemas de altura."
+      },
+      {
+        "texto": "Es un cazador activo que persigue pequeños roedores e insectos durante el vuelo nocturno.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Cóndor no es un cazador nocturno. Su peso le impide cazar presas ágiles en movimiento; en cambio, aprovecha sus agudizados sentidos para detectar carroña durante el día."
+      },
+      {
+        "texto": "Se alimenta exclusivamente de frutos y semillas de los árboles del bosque patagónico.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Cóndor es estrictamente carnívoro carroñero, no consume frutos ni vegetación."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": "insignia_guardian_alturas"
+  },
+  {
+    "id_trivia": "trivia_huemul_01",
+    "id_especie": 1,
+    "nombre_especie": "Huemul",
+    "id_bioma": 1,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "El Guardián Silencioso del Bosque",
+    "situacion_narrativa": "Te adentras en la tupida vegetación de la Patagonia. El aire es húmedo y las hojas crujen bajo tus pies. De repente, entre los troncos de Nothofagus, divisas la figura elegante de un Huemul. Te mira fijamente sin huir, confiando en su mimetismo.",
+    "pregunta": "¿Qué adaptación física le permite al Huemul resistir las extremas heladas de la Patagonia y cuál es su principal amenaza actual?",
+    "pista_narrativa": "Observa el tipo de pelaje que posee y piensa en el impacto de los animales domésticos y la fragmentación de su hábitat.",
+    "opciones": [
+      {
+        "texto": "Posee un pelaje compuesto por pelos huecos que atrapan el aire aislándolo del frío, y su principal amenaza es la pérdida de hábitat y los ataques de perros asilvestrados.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente observación! Sus pelos térmicos son una maravilla evolutiva. Lamentablemente, la pérdida de su territorio original y la presencia de perros han reducido drásticamente su población a estado En Peligro (EN)."
+      },
+      {
+        "texto": "Acumula grandes capas de grasa bajo la piel e hiberna en cuevas subterráneas durante todo el invierno.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Huemul no es un animal cavador ni hiberna en cuevas. Se mantiene activo durante el invierno buscando brotes resguardados."
+      },
+      {
+        "texto": "Cambia totalmente de pelaje a color blanco nieve y su única amenaza son los incendios forestales del norte.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Huemul conserva su tono pardo para camuflarse en la corteza y sotobosque, y sus amenazas principales son de origen antrópico directo en el sur."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": "insignia_amigo_del_huemul"
+  },
+  {
+    "id_trivia": "trivia_alerce_01",
+    "id_especie": 2,
+    "nombre_especie": "Alerce",
+    "id_bioma": 1,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "El Gigante Milenario",
+    "situacion_narrativa": "Te encuentras al pie de un tronco colosal en la selva valdiviana. Su corteza rojiza está cubierta de musgos y líquenes. Estás frente a un Alerce (*Fitzroya cupressoides*), un árbol que echó raíces miles de años atrás, presenciando la historia del planeta.",
+    "pregunta": "¿Qué característica de longevidad destaca al Alerce en Sudamérica y por qué su estado de conservación es crítico?",
+    "pista_narrativa": "Considera los miles de años que tarda en crecer un individuo adulto y la tala histórica por su madera imputrescible.",
+    "opciones": [
+      {
+        "texto": "Es una de las especies más longevas del mundo (pudiendo vivir más de 3.600 años), pero su lentísimo crecimiento y la tala histórica por su valiosa madera lo dejaron En Peligro (EN).",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Muy bien! El Alerce es un verdadero fósil viviente. Crece apenas 1 milímetro de diámetro al año, por lo que la recuperación de sus bosques demora siglos."
+      },
+      {
+        "texto": "Es una planta herbácea que florece cada 50 años y muere tras dejar semillas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Alerce es una conífera arbórea perenne gigante, no una planta herbácea."
+      },
+      {
+        "texto": "Crece rápidamente en solo 10 años y está fuera de riesgo de extinción debido a su alta abundancia.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Al contrario, su crecimiento es extremadamente lento y está protegido legalmente como Monumento Natural debido a su vulnerabilidad."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": "insignia_guardian_milenario"
+  },
+  {
+    "id_trivia": "trivia_loro_tricahue_01",
+    "id_especie": 3,
+    "nombre_especie": "Loro tricahue",
+    "id_bioma": 3,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "El Bullicio en la Quebrada",
+    "situacion_narrativa": "Al aproximarte a una pared de arcilla cerca de un río en la Zona Central, escuchas un potente coro de graznidos. Decenas de Loros Tricahue de brillantes plumajes verde, amarillo y azul vuelan en bandada hacia las barrancas.",
+    "pregunta": "¿Dónde nidifica el Loro Tricahue y qué hábito social lo caracteriza?",
+    "pista_narrativa": "Observa las cuevas excavadas en los paredones verticales de tierra...",
+    "opciones": [
+      {
+        "texto": "Excava profundos túneles en barrancos de tierra o arcilla (loreras) y vive en colonias comunitarias muy ruidosas y organizadas.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! El Tricahue es un loro cavernícola gregario. Sus colonias en acantilados son fundamentales para su reproducción y protección mutua."
+      },
+      {
+        "texto": "Construye grandes nidos de ramas en la copa de las palmeras solitarias en las islas lejanas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Tricahue no construye nidos de ramas en palmeras, utiliza acantilados y quebradas de tierra firme en Chile central y sur."
+      },
+      {
+        "texto": "Nidifica en el suelo desértico enterrando sus huevos en la arena cálida.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No nidifica enterrado en la arena desértica; requiere paredes verticales para proteger sus huevos de depredadores."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": "insignia_eco_gregario"
+  }
+]

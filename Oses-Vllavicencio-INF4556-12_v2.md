@@ -360,32 +360,26 @@ gantt
 
 Durante el desarrollo del presente informe se utilizaron herramientas de inteligencia artificial, específicamente Gemini 3.1 Pro de Google, como apoyo en la redacción, organización de ideas y mejora de la coherencia textual
 
-Su uso se limitó a funciones de asistencia, no siendo empleada como fuente primaria de información. En este sentido, todos los contenidos fueron revisados, contrastados y complementados mediante fuentes académicas y literatura científica confiable, resguardando la validez y rigurosidad del documento.
+Su uso se limitó a funciones de asistencia, no siendo empleada como fuente primaria de información. E## ***7.1 Descripción General del Sistema y Lore Narrativo*** {#7.1-descripción-general-del-sistema}
 
-# **7\. PROPUESTA** {#7.-propuesta}
+*Faunetra* se concibe como una experiencia de **Realismo Mágico Ecológico**, inspirada en el estilo de los *cozy games* (juegos relajantes) y en la simulación de gestión de santuarios naturales. El propósito central del sistema es contribuir a mitigar la "ceguera botánica" y la "extinción de la experiencia" relacionando al usuario con el patrimonio natural chileno a través de un envoltorio narrativo de fantasía mística.
 
-En esta sección se presenta una descripción inicial del sistema *Faunetra*. Por tratarse de una etapa temprana del proyecto, todos los elementos aquí descritos deben entenderse como parte de una propuesta en construcción, sujeta a ajustes y refinamientos durante el proceso de desarrollo.
-
-## ***7.1 Descripción General del Sistema*** {#7.1-descripción-general-del-sistema}
-
-*Faunetra* se concibe como un juego de ecosistema lúdico híbrido, inspirado en el estilo de los *cozy games* (juegos relajantes) y en la simulación de gestión de santuarios naturales. El propósito central del sistema sería contribuir a mitigar la "ceguera botánica" y la "extinción de la experiencia" en relación con el patrimonio natural chileno.
-
-A diferencia de otros juegos de colección que se basan en la captura o la competencia, *Faunetra* propondría una mecánica principal de "Observar para restaurar". El sistema se estructuraría en torno a un Refugio Digital, accesible desde cualquier lugar con conexión a internet. En este espacio, el usuario administraría un terreno inicialmente deteriorado que representaría un bioma chileno (por ejemplo, Bosque Esclerófilo o Estepa Patagónica). El avance en la restauración del ecosistema virtual dependería de la resolución de trivias y desafíos de conocimiento, los cuales generarían Puntos de Restauración (PR) .  
- 
+**La Niebla del Olvido y el Guardián de la Biodiversidad:**
+En la historia del juego, los biomas de Chile se encuentran amenazados por la **"Niebla del Olvido"** (representación metafórica de la ceguera botánica), una fuerza oscura que ha vuelto invisibles a las plantas y animales nativos, marchitando el paisaje. El jugador asume el rol de un **"Guardián de la Biodiversidad"**, equipado con la **Tableta del Guardián (Tableta de Campo)**. Esta herramienta tecnológica-mística le permite escanear el terreno, acceder a la Biopedia, resolver trivias e interactuar con el entorno para restaurar la salud de la tierra mediante la **"Esencia Vital"** (Puntos de Restauración - PR).
 
 ## ***7.2 Mecánicas de Juego*** {#7.2-mecánicas-de-juego}
 
 Las mecánicas están diseñadas para favorecer una progresión tranquila y satisfactoria, donde se privilegie el aprendizaje por sobre la destreza manual o la velocidad. El sistema se articula en torno a un ciclo de juego principal (Core Loop) de tres etapas: **Aprender, Sanar y Atraer**.
 
-*   **Aprender:** El usuario consulta la "Biopedia" (enciclopedia interna) y resuelve sesiones cortas de trivias para obtener Puntos de Restauración (PR).
-*   **Sanar:** Los PR acumulados se invierten directamente en el mapa en acciones sobre el terreno digital, como eliminar elementos degradantes (microbasurales virtuales) o plantar especies nativas ya descubiertas.
+*   **Aprender:** El usuario despliega su **Tableta de Campo**, consulta la "Biopedia" (enciclopedia interna) y resuelve sesiones cortas de trivias para obtener Esencia Vital (PR).
+*   **Sanar:** La Esencia Vital acumulada se invierte directamente en el terreno para disipar la Niebla del Olvido, eliminar elementos degradantes (microbasurales virtuales) o plantar especies nativas ya descubiertas.
 *   **Atraer:** Cuando el ecosistema virtual alcanza ciertos niveles de salud y diversidad vegetal, la fauna nativa asociada comienza a aparecer de manera pasiva en el refugio, completando la colección del usuario sin necesidad de captura activa.
 
 ```mermaid
 graph TD
-    A[Aprender: Biopedia, Trivias y Puzzles] -->|Genera| B((Puntos de Restauración - PR))
-    B -->|Inversión Local| C[Sanar: Limpiar y Plantar]
-    C -->|Incrementa Salud 0% a 100%| D[Atraer: Fauna Nativa]
+    A[Aprender: Biopedia, Tableta de Campo y Trivias] -->|Genera| B((Esencia Vital - PR))
+    B -->|Inversión Local| C[Sanar: Disipar Niebla y Plantar]
+    C -->|Incrementa Salud 0% a 100%| D[Atraer: Fauna Nativa y Espíritus]
     D -.->|Degradación por Abandono| A
 ```
 
@@ -393,31 +387,37 @@ graph TD
 
 **Progresión por Biomas Ecosistémicos:** El juego reemplaza los niveles numéricos tradicionales por una estructura basada en **Biomas Ecosistémicos Desbloqueables** (Norte Árido, Zona Central Mediterránea, Bosques Templados del Sur, Patagonia y Territorios Insulares). Cada bioma cuenta con un **Indicador de Salud de Ecosistema (0% a 100%)**. El usuario debe incrementar la salud del bioma actual hasta un umbral crítico (ej. 75%) para desbloquear el acceso al siguiente ecosistema.
 
-**Economía localizada:** Los Puntos de Restauración (PR) están asociados estrictamente a su bioma de origen. La economía no es global; el progreso y los PR obtenidos en el "Norte Árido" no se transfieren al bioma de la "Zona Central". Esto refuerza la identidad ecológica de cada bioma y obliga al usuario a conocer sus características específicas.
+**Puntos de Restauración (PR) como Esencia Vital:** Los PR representan la energía mística del bosque (*Esencia Vital*). Se obtienen al resolver preguntas en la Tableta de Campo. Al gastar PR en el terreno, el jugador realiza rituales de restauración: disipa la Niebla del Olvido, retira microbasurales virtuales y siembra semillas nativas. La economía no es global; los PR obtenidos en el "Norte Árido" no se transfieren a la "Zona Central".
 
-**Flujo de gasto:** Los PR acumulados se utilizan como divisa para dos propósitos principales: 
-1. La remoción de bloqueadores ambientales (limpieza de microbasurales virtuales o focos de especies invasoras).
-2. La adquisición de insumos de optimización del terreno y semillas de especies vegetales nativas ya desbloqueadas.
+**Sinergias Ecosistémicas Profundas:** Las especies no actúan como elementos aislados. El sistema simula relaciones simbióticas reales revestidas de efectos mágicos: por ejemplo, al plantar un *Peumo*, este emite un "Aura de Humedad" que potencia el crecimiento de especies colindantes como el *Quillay* en un 20%, lo que a su vez atrae pasivamente al *Monito del Monte*, liberando destellos de polen luminoso en el refugio.
 
-**Descubrimiento en la Biopedia:** Las especies no descubiertas se presentan en la Biopedia de forma restringida, mostrando únicamente siluetas y datos taxonómicos básicos. El desbloqueo de la ficha técnica completa ocurre de forma orgánica al atraer al espécimen al refugio, o bien mediante la resolución de pistas conceptuales integradas en la interfaz.
+**Descubrimiento en la Biopedia:** Las especies no descubiertas se presentan en la Biopedia de la Tableta de forma restringida, mostrando únicamente siluetas y datos taxonómicos básicos. El desbloqueo de la ficha técnica completa ocurre de forma orgánica al atraer al espécimen al refugio, o bien mediante la resolución de pistas conceptuales integradas en la interfaz.
 
-### **7.2.2. Sistema de Trivias y Algoritmo de Repetición Espaciada** {#7.2.2.-algoritmo-de-validación-(repetición-espaciada)}
+### **7.2.2. Motor de Tutoría Inteligente (ITS) y Tableta del Personaje** {#7.2.2.-algoritmo-de-validación-(repetición-espaciada)}
 
-**Formato de Trivias por Rondas:** Las trivias no ocurren de forma aislada, sino en **rondas dinámicas de 3 a 5 preguntas cortas** (de selección múltiple o verdadero/falso) generadas dinámicamente a partir del contenido pedagógico almacenado en la Biopedia.
+**Interfaz Inmersiva en la Tableta de Campo:** La resolución de trivias y la consulta de la Biopedia ocurren dentro del juego a través de la **Tableta del Guardián**. Al interactuar con una especie o seleccionar el módulo de aprendizaje, el personaje despliega su tableta digital en pantalla, donde responde las trivias.
 
-**Algoritmo de Validación (Repetición Espaciada):** Con el fin de favorecer la consolidación del conocimiento en la memoria a largo plazo, para validar de forma permanente una especie el sistema programa trivias de repaso en intervalos de tiempo progresivos: 24 horas, 3 días y 7 días posteriores al primer avistamiento.
+**Integración de Sistema Tutor Inteligente (ITS):** Para dotar al videojuego de una **profundidad pedagógica avanzada** e impedir la monotonía, la tableta integra en su software un **Sistema Tutor Inteligente (ITS)** compuesto por tres módulos adaptativos:
 
-**Tolerancia a errores y ausencia de castigo:** La respuesta incorrecta en un desafío de validación **no penaliza** la salud ni descuenta PR acumulados. El sistema simplemente congela la fase de validación actual y reprograma el reintento para la siguiente sesión del usuario, proporcionando además una pista interactiva de apoyo cognitivo para reducir la frustración.
+1.  **Módulo del Estudiante (Modelo de Usuario):** La tableta evalúa continuamente el perfil del jugador, rastreando sus áreas de fortaleza y debilidad (ej. si sufre de ceguera botánica frente a la flora o si domina el reconocimiento de aves).
+2.  **Módulo Pedagógico (Estrategia Adaptativa):** Si el jugador presenta dificultades al identificar plantas, la tableta le ofrece pistas visuales e imágenes comparativas de apoyo, ajustando la dificultad de las trivias (rondas de 3 a 5 preguntas cortas). Si el jugador demuestra maestría, la tableta incrementa el nivel de profundidad formulando preguntas sobre cadenas tróficas y relaciones simbióticas complejas.
+3.  **Módulo Experto (Modelo de Dominio):** La base de datos estructurada en la tableta con las 80 especies nativas de Chile y sus reglas de coexistencia validadas científicamente.
 
-**Sinergias pasivas e inter-especies:** La validación exitosa de una especie activa sus beneficios pasivos en el mapa. Se implementan reglas de coexistencia basadas en relaciones ecológicas reales; por ejemplo, ciertas especies vegetales como el Peumo otorgan bonificaciones de crecimiento y salud a especies colindantes como el Quillay.
+**Algoritmo de Validación (Repetición Espaciada):** Con el fin de favorecer la consolidación del conocimiento en la memoria a largo plazo, para validar de forma permanente una especie el sistema programa trivias de repaso en la tableta en intervalos de tiempo progresivos: 24 horas, 3 días y 7 días posteriores al primer avistamiento.
+
+**Tolerancia a errores y ausencia de castigo:** La respuesta incorrecta en un desafío de validación **no penaliza** la salud ni descuenta PR acumulados. El sistema simplemente congela la fase de validación actual y reprograma el reintento para la siguiente sesión del usuario en la tableta, proporcionando además una pista interactiva de apoyo cognitivo para reducir la frustración.
 
 ### **7.2.3. Sistema de Interacción en Pantalla y Puzzles de Percepción** {#7.2.3.-mecánicas-de-obtención-de-recursos-(pr)}
 
 **Interacción Isométrica 2D con Agregados Lúdicos:** La pantalla principal del refugio presenta el terreno en perspectiva isométrica 2D. El jugador interactúa directamente tocando las parcelas para limpiar o plantar. Para evitar la monotonía, esta interacción se complementa con **minijuegos y puzzles de percepción**:
 
-*   **Puzzles de percepción visual:** Dinámicas orientadas a mitigar la "ceguera botánica", donde el usuario debe identificar especies camufladas en el paisaje, ejercitando la separación entre la flora y el fondo indiferenciado.
-*   **Puzzles de asociación acústica:** Módulos donde el jugador escucha paisajes sonoros reales (cantos de aves, sonidos de anfibios) y debe asociarlos con su respectiva ficha visual en la Biopedia.
+*   **Puzzles de percepción visual:** Dinámicas orientadas a mitigar la "ceguera botánica", donde el usuario usa el *Lente Ancestral* de su tableta para identificar especies camufladas en el paisaje.
+*   **Puzzles de asociación acústica:** Módulos en la tableta donde el jugador escucha paisajes sonoros reales (cantos de aves, sonidos de anfibios) y debe asociarlos con su respectiva ficha visual en la Biopedia.
 *   **Mitigación de amenazas ambientales:** Parches de degradación (microbasurales virtuales o focos de exóticas invasoras) que actúan como bloqueadores del terreno que consumen PR para ser removidos.
+
+### **7.2.4. Dinámica de Degradación por Abandono** {#7.2.4.-dinámica-de-degradación-por-abandono}
+
+El sistema calcula el tiempo de inactividad del usuario en tiempo real. Ante ausencias de varios días consecutivos, la Niebla del Olvido vuelve a avanzar sobre el ecosistema digital: las plantas comienzan a marchitarse y la fauna nativa abandona temporalmente el refugio, reduciendo la salud del bioma y exigiendo una reinversión de PR para restaurar el hábitat al regresar. Esta mecánica busca incentivar el compromiso continuo del jugador sin llegar a eliminar su progreso alcanzado. que actúan como bloqueadores del terreno que consumen PR para ser removidos.
 
 ### **7.2.4. Dinámica de Degradación por Abandono** {#7.2.4.-dinámica-de-degradación-por-abandono}
 
@@ -535,20 +535,35 @@ flowchart TD
 
 ### **7.6.1. Motor gráfico y Frontend: Godot Engine** {#7.6.1.-motor-grafico-y-frontend:-godot-engine}
 
-Se utilizará **Godot Engine** como el motor principal para la construcción de la aplicación móvil. Más allá de su destacada facilidad de uso y curva de aprendizaje amigable, la elección de Godot como motor de desarrollo se fundamenta en sus características técnicas y arquitectónicas:
+Se ha seleccionado **Godot Engine 4** como el motor de desarrollo principal para la construcción del videojuego. En comparación con elecciones previas basaras en frameworks web o hibridos (como la combinación de React Native y Phaser 3 encapsulados en WebViews), Godot Engine ofrece ventajas arquitectónicas y operativas sustanciales:
 
-**Justificación técnica:**
-*   **Arquitectura basada en Nodos:** Permite un diseño altamente modular y orientado a la composición. Esto facilita la creación de interfaces complejas y entidades de juego que pueden encapsular su propia lógica de manera independiente, ideal para mantener el código ordenado.
-*   **Licencia Open Source (MIT):** Garantiza que el proyecto no esté sujeto a regalías o costos de licencias en el futuro, otorgando total libertad sobre el código fuente.
-*   **GDScript y Orientación a Objetos:** Su lenguaje nativo está diseñado específicamente para el desarrollo de juegos y se integra a la perfección con el paradigma de Programación Orientada a Objetos, permitiendo aplicar patrones de diseño complejos (como Máquinas de Estados) de forma nativa.
-*   **Ligereza y Soporte Multiplataforma:** El motor es sumamente liviano y está optimizado para funcionar en una amplia gama de hardware, facilitando la exportación nativa a iOS y Android.
+**Ventajas sobre la arquitectura previa:**
+*   **Integración Nativa sin Puentes (No WebView Overhead):** Al utilizar un motor de juego nativo, se elimina la sobrecarga de memoria y latencia asociada a ejecutar canvas web dentro de WebViews en dispositivos móviles, garantizando una tasa constante de 60 FPS.
+*   **Editor Unificado de UI y Escenas 2D:** Godot integra herramientas avanzadas de diseño de interfaz (nodos `Control`) en el mismo entorno que la escena del juego 2D, eliminando la necesidad de coordinar estados entre una capa nativa (React) y un canvas secundario.
+*   **Licencia Abierta y Libertad Total (MIT):** Es un software de código abierto sin regalías ni costos ocultos, garantizando la viabilidad económica a largo plazo.
+*   **Lenguaje GDScript Dedicado:** Su lenguaje oficial está optimizado específicamente para lógica de juegos y Programación Orientada a Objetos (POO), reduciendo el consumo de batería y facilitando la implementación de patrones de diseño.
+
+#### **Principios Fundamentales de Funcionamiento en Godot Engine**
+Para comprender la arquitectura del juego, es necesario definir los pilares organizativos de Godot:
+
+1.  **Nodos:** Es la unidad fundamental del motor. Cada nodo cumple una función específica (renderizar un sprite, manejar física 2D, procesar audio o crear un botón). Los nodos se organizan jerárquicamente en forma de árbol (*Scene Tree*).
+2.  **Escenas (`.tscn`):** Es una colección estructurada de nodos guardada como un archivo reutilizable. En Faunetra, tanto un personaje (`player.tscn`), una especie (`especie.tscn`), un bioma completo (`bosque_templado.tscn`) o una pantalla de la interfaz (`PanelTrivia.tscn`) son escenas independientes.
+3.  **Scripts (`.gd`):** Archivos de código fuente escritos en GDScript que se adjuntan a un nodo para extender su comportamiento, gestionar variables y responder a eventos de la lógica de negocio.
+4.  **Señales (Signals):** Es el mecanismo de comunicación asíncrono nativo del motor basado en el patrón *Observer*. Un nodo emite una señal cuando ocurre un evento (ej. presionar un botón o hacer clic en una especie), y otros nodos suscritos reaccionan a ella sin necesidad de estar fuertemente acoplados.
+
+#### **Arquitectura de Autoloads (Singletons Globales)**
+Para administrar el estado global del sistema y la comunicación entre pantallas, se implementaron tres componentes de carga automática (*Autoloads*) que permanecen activos en memoria durante toda la ejecución:
+
+*   **`GameState.gd` (Patrón Singleton de Estado):** Hereda de `Node` y gestiona las variables centrales de la sesión del jugador: el bioma activo (`bioma_actual_id`), el total acumulado de Puntos de Restauración (`pr_sesion`) y la herramienta activa (`herramienta_activa = "identificar"`). Emite la señal `pr_actualizado(nuevo_total)` para refrescar dinámicamente la UI.
+*   **`EventBus.gd` (Patrón Bus de Eventos):** Hereda de `Node` y actúa como un canal centralizado de señales globales. Contiene la señal `especie_seleccionada(datos_especie: EspecieData)`, permitiendo que cualquier nodo de especie en el mapa notifique a la interfaz de usuario de forma completamente desacoplada.
+*   **`ApiClient.gd` (Cliente HTTP y Sincronización Backend):** Hereda de `Node` e integra un nodo `HTTPRequest`. Se encarga de conectarse a la API REST de **Supabase** (`https://tu-proyecto.supabase.co/rest/v1/especie`), procesar las respuestas JSON remotas y deserializarlas en objetos nativos de tipo `EspecieData`.
 
 ```mermaid
 sequenceDiagram
     actor Jugador
     participant Godot as Godot Engine (App)
     participant Local as Almacenamiento Local
-    participant API as API REST Node.js
+    participant API as API REST Node.js / Supabase
     participant DB as PostgreSQL
     
     Jugador->>Godot: Responde Trivia
@@ -585,13 +600,15 @@ El almacenamiento persistente y la estructura del conocimiento del sistema se ad
 
 Para lograr el propósito inmersivo y relajante propio del modelo cozy game, la estética de Faunetra toma inspiración en los juegos de gestión idle modernos. Se aleja del hiperrealismo científico para adoptar una dirección artística basada en la abstracción amigable, la perspectiva isométrica y una alta legibilidad visual.
 
-### **7.7.1. Estilo gráfico y perspectiva** {#7.7.1.-estilo-gráfico-y-perspectiva}
+### **7.7.1. Estilo gráfico, perspectiva y Realismo Mágico** {#7.7.1.-estilo-gráfico-y-perspectiva}
 
 **Perspectiva isométrica 2D:** El refugio digital se construirá sobre una cuadrícula isométrica (vista en 3/4 desde arriba), lo que permite al usuario tener una visión global y ordenada del terreno que está restaurando, facilitando la gestión espacial de las plantas y la observación de la fauna.
 
-**Arte vectorial estilizado:** Los elementos del ecosistema tendrán un diseño estilizado con proporciones amigables y redondeadas, utilizando colores planos y vibrantes con contornos limpios integrados en el color base, sin líneas negras duras.
+**Arte vectorial estilizado y Evolución del Paisaje:** Los elementos del ecosistema tendrán un diseño estilizado con proporciones amigables y redondeadas, utilizando colores planos y vibrantes. Las áreas dominadas por la Niebla del Olvido se muestran inicialmente desaturadas y grisáceas; a medida que el jugador invierte Esencia Vital (PR), la niebla se disipa y el paisaje cobra colores intensos y floración.
 
 **Proporciones amigables:** La fauna nativa (como el pudú o el zorro culpeo) tendrá un diseño ligeramente redondeado que transmita ternura y empatía, facilitando la conexión emocional del jugador con las especies representadas.
+
+**Los Espíritus Guardianes del Bioma:** Al completar la salud de un bioma al 100% y validar sus especies, se despierta al **Espíritu Guardián del Bioma** (ej. el *Cóndor Dorado Ancestral* en los Andes o el *Guardián del Peumo* en la Zona Central). Estos entes míticos otorgan bendiciones pasivas al refugio, manifestándose con efectos de partículas luminosas nocturnas, auroras y un aumento en la atracción pasiva de fauna.
 
 ### **7.7.2. Animación y retroalimentación visual** {#7.7.2.-animación-y-retroalimentación-visual}
 
@@ -680,13 +697,123 @@ La presente sección documenta el diseño funcional y estructural del sistema Fa
 
 ## ***8.1. Estructura de Módulos y Componentes***
 
-La arquitectura funcional de Faunetra se organiza en cinco módulos principales, diseñados bajo un criterio de bajo acoplamiento y alta cohesión, de manera que cada uno encapsule una responsabilidad específica del sistema y pueda evolucionar de forma independiente durante las fases posteriores de desarrollo.  
-Módulo de Autenticación y Perfil de Usuario: Responsable de la creación, validación y gestión de las cuentas de usuario, incluyendo el manejo de sesiones, la vinculación con el tutor responsable (en el caso de usuarios menores de edad) y la persistencia de las preferencias de accesibilidad seleccionadas por el jugador. Este módulo expone los servicios necesarios para que el Módulo de Progreso recupere el contexto del usuario activo.  
-Módulo de Core Gameplay (Mecánicas Centrales): Constituye el núcleo lúdico del sistema y orquesta el ciclo de juego principal —Aprender, Sanar, Atraer— descrito en la sección 7.2. Integra los submódulos de Motor de Trivias (RF04), Puzzles de Percepción (RF08) y el Algoritmo de Validación por Repetición Espaciada (RF05–RF06). Este módulo opera de manera centralizada sobre el motor Godot Engine, gestionando las señales de eventos internos del juego.  
-Módulo de Catálogo y Enciclopedia de Especies (Biopedia): Administra el acceso a la información taxonómica y ecológica de las especies, gestionando los estados de bloqueo/desbloqueo de cada ficha (RF03) y la activación de las reglas de sinergia inter-especies (RF07). Este módulo actúa como capa de consulta sobre el modelo de datos de especies, sirviendo tanto al Core Gameplay como a las pantallas de exploración del catálogo.  
-Módulo de Progreso y Economía: Encapsula la lógica de cálculo, acumulación y descuento de los Puntos de Restauración (PR) de forma independiente por bioma (RF01), así como la gestión de los bloqueadores ambientales (RF02) y la dinámica de degradación por abandono (RF09). Este módulo es el responsable directo de mantener la coherencia del estado del Refugio Digital entre sesiones.  
-Módulo de Persistencia y Sincronización (Base de Datos): Gestiona la comunicación con la capa de almacenamiento, distinguiendo entre la persistencia local en el sistema de guardado de Godot —utilizada durante los períodos sin conectividad, conforme a la restricción RT02— y la sincronización con la base de datos PostgreSQL a través de llamadas HTTPRequest hacia una API REST externa. Este módulo actúa como capa de abstracción de datos (Data Access Layer) para el resto de los módulos funcionales, evitando que la lógica de negocio dependa directamente del motor de almacenamiento.  
-La interacción entre estos cinco módulos sigue un patrón de comunicación centralizado, donde el Módulo de Core Gameplay actúa como orquestador principal, consultando al Módulo de Catálogo y al Módulo de Progreso en tiempo de ejecución, mientras que el Módulo de Persistencia opera de forma transversal, sirviendo de soporte a todos los demás.
+La arquitectura funcional de Faunetra se organiza en cinco módulos principales, diseñados bajo un criterio de bajo acoplamiento y alta cohesión, encapsulando sus responsabilidades a través de clases GDScript orientadas a objetos:
+
+*   **Módulo de Autenticación y Perfil de Usuario:** Responsable de la creación, validación y gestión de las cuentas de usuario. Este módulo expone los servicios necesarios para que el Módulo de Progreso recupere el contexto del usuario activo.
+*   **Módulo de Core Gameplay (Mecánicas Centrales):** Constituye el núcleo lúdico del sistema y orquesta el ciclo de juego principal —Aprender, Sanar, Atraer— descrito en la sección 7.2. Se compone de las siguientes clases principales:
+    *   **Controlador del Jugador (`player.gd` - Herencia `CharacterBody2D`):** Gestiona la física de movimiento 2D, vectores de dirección, aceleración y fricción. Incluye un área de interacción (`InteractionArea`) que detecta especies nativas cercanas y ejecuta un algoritmo de distancia euclidiana para interactuar con la más próxima al presionar la tecla asignada.
+    *   **Entidad Especie (`especie.gd` - Herencia `Node2D`):** Instancia visual de la planta o animal en el mapa. Posee un nodo `Sprite2D` y un `Area2D` para capturar eventos del mouse (`input_event`). Cuenta con un sistema dinámico que genera un color *placeholder* específico según la clasificación taxonómica (Verde claro = vertebrado, Azul = ave, Verde bosque = planta, Café = hongo, Naranja = invertebrado) cuando no hay sprite asignado.
+*   **Módulo de Catálogo y Enciclopedia de Especies (Biopedia):** Administra la información taxonómica y ecológica de las especies a través de:
+    *   **Estructura de Datos (`EspecieData.gd` - Herencia `Resource`):** Clase de tipo `Resource` que define las variables exportadas: `id_especie`, `nombre_cientifico`, `nombre_comun`, `tipo`, `estado_conservacion` (RCE), `rol_ecologico`, `umbral_desbloqueo`, `id_bioma`, `textura` y `audio_canto`.
+    *   **Catálogo Maestro de 80 Especies (`res://data/especies/`):** Contiene los **80 archivos de recursos nativos (`.tres`)** ya generados individualmente para la fauna y flora de todos los biomas chilenos.
+    *   **Fábrica de Carga (`EspecieLoader.gd` - Herencia `RefCounted`):** Clase auxiliar estática que lee la carpeta de datos, filtra las especies por `id_bioma` e instancia automáticamente las escenas `especie.tscn` en las posiciones del mapa.
+*   **Módulo de Interfaz de Usuario (UI):**
+    *   **Ficha Informativa y Trivia (`panel_trivia.gd` - Herencia `Control`):** Interfaz de usuario desacoplada que escucha la señal `especie_seleccionada` del `EventBus` y despliega dinámicamente el nombre común y rol ecológico de la especie seleccionada.
+*   **Módulo de Progreso y Economía:** Encapsula la lógica de cálculo, acumulación y descuento de los Puntos de Restauración (PR) de forma independiente por bioma a través del singleton `GameState.gd`.
+*   **Módulo de Persistencia y Sincronización (Base de Datos):** Gestiona la persistencia local en el sistema de guardado de Godot y la comunicación remota con PostgreSQL vía `ApiClient.gd` (`HTTPRequest`).
+
+```mermaid
+classDiagram
+    class Node {
+        <<Godot Native>>
+    }
+    class Resource {
+        <<Godot Native>>
+    }
+    class Node2D {
+        <<Godot Native>>
+    }
+    class CharacterBody2D {
+        <<Godot Native>>
+    }
+    class Control {
+        <<Godot Native>>
+    }
+    class RefCounted {
+        <<Godot Native>>
+    }
+
+```mermaid
+classDiagram
+    direction TB
+
+    class GameState {
+        <<Singleton Autoload>>
+        +pr_actualizado: Signal
+    }
+
+    class EventBus {
+        <<Singleton Autoload>>
+        +especie_seleccionada: Signal
+    }
+
+    class ApiClient {
+        <<Singleton Autoload>>
+    }
+
+    class EspecieData {
+        <<Resource>>
+    }
+
+    class Especie {
+        <<Node2D>>
+        +interactuar()
+    }
+
+    class Player {
+        <<CharacterBody2D>>
+        +interactuar_con_mas_cercana()
+    }
+
+    class EspecieLoader {
+        <<RefCounted / Factory>>
+        +cargar_especies()
+        +instanciar_especies()
+    }
+
+    class PanelTrivia {
+        <<UI Control>>
+        +mostrar_ficha()
+    }
+
+    %% Relaciones y Conexiones entre Clases
+    Player "1" ..> "0..*" Especie : Detecta proximidad (Area2D) e invoca interactuar()
+    Especie "1" o-- "1" EspecieData : Encapsula datos de especie
+    EspecieLoader ..> EspecieData : Lee recursos de datos (.tres)
+    EspecieLoader ..> Especie : Instancia nodos en la escena del bioma
+    ApiClient ..> EspecieData : Transforma JSON de Supabase a Resource
+
+    %% Bus de Eventos y Comunicación Desacoplada
+    Especie ..> EventBus : Emite especie_seleccionada(data)
+    EventBus ..> PanelTrivia : Notifica evento a la Interfaz de Usuario
+    GameState ..> PanelTrivia : Notifica actualización de Puntos (PR)
+```
+
+### **8.1.1. Diagrama de Secuencia: Flujo de Interacción y Eventos Desacoplados**
+El siguiente diagrama detalla cómo se conectan dinámicamente las clases del sistema durante la interacción del jugador con una especie nativa:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor J as Jugador
+    participant P as Player (CharacterBody2D)
+    participant E as Especie (Node2D)
+    participant EB as EventBus (Singleton)
+    participant UI as PanelTrivia (Control)
+    participant GS as GameState (Singleton)
+
+    J->>P: Presiona tecla de interacción ("interact")
+    P->>P: Calcula Especie más cercana en InteractionArea
+    P->>E: Llama a interactuar()
+    E->>EB: Emite señal especie_seleccionada(EspecieData)
+    EB-->>UI: Retransmite evento especie_seleccionada
+    UI->>UI: Carga datos (nombre_comun, rol_ecologico) y show()
+    
+    J->>UI: Responde Trivia correctamente en la Tableta
+    UI->>GS: Llama a agregar_pr(puntos)
+    GS->>GS: Actualiza saldo de pr_sesion
+    GS-->>UI: Emite señal pr_actualizado(nuevo_total)
+```
 
 ## ***8.2. Diseño del Sistema: Registros de Captura y Máquina de Estados***
 
@@ -709,42 +836,48 @@ En la implementación orientada a objetos:
 *   El diseño está basado en **polimorfismo**: todos los estados responden de forma distinta a la función `procesar()`.
 *   Ningún registro "piensa" en qué estado se encuentra; simplemente trabaja delegando la acción al estado actual que posee.
 
-#### Estados Definidos
-Existen 3 estados principales, cada uno con su propia lógica (ver Diagrama UML):
+#### Estados Definidos y Conexiones de Transición
+Existen 3 estados principales, cada uno con su propia lógica y reglas de transición (ver Diagrama UML a continuación):
 1.  **EstadoPendiente:** Lógica para cuando el registro recién se realiza y espera ser validado.
 2.  **EstadoValidado:** Lógica para cuando la captura cumple los criterios y es aprobada exitosamente.
 3.  **EstadoFallidoReprogramado:** Lógica para cuando la captura no cumple los requisitos, falla y debe manejarse su reprogramación.
 
 ```mermaid
 classDiagram
+    direction LR
+
     class ContextoCaptura {
-        - estadoActual: EstadoCapturaBase
-        + ContextoCaptura(estadoInicial)
-        + cambiar_estado(nuevoEstado: EstadoCapturaBase)
-        + procesar()
+        -estadoActual: EstadoCapturaBase
+        +ContextoCaptura(estadoInicial)
+        +cambiar_estado(nuevoEstado)
+        +procesar()
     }
-    
+
     class EstadoCapturaBase {
-        <<abstract>>
-        + procesar(contexto: ContextoCaptura)*
+        <<interface / abstract>>
+        +procesar(contexto)*
     }
-    
+
     class EstadoPendiente {
-        + procesar(contexto: ContextoCaptura)
+        +procesar(contexto)
     }
-    
+
     class EstadoValidado {
-        + procesar(contexto: ContextoCaptura)
+        +procesar(contexto)
     }
-    
+
     class EstadoFallidoReprogramado {
-        + procesar(contexto: ContextoCaptura)
+        +procesar(contexto)
     }
-    
-    ContextoCaptura "1" *-- "1" EstadoCapturaBase : delega el comportamiento a
-    EstadoCapturaBase <|-- EstadoPendiente : Herencia/Polimorfismo
-    EstadoCapturaBase <|-- EstadoValidado : Herencia/Polimorfismo
-    EstadoCapturaBase <|-- EstadoFallidoReprogramado : Herencia/Polimorfismo
+
+    ContextoCaptura "1" *-- "1" EstadoCapturaBase : Mantiene estado activo
+    EstadoCapturaBase <|-- EstadoPendiente : Implementa lógica pendiente
+    EstadoCapturaBase <|-- EstadoValidado : Implementa lógica validado
+    EstadoCapturaBase <|-- EstadoFallidoReprogramado : Implementa lógica fallido
+
+    EstadoPendiente ..> EstadoValidado : Transiciona si trivia es correcta
+    EstadoPendiente ..> EstadoFallidoReprogramado : Transiciona si trivia es incorrecta
+    EstadoFallidoReprogramado ..> EstadoPendiente : Transiciona al vencer temporizador
 ```
 
 ## ***8.3. Esquema de Base de Datos (Modelo Entidad-Relación Descriptivo)***
