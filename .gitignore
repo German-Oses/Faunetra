@@ -1,3 +1,13 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Configuración local del editor / asistentes (rutas personales)
+.mcp.json
+.cursor/
+.vscode/
+.DS_Store
+**/.DS_Store
+
+# Copia duplicada de las imágenes de referencia (ya están en Assets/sprites/desierto)
+Desierto FAUNA/

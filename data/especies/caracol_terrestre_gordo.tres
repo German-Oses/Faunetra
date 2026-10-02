@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://af4c6a84e043"]
 
 [ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+[ext_resource type="PackedScene" path="res://entities/especies/animales/caracol_terrestre_gordo.tscn" id="2_escena"]
 
 [resource]
 script = ExtResource("1_n7w5m")
@@ -12,4 +13,5 @@ estado_conservacion = "EN"
 rol_ecologico = "Pequeño consumidor primario de algas y microhongos superficiales sobre hojas nativas sanas."
 umbral_desbloqueo = 0
 id_bioma = 5
+escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

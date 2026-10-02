@@ -1,11 +1,434 @@
 extends Node
 
-var bioma_actual_id: int= -1
-var pr_sesion: int = 0
-var herramienta_activa : String = "identificar" 
-signal pr_actualizado(nuevo_total:int )
+## GameState - Estado persistente de Faunetra.
+## - Economía local: los Puntos de Restauración (PR) se guardan y gastan por bioma.
+## - Salud 0-100% por bioma y desbloqueo secuencial al superar UMBRAL_DESBLOQUEO.
+## - Estado de la grilla de cada refugio (niebla, bloqueadores, plantas, fauna presente).
+## - Biopedia (especies descubiertas) y validaciones de repetición espaciada (24 h, 3 y 7 días).
+## - Degradación por abandono calculada con timestamps entre sesiones.
+
+signal pr_actualizado(id_bioma: int, nuevo_total: int)
+signal salud_actualizada(id_bioma: int, salud: float)
+signal bioma_desbloqueado(id_bioma: int)
+signal herramienta_cambiada(herramienta: String)
+signal especie_descubierta(data: EspecieData)
+signal repasos_actualizados
+
+const RUTA_GUARDADO := "user://faunetra_guardado.json"
+## Orden de desbloqueo. El prototipo comienza en el Bosque Templado (id 3), que tiene todas
+## sus especies animadas; luego sigue de norte a sur y finalmente las islas.
+const ORDEN_BIOMAS: Array[int] = [3, 2, 1, 4, 5]
+const NOMBRES_BIOMAS := {
+	1: "Zona Central Mediterránea",
+	2: "Norte Árido",
+	3: "Bosques Templados del Sur",
+	4: "Patagonia",
+	5: "Territorios Insulares",
+}
+const UMBRAL_DESBLOQUEO := 75.0
+const PR_INICIAL := 120
+const SEGUNDOS_DIA := 86400
+## Días sin jugar que se toleran antes de que el refugio comience a degradarse.
+const DIAS_DE_GRACIA := 1
+const MAX_SEVERIDAD := 7
+const INTERVALOS_REPASO_DIAS: Array[int] = [1, 3, 7]
+const SEGUNDOS_ENTRE_GUARDADOS := 3.0
+
+# Pesos del indicador de salud (suman 100).
+const PESO_DESPEJE := 30.0
+const PESO_LIMPIEZA := 20.0
+const PESO_FLORA := 30.0
+const PESO_FAUNA := 20.0
+
+var bioma_actual_id: int = -1
+var herramienta_activa: String = "identificar":
+	set(valor):
+		herramienta_activa = valor
+		herramienta_cambiada.emit(valor)
+var especie_para_plantar: EspecieData
+
+var biomas: Dictionary = {}        # "id_bioma" -> estado del bioma (ver estado_bioma)
+var descubiertas: Dictionary = {}  # "id_especie" -> timestamp del primer avistamiento
+var validaciones: Dictionary = {}  # "id_especie" -> {etapa, proxima, sesion_bloqueada}
+var desbloqueados: Array[int] = []
+var ultimo_bioma: int = -1
+var sesion: int = 0
+var primera_partida := true
+var datos_trivia: Dictionary = {}
+
+## Resumen de lo que ocurrió mientras el jugador no estuvo (se muestra al iniciar).
+var informe_degradacion: Array[String] = []
+var dias_inactivo: int = 0
+
+var _ultima_sesion: float = 0.0
+var _cambios_pendientes := false
+var _tiempo_sin_guardar := 0.0
 
 
-func agregar_pr(cantidad: int )-> void:
-	pr_sesion += cantidad
-	pr_actualizado.emit(pr_sesion)
+func _ready() -> void:
+	cargar()
+	sesion += 1
+	_aplicar_degradacion_por_inactividad(Time.get_unix_time_from_system())
+	guardar()
+
+
+func _process(delta: float) -> void:
+	if not _cambios_pendientes:
+		return
+	_tiempo_sin_guardar += delta
+	if _tiempo_sin_guardar >= SEGUNDOS_ENTRE_GUARDADOS:
+		guardar()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
+		guardar()
+
+
+# --- Biomas -------------------------------------------------------------------
+
+func estado_bioma(id_bioma: int) -> Dictionary:
+	var clave := str(id_bioma)
+	if not biomas.has(clave):
+		biomas[clave] = {
+			"pr": PR_INICIAL,
+			"salud": 0.0,
+			"celdas": {},
+			"fauna": [],
+			"bloqueadores_iniciales": 0,
+			"fauna_total": 0,
+			"niebla_pendiente": 0,
+		}
+	return biomas[clave]
+
+
+func nombre_bioma(id_bioma: int) -> String:
+	return NOMBRES_BIOMAS.get(id_bioma, "Bioma %d" % id_bioma)
+
+
+func esta_desbloqueado(id_bioma: int) -> bool:
+	return desbloqueados.has(id_bioma)
+
+
+func bioma_anterior(id_bioma: int) -> int:
+	var i := ORDEN_BIOMAS.find(id_bioma)
+	return ORDEN_BIOMAS[i - 1] if i > 0 else -1
+
+
+func salud(id_bioma: int) -> float:
+	return float(estado_bioma(id_bioma).get("salud", 0.0))
+
+
+## Salud 0-100 derivada del estado de la grilla: niebla despejada, bloqueadores retirados,
+## vitalidad de la flora plantada y fauna presente.
+func calcular_salud(id_bioma: int) -> float:
+	var estado := estado_bioma(id_bioma)
+	var celdas: Dictionary = estado["celdas"]
+	var total := celdas.size()
+	if total == 0:
+		return 0.0
+
+	var con_niebla := 0
+	var bloqueos := 0
+	var vitalidad := 0.0
+	for clave in celdas:
+		var c: Dictionary = celdas[clave]
+		if str(c.get("b", "")) != "":
+			bloqueos += 1
+		if c.get("n", false):
+			con_niebla += 1
+			continue
+		if int(c.get("e", 0)) > 0:
+			vitalidad += float(c.get("c", 0.0)) * (0.3 if c.get("m", false) else 1.0)
+	con_niebla = mini(total, con_niebla + int(estado.get("niebla_pendiente", 0)))
+
+	var despeje := 1.0 - float(con_niebla) / total
+	var iniciales := int(estado.get("bloqueadores_iniciales", 0))
+	var limpieza := 1.0 if iniciales == 0 else clampf(1.0 - float(bloqueos) / iniciales, 0.0, 1.0)
+	var flora := clampf(vitalidad / meta_flora(total), 0.0, 1.0)
+	var fauna_total := int(estado.get("fauna_total", 0))
+	var peso_flora := PESO_FLORA
+	var fauna := 0.0
+	if fauna_total > 0:
+		fauna = clampf(float((estado["fauna"] as Array).size()) / fauna_total, 0.0, 1.0)
+	else:
+		peso_flora += PESO_FAUNA
+	var resultado := despeje * PESO_DESPEJE + limpieza * PESO_LIMPIEZA + flora * peso_flora
+	if fauna_total > 0:
+		resultado += fauna * PESO_FAUNA
+	return clampf(resultado, 0.0, 100.0)
+
+
+## Cantidad de plantas adultas sanas para completar el componente de flora de la salud.
+func meta_flora(total_celdas: int) -> float:
+	return clampf(total_celdas * 0.08, 6.0, 20.0)
+
+
+func actualizar_salud(id_bioma: int) -> float:
+	var valor := calcular_salud(id_bioma)
+	var estado := estado_bioma(id_bioma)
+	if absf(valor - float(estado.get("salud", 0.0))) > 0.01:
+		estado["salud"] = valor
+		marcar_cambios()
+	salud_actualizada.emit(id_bioma, valor)
+	if valor >= UMBRAL_DESBLOQUEO:
+		_desbloquear_siguiente(id_bioma)
+	return valor
+
+
+func _desbloquear_siguiente(id_bioma: int) -> void:
+	var i := ORDEN_BIOMAS.find(id_bioma)
+	if i < 0 or i + 1 >= ORDEN_BIOMAS.size():
+		return
+	var siguiente := ORDEN_BIOMAS[i + 1]
+	if desbloqueados.has(siguiente):
+		return
+	desbloqueados.append(siguiente)
+	marcar_cambios()
+	bioma_desbloqueado.emit(siguiente)
+
+
+# --- Economía (PR locales por bioma) -----------------------------------------------
+
+func obtener_pr(id_bioma: int = -1) -> int:
+	if id_bioma < 0:
+		id_bioma = bioma_actual_id
+	return int(estado_bioma(id_bioma).get("pr", 0))
+
+
+func agregar_pr(cantidad: int, id_bioma: int = -1) -> void:
+	if id_bioma < 0:
+		id_bioma = bioma_actual_id
+	if id_bioma < 0:
+		return
+	var estado := estado_bioma(id_bioma)
+	estado["pr"] = obtener_pr(id_bioma) + cantidad
+	marcar_cambios()
+	pr_actualizado.emit(id_bioma, int(estado["pr"]))
+
+
+func gastar_pr(cantidad: int, id_bioma: int = -1) -> bool:
+	if id_bioma < 0:
+		id_bioma = bioma_actual_id
+	if obtener_pr(id_bioma) < cantidad:
+		return false
+	agregar_pr(-cantidad, id_bioma)
+	return true
+
+
+# --- Biopedia y repetición espaciada -------------------------------------------------
+
+func esta_descubierta(id_especie: int) -> bool:
+	return descubiertas.has(str(id_especie))
+
+
+## Registra el primer avistamiento y programa las validaciones de 24 h, 3 y 7 días.
+func descubrir_especie(data: EspecieData) -> bool:
+	if data == null or esta_descubierta(data.id_especie):
+		return false
+	var clave := str(data.id_especie)
+	var ahora := Time.get_unix_time_from_system()
+	descubiertas[clave] = ahora
+	validaciones[clave] = {
+		"etapa": 0,
+		"proxima": ahora + INTERVALOS_REPASO_DIAS[0] * SEGUNDOS_DIA,
+		"sesion_bloqueada": -1,
+	}
+	marcar_cambios()
+	especie_descubierta.emit(data)
+	repasos_actualizados.emit()
+	return true
+
+
+func etapa_validacion(id_especie: int) -> int:
+	return int(validaciones.get(str(id_especie), {}).get("etapa", 0))
+
+
+func proximo_repaso(id_especie: int) -> float:
+	return float(validaciones.get(str(id_especie), {}).get("proxima", 0.0))
+
+
+func repasos_pendientes() -> Array[int]:
+	var resultado: Array[int] = []
+	var ahora := Time.get_unix_time_from_system()
+	for clave in validaciones:
+		var v: Dictionary = validaciones[clave]
+		if int(v["etapa"]) >= INTERVALOS_REPASO_DIAS.size():
+			continue
+		if ahora >= float(v["proxima"]) and int(v.get("sesion_bloqueada", -1)) < sesion:
+			resultado.append(int(clave))
+	resultado.sort()
+	return resultado
+
+
+## Acierto: avanza la validación. Error: sin castigo, se reprograma para la próxima sesión.
+func registrar_repaso(id_especie: int, correcta: bool) -> void:
+	var clave := str(id_especie)
+	if not validaciones.has(clave):
+		return
+	var v: Dictionary = validaciones[clave]
+	if correcta:
+		var etapa := int(v["etapa"]) + 1
+		v["etapa"] = etapa
+		if etapa < INTERVALOS_REPASO_DIAS.size():
+			var ahora := Time.get_unix_time_from_system()
+			var desde_avistamiento := float(descubiertas.get(clave, ahora)) + INTERVALOS_REPASO_DIAS[etapa] * SEGUNDOS_DIA
+			var espera_minima := (INTERVALOS_REPASO_DIAS[etapa] - INTERVALOS_REPASO_DIAS[etapa - 1]) * SEGUNDOS_DIA
+			v["proxima"] = maxf(desde_avistamiento, ahora + espera_minima)
+	else:
+		v["sesion_bloqueada"] = sesion
+	marcar_cambios()
+	repasos_actualizados.emit()
+
+
+# --- Degradación por abandono ---------------------------------------------------------
+
+func _aplicar_degradacion_por_inactividad(ahora: float) -> void:
+	informe_degradacion.clear()
+	dias_inactivo = 0
+	if _ultima_sesion <= 0.0:
+		return
+	dias_inactivo = int((ahora - _ultima_sesion) / SEGUNDOS_DIA)
+	if dias_inactivo <= DIAS_DE_GRACIA:
+		return
+
+	var severidad := mini(dias_inactivo - DIAS_DE_GRACIA, MAX_SEVERIDAD)
+	var prob_marchitar := minf(0.9, 0.25 * severidad)
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	for clave in biomas:
+		var estado: Dictionary = biomas[clave]
+		var celdas: Dictionary = estado.get("celdas", {})
+		if celdas.is_empty():
+			continue
+		var marchitas := 0
+		for k in celdas:
+			var c: Dictionary = celdas[k]
+			if int(c.get("e", 0)) > 0 and not c.get("m", false) and rng.randf() < prob_marchitar:
+				c["m"] = true
+				marchitas += 1
+		var fauna: Array = estado.get("fauna", [])
+		var se_fueron := fauna.size()
+		fauna.clear()
+		var niebla := 3 * severidad
+		estado["niebla_pendiente"] = int(estado.get("niebla_pendiente", 0)) + niebla
+		var antes := float(estado.get("salud", 0.0))
+		estado["salud"] = calcular_salud(int(clave))
+
+		var partes: Array[String] = []
+		if marchitas > 0:
+			partes.append("%d plantas se marchitaron" % marchitas)
+		if se_fueron > 0:
+			partes.append("%d especies de fauna abandonaron el refugio" % se_fueron)
+		partes.append("la Niebla del Olvido avanzó sobre %d parcelas" % niebla)
+		informe_degradacion.append("• %s: %s (salud %d%% → %d%%)." % [
+			nombre_bioma(int(clave)), ", ".join(PackedStringArray(partes)), int(antes), int(estado["salud"])])
+	marcar_cambios()
+
+
+## Herramienta de desarrollo: simula que pasaron `dias` sin jugar (degradación y repasos vencidos).
+func simular_inactividad(dias: int) -> void:
+	var desplazamiento := float(dias * SEGUNDOS_DIA)
+	for clave in descubiertas:
+		descubiertas[clave] = float(descubiertas[clave]) - desplazamiento
+	for clave in validaciones:
+		validaciones[clave]["proxima"] = float(validaciones[clave]["proxima"]) - desplazamiento
+	var ahora := Time.get_unix_time_from_system()
+	_ultima_sesion = ahora - desplazamiento
+	sesion += 1
+	_aplicar_degradacion_por_inactividad(ahora)
+	repasos_actualizados.emit()
+	guardar()
+
+
+# --- Persistencia -------------------------------------------------------------------
+
+## Borra todo el progreso y vuelve a cargar la escena principal desde cero.
+func reiniciar_partida() -> void:
+	biomas = {}
+	descubiertas = {}
+	validaciones = {}
+	desbloqueados = [ORDEN_BIOMAS[0]]
+	ultimo_bioma = -1
+	bioma_actual_id = -1
+	especie_para_plantar = null
+	herramienta_activa = "identificar"
+	sesion = 1
+	primera_partida = true
+	informe_degradacion.clear()
+	dias_inactivo = 0
+	var trivia := get_node_or_null("/root/TriviaManager")
+	if trivia:
+		trivia.reiniciar()
+	datos_trivia = {}
+	guardar()
+	get_tree().reload_current_scene()
+
+
+func marcar_cambios() -> void:
+	_cambios_pendientes = true
+
+
+func guardar() -> void:
+	var trivia := get_node_or_null("/root/TriviaManager")
+	if trivia:
+		datos_trivia = trivia.exportar()
+	_ultima_sesion = Time.get_unix_time_from_system()
+	var datos := {
+		"version": 1,
+		"ultima_sesion": _ultima_sesion,
+		"sesion": sesion,
+		"primera_partida": primera_partida,
+		"ultimo_bioma": ultimo_bioma,
+		"desbloqueados": desbloqueados,
+		"biomas": biomas,
+		"descubiertas": descubiertas,
+		"validaciones": validaciones,
+		"trivia": datos_trivia,
+	}
+	var archivo := FileAccess.open(RUTA_GUARDADO, FileAccess.WRITE)
+	if archivo == null:
+		push_error("[GameState] No se pudo guardar la partida: %s" % error_string(FileAccess.get_open_error()))
+		return
+	archivo.store_string(JSON.stringify(datos))
+	archivo.close()
+	_cambios_pendientes = false
+	_tiempo_sin_guardar = 0.0
+
+
+func cargar() -> void:
+	desbloqueados = [ORDEN_BIOMAS[0]]
+	if not FileAccess.file_exists(RUTA_GUARDADO):
+		return
+	var datos = JSON.parse_string(FileAccess.get_file_as_string(RUTA_GUARDADO))
+	if not (datos is Dictionary):
+		push_warning("[GameState] Guardado ilegible, se inicia una partida nueva.")
+		return
+
+	_ultima_sesion = float(datos.get("ultima_sesion", 0.0))
+	sesion = int(datos.get("sesion", 0))
+	primera_partida = bool(datos.get("primera_partida", true))
+	ultimo_bioma = int(datos.get("ultimo_bioma", -1))
+	for id in datos.get("desbloqueados", []):
+		if not desbloqueados.has(int(id)):
+			desbloqueados.append(int(id))
+	biomas = datos.get("biomas", {})
+	descubiertas = datos.get("descubiertas", {})
+	validaciones = datos.get("validaciones", {})
+	datos_trivia = datos.get("trivia", {})
+
+	# JSON guarda todos los números como float: normalizamos los que se usan como enteros.
+	for clave in biomas:
+		var estado: Dictionary = biomas[clave]
+		var fauna: Array = []
+		for id in estado.get("fauna", []):
+			fauna.append(int(id))
+		estado["fauna"] = fauna
+		estado["pr"] = int(estado.get("pr", PR_INICIAL))
+		for k in estado.get("celdas", {}):
+			var c: Dictionary = estado["celdas"][k]
+			c["e"] = int(c.get("e", 0))
+	for clave in validaciones:
+		var v: Dictionary = validaciones[clave]
+		v["etapa"] = int(v.get("etapa", 0))
+		v["sesion_bloqueada"] = int(v.get("sesion_bloqueada", -1))

@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://tpcbfqf2n1fg"
+path="res://.godot/imported/mapa_2.aseprite-453197d8bfdbde4146ee2b3d03198ed2.res"
+
+[deps]
+
+source_file="res://Assets/tilesets/mapa_2.aseprite"
+dest_files=["res://.godot/imported/mapa_2.aseprite-453197d8bfdbde4146ee2b3d03198ed2.res"]
+
+[params]
+

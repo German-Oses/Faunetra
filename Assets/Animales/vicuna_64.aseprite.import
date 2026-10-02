@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://iyemgcbteka7"
+path="res://.godot/imported/vicuna_64.aseprite-0a4a4da6eeec8aa6798a0eac1067b82a.res"
+
+[deps]
+
+source_file="res://Assets/Animales/vicuna_64.aseprite"
+dest_files=["res://.godot/imported/vicuna_64.aseprite-0a4a4da6eeec8aa6798a0eac1067b82a.res"]
+
+[params]
+

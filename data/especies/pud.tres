@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://e480c79e740c"]
+[gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://e480c8ae740c"]
 
 [ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+[ext_resource type="PackedScene" path="res://entities/especies/animales/pudu.tscn" id="2_escena"]
 
 [resource]
 script = ExtResource("1_n7w5m")
@@ -10,6 +11,6 @@ nombre_comun = "Pudú"
 tipo = "vertebrado"
 estado_conservacion = "VU"
 rol_ecologico = "Ciervo enano de sotobosque denso. Requiere niveles altos de cobertura arbustiva para ocultarse."
-umbral_desbloqueo = 0
 id_bioma = 3
+escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://c4vxjwnjwds2m"
+path="res://.godot/imported/tileset_insular.aseprite-1164e1bef73ddc6730c98f47d95f5242.res"
+
+[deps]
+
+source_file="res://Assets/tilesets/tileset_insular.aseprite"
+dest_files=["res://.godot/imported/tileset_insular.aseprite-1164e1bef73ddc6730c98f47d95f5242.res"]
+
+[params]
+

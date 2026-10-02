@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://ih4561pykgcc"
+path="res://.godot/imported/escenas.aseprite-b5185d1a791ddc279f98ad3b9d71bb3a.res"
+
+[deps]
+
+source_file="res://Assets/UI/escenas.aseprite"
+dest_files=["res://.godot/imported/escenas.aseprite-b5185d1a791ddc279f98ad3b9d71bb3a.res"]
+
+[params]
+

@@ -3,7 +3,7 @@
     "id_trivia": "trivia_condor_01",
     "id_especie": 20,
     "nombre_especie": "Cóndor andino",
-    "id_bioma": 2,
+    "id_bioma": 1,
     "dificultad": "FACIL",
     "titulo_narrativo": "El Vigía de las Alturas",
     "situacion_narrativa": "Durante un día helado en la Cordillera de los Andes, te encuentras en un mirador rocoso rodeado de picos nevados. De pronto, una inmensa silueta proyecta su sombra sobre las rocas: un Cóndor andino desciende planeando serenamente sin mover sus gigantescas alas.",
@@ -31,9 +31,9 @@
   },
   {
     "id_trivia": "trivia_huemul_01",
-    "id_especie": 1,
+    "id_especie": 49,
     "nombre_especie": "Huemul",
-    "id_bioma": 1,
+    "id_bioma": 4,
     "dificultad": "MEDIO",
     "titulo_narrativo": "El Guardián Silencioso del Bosque",
     "situacion_narrativa": "Te adentras en la tupida vegetación de la Patagonia. El aire es húmedo y las hojas crujen bajo tus pies. De repente, entre los troncos de Nothofagus, divisas la figura elegante de un Huemul. Te mira fijamente sin huir, confiando en su mimetismo.",
@@ -61,9 +61,9 @@
   },
   {
     "id_trivia": "trivia_alerce_01",
-    "id_especie": 2,
+    "id_especie": 34,
     "nombre_especie": "Alerce",
-    "id_bioma": 1,
+    "id_bioma": 3,
     "dificultad": "DIFICIL",
     "titulo_narrativo": "El Gigante Milenario",
     "situacion_narrativa": "Te encuentras al pie de un tronco colosal en la selva valdiviana. Su corteza rojiza está cubierta de musgos y líquenes. Estás frente a un Alerce (*Fitzroya cupressoides*), un árbol que echó raíces miles de años atrás, presenciando la historia del planeta.",
@@ -91,9 +91,9 @@
   },
   {
     "id_trivia": "trivia_loro_tricahue_01",
-    "id_especie": 3,
+    "id_especie": 31,
     "nombre_especie": "Loro tricahue",
-    "id_bioma": 3,
+    "id_bioma": 1,
     "dificultad": "FACIL",
     "titulo_narrativo": "El Bullicio en la Quebrada",
     "situacion_narrativa": "Al aproximarte a una pared de arcilla cerca de un río en la Zona Central, escuchas un potente coro de graznidos. Decenas de Loros Tricahue de brillantes plumajes verde, amarillo y azul vuelan en bandada hacia las barrancas.",
@@ -118,5 +118,545 @@
     ],
     "recompensa_xp": 50,
     "insignia_id": "insignia_eco_gregario"
+  },
+  {
+    "id_trivia": "bosque_pudu_01",
+    "id_especie": 33,
+    "nombre_especie": "Pudú",
+    "id_bioma": 3,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Un ciervo del tamaño de un perro",
+    "situacion_narrativa": "Entre las quilas escuchas un leve crujido. Un animal pequeño, de pelaje café rojizo y cuernos diminutos, te observa un segundo y desaparece en el sotobosque.",
+    "pregunta": "¿Qué especie acabas de ver y qué la hace única?",
+    "pista_narrativa": "Es un ciervo, pero apenas mide unos 40 cm de alto.",
+    "opciones": [
+      {
+        "texto": "El Pudú, uno de los ciervos más pequeños del mundo.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Exacto! El Pudú mide cerca de 40 cm a la cruz y depende del sotobosque denso para esconderse de sus depredadores."
+      },
+      {
+        "texto": "El Huemul, el ciervo más grande de Chile.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Huemul vive más al sur y en laderas andinas; es mucho más grande. Lo que viste era un Pudú."
+      },
+      {
+        "texto": "Una cría de guanaco perdida en el bosque.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Los guanacos no tienen cuernos y viven en zonas abiertas. Este pequeño ciervo es el Pudú."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": "insignia_amigo_del_pudu"
+  },
+  {
+    "id_trivia": "bosque_pudu_02",
+    "id_especie": 33,
+    "nombre_especie": "Pudú",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "El escondite del Pudú",
+    "situacion_narrativa": "Una empresa quiere despejar el sotobosque de quila para abrir un camino. El guardaparques te pide un argumento para protegerlo.",
+    "pregunta": "¿Por qué la quila y los arbustos densos son vitales para el Pudú?",
+    "pista_narrativa": "Piensa en cómo huye un animal pequeño cuando aparece un depredador.",
+    "opciones": [
+      {
+        "texto": "Porque le sirven de refugio: se oculta y escapa entre la vegetación densa.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Muy bien! Sin cobertura arbustiva el Pudú queda expuesto a perros y otros depredadores; por eso está clasificado como Vulnerable."
+      },
+      {
+        "texto": "Porque se alimenta exclusivamente de las raíces de la quila.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Pudú ramonea hojas, brotes y frutos de muchas plantas. La quila le importa sobre todo como refugio."
+      },
+      {
+        "texto": "Porque construye madrigueras bajo la quila para hibernar.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Pudú no hiberna ni cava madrigueras; usa la vegetación densa para ocultarse."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_rana_darwin_01",
+    "id_especie": 44,
+    "nombre_especie": "Rana de Darwin",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Un padre muy especial",
+    "situacion_narrativa": "Junto a un arroyo sombrío ves una ranita parecida a una hoja seca. Al acercarte notas que el macho tiene la garganta abultada… ¡y se mueve algo adentro!",
+    "pregunta": "¿Qué está ocurriendo dentro del saco vocal del macho de la Rana de Darwin?",
+    "pista_narrativa": "Es un cuidado parental muy poco común entre los anfibios.",
+    "opciones": [
+      {
+        "texto": "Está incubando a sus renacuajos hasta que salen convertidos en pequeñas ranas.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! El macho traga los huevos y los renacuajos se desarrollan en su saco vocal (neomelia). Es una especie En Peligro y un excelente bioindicador."
+      },
+      {
+        "texto": "Está almacenando insectos para el invierno.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No es una despensa: el macho protege a sus crías dentro del saco vocal."
+      },
+      {
+        "texto": "Está inflando el saco para asustar a los depredadores.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Aunque muchas ranas inflan su cuerpo, aquí el macho lleva a sus propios renacuajos."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": "insignia_guardian_de_anfibios"
+  },
+  {
+    "id_trivia": "bosque_rana_darwin_02",
+    "id_especie": 44,
+    "nombre_especie": "Rana de Darwin",
+    "id_bioma": 3,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "El termómetro del bosque",
+    "situacion_narrativa": "Un equipo científico monitorea las poblaciones de Rana de Darwin para evaluar la salud de todo el bosque.",
+    "pregunta": "¿Por qué los anfibios como la Rana de Darwin son buenos bioindicadores?",
+    "pista_narrativa": "Su piel es muy delgada y dependen del agua y la humedad.",
+    "opciones": [
+      {
+        "texto": "Su piel permeable los hace muy sensibles a contaminantes, cambios de humedad y enfermedades, así que sus poblaciones reflejan rápidamente el deterioro del ecosistema.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente! Cuando los anfibios declinan, suele ser la primera señal de que algo anda mal en el bosque."
+      },
+      {
+        "texto": "Porque son los depredadores tope de la cadena trófica.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Los anfibios son presas y depredadores intermedios; su valor como indicadores viene de su sensibilidad ambiental."
+      },
+      {
+        "texto": "Porque viven más de cien años y acumulan información del ambiente.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Viven pocos años. Su utilidad está en su sensibilidad, no en su longevidad."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_zorro_chiloe_01",
+    "id_especie": 35,
+    "nombre_especie": "Zorro de Chiloé / Darwin",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "El zorro que describió Darwin",
+    "situacion_narrativa": "En 1834 Charles Darwin observó en Chiloé un zorro pequeño y oscuro. Hoy sobrevive en muy pocos lugares.",
+    "pregunta": "¿Cuál es una de las principales amenazas actuales del Zorro de Chiloé?",
+    "pista_narrativa": "Piensa en animales domésticos que se mueven libres por el bosque.",
+    "opciones": [
+      {
+        "texto": "Los perros sin control, que lo atacan y le transmiten enfermedades, junto con la pérdida de bosque nativo.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! El Zorro de Chiloé está En Peligro: vive en Chiloé y la cordillera de Nahuelbuta, y sufre por perros asilvestrados y la fragmentación del bosque."
+      },
+      {
+        "texto": "La competencia con los pingüinos por el alimento.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No comparte hábitat ni dieta con los pingüinos. Sus amenazas vienen de perros y pérdida de hábitat."
+      },
+      {
+        "texto": "El exceso de lluvias del sur de Chile.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es una especie adaptada al bosque lluvioso; el problema son las perturbaciones humanas."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_loro_choroy_01",
+    "id_especie": 45,
+    "nombre_especie": "Loro choroy",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Un pico hecho a la medida",
+    "situacion_narrativa": "Una bandada ruidosa de loros verdes se posa en la copa de los árboles. Con sus picos curvos y alargados abren conos y frutos con destreza.",
+    "pregunta": "¿Qué rol ecológico cumple el Loro choroy?",
+    "pista_narrativa": "Fíjate en lo que hacen con las semillas que no se comen.",
+    "opciones": [
+      {
+        "texto": "Dispersa semillas de árboles nativos al abrir conos y frutos y dejar caer parte de ellas lejos del árbol.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Así es! Su pico largo le permite extraer semillas, y en el proceso ayuda a regenerar el bosque."
+      },
+      {
+        "texto": "Poliniza las flores de la quila durante la noche.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El choroy es diurno y se alimenta de semillas y frutos; no es polinizador nocturno."
+      },
+      {
+        "texto": "Controla las plagas de roedores cazándolos.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es un ave granívora-frugívora, no un depredador de roedores."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_alerce_01",
+    "id_especie": 34,
+    "nombre_especie": "Alerce",
+    "id_bioma": 3,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "El abuelo del bosque",
+    "situacion_narrativa": "Frente a ti se alza un árbol enorme de corteza rojiza y fibrosa. El guardaparques te cuenta que algunos alerces tienen miles de años.",
+    "pregunta": "¿Por qué el Alerce es un símbolo de la conservación en Chile?",
+    "pista_narrativa": "Es uno de los árboles más longevos del planeta y crece muy lento.",
+    "opciones": [
+      {
+        "texto": "Puede vivir más de 3.600 años, crece muy lentamente y fue sobreexplotado por su madera; hoy es Monumento Natural.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Por su lentitud de crecimiento, un alerce talado tarda milenios en reemplazarse. Por eso está protegido."
+      },
+      {
+        "texto": "Porque es un árbol invasor traído desde Europa.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Alerce es nativo del sur de Chile y Argentina; no es invasor."
+      },
+      {
+        "texto": "Porque florece una vez al año con flores gigantes.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Alerce es una conífera: no tiene flores vistosas. Su importancia está en su longevidad."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": "insignia_guardian_milenario"
+  },
+  {
+    "id_trivia": "bosque_luma_01",
+    "id_especie": 48,
+    "nombre_especie": "Luma",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Frutos para las aves",
+    "situacion_narrativa": "En otoño los árboles de Luma se cargan de pequeños frutos oscuros y el bosque se llena de aves.",
+    "pregunta": "¿Qué importancia tiene la Luma para la fauna del bosque?",
+    "pista_narrativa": "Revisa su ficha: es una mirtácea melífera.",
+    "opciones": [
+      {
+        "texto": "Sus flores alimentan a insectos polinizadores y sus frutos sustentan a las aves en otoño.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Bien! La Luma es una fuente clave de néctar y frutos; además su madera es muy dura."
+      },
+      {
+        "texto": "Libera una toxina que ahuyenta a las aves.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Al contrario: sus frutos atraen a las aves, que dispersan sus semillas."
+      },
+      {
+        "texto": "Solo sirve como soporte para enredaderas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Su rol es mucho mayor: es una especie melífera y productora de frutos."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_arrayan_01",
+    "id_especie": 47,
+    "nombre_especie": "Arrayán",
+    "id_bioma": 3,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "La corteza color canela",
+    "situacion_narrativa": "A orillas del río ves árboles de tronco liso y anaranjado que brilla con la luz.",
+    "pregunta": "¿Qué árbol nativo reconoces por su corteza anaranjada y dónde suele crecer?",
+    "pista_narrativa": "Es una mirtácea pariente de la Luma.",
+    "opciones": [
+      {
+        "texto": "El Arrayán, que crece en riberas y suelos húmedos, ayudando a estabilizar los cauces.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Exacto! Sus raíces protegen las orillas y su corteza canela es inconfundible."
+      },
+      {
+        "texto": "El Alerce, que crece en dunas secas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Alerce tiene corteza rojiza fibrosa y crece en zonas húmedas de altura; el tronco liso anaranjado es del Arrayán."
+      },
+      {
+        "texto": "El Pino insigne, que crece junto a los ríos.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Pino insigne es una especie exótica; el árbol nativo de corteza canela es el Arrayán."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_quila_01",
+    "id_especie": 46,
+    "nombre_especie": "Quila",
+    "id_bioma": 3,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "La floración de la quila",
+    "situacion_narrativa": "Los habitantes del sur recuerdan años en que la quila floreció masivamente y, poco después, aparecieron plagas de ratones.",
+    "pregunta": "¿Por qué la floración masiva de la quila puede provocar una 'ratada'?",
+    "pista_narrativa": "Piensa en qué pasa con la población de un consumidor cuando su alimento se multiplica de golpe.",
+    "opciones": [
+      {
+        "texto": "Porque la quila florece de forma sincronizada tras varias décadas y produce enormes cantidades de semillas; los roedores se alimentan de ellas y su población explota.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente análisis trófico! El pulso de alimento dispara la reproducción de los roedores; cuando las semillas se acaban, los ratones invaden otros lugares."
+      },
+      {
+        "texto": "Porque las flores de la quila son venenosas para los depredadores de ratones.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No hay evidencia de eso: la clave es el exceso de semillas disponibles para los roedores."
+      },
+      {
+        "texto": "Porque la quila se seca y los ratones pierden su refugio.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Aunque la quila muere tras florecer, la ratada se explica por la abundancia de semillas."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": "insignia_cadena_trofica"
+  },
+  {
+    "id_trivia": "bosque_hongo_01",
+    "id_especie": 40,
+    "nombre_especie": "Hongo subterráneo",
+    "id_bioma": 3,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "Un tesoro bajo tierra",
+    "situacion_narrativa": "Hurgando con cuidado entre la hojarasca encuentras un hongo que crece bajo el suelo, como una pequeña trufa.",
+    "pregunta": "¿Cómo se dispersan los hongos subterráneos y qué relación tienen con los árboles?",
+    "pista_narrativa": "No pueden liberar esporas al viento porque no salen a la superficie.",
+    "opciones": [
+      {
+        "texto": "Pequeños mamíferos los comen y dispersan sus esporas con sus fecas; además forman micorrizas que ayudan a las raíces de los árboles a absorber agua y nutrientes.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Es una red de intercambio: el hongo recibe azúcares del árbol, el árbol nutrientes del hongo y los roedores alimento."
+      },
+      {
+        "texto": "Se dispersan con el viento cuando llueve fuerte.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Al estar bajo tierra dependen de animales que los desentierran y comen."
+      },
+      {
+        "texto": "Son parásitos que matan a los árboles cercanos.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Son aliados: forman micorrizas beneficiosas con las raíces."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_mosca_01",
+    "id_especie": 43,
+    "nombre_especie": "Mosca florícola valdiviana",
+    "id_bioma": 3,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "¿Avispa o mosca?",
+    "situacion_narrativa": "Un insecto con franjas amarillas y negras revolotea entre las flores. Parece una avispa, pero tiene solo un par de alas.",
+    "pregunta": "¿Por qué la Mosca florícola valdiviana se parece a una avispa?",
+    "pista_narrativa": "Parecerse a un animal peligroso puede ser una buena defensa.",
+    "opciones": [
+      {
+        "texto": "Es un caso de mimetismo: al imitar a una avispa, los depredadores la evitan aunque ella no pica.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Muy bien! Además es una polinizadora importante del bosque lluvioso."
+      },
+      {
+        "texto": "Porque es una avispa joven que aún no desarrolla su aguijón.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es una mosca (díptero), no una avispa: tiene un solo par de alas."
+      },
+      {
+        "texto": "Porque las franjas le permiten camuflarse en la nieve.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Las franjas amarillas y negras son una señal de advertencia que imita a las avispas."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_camaron_01",
+    "id_especie": 41,
+    "nombre_especie": "Camarón de vega",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Chimeneas en la vega",
+    "situacion_narrativa": "En un prado húmedo ves pequeñas torres de barro con un agujero en la punta, como chimeneas en miniatura.",
+    "pregunta": "¿Quién construye estas chimeneas y qué beneficio aportan al suelo?",
+    "pista_narrativa": "Es un crustáceo que excava hasta llegar a la napa de agua.",
+    "opciones": [
+      {
+        "texto": "El Camarón de vega, que al excavar sus galerías airea y remueve el suelo.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Sus túneles llegan al agua subterránea y mejoran la aireación y los nutrientes del suelo."
+      },
+      {
+        "texto": "Una colonia de hormigas que almacena agua.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Esas chimeneas de barro son obra del Camarón de vega."
+      },
+      {
+        "texto": "El Pudú, que marca su territorio.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El Pudú no construye estructuras. Las chimeneas son del Camarón de vega."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_huairavillo_01",
+    "id_especie": 42,
+    "nombre_especie": "Huairavillo",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Inmóvil entre los juncos",
+    "situacion_narrativa": "En un pajonal junto al agua, un ave pequeña estira el cuello y apunta el pico hacia el cielo, quedándose completamente quieta.",
+    "pregunta": "¿Por qué el Huairavillo adopta esta postura?",
+    "pista_narrativa": "Mira a su alrededor: está rodeado de juncos y totoras verticales.",
+    "opciones": [
+      {
+        "texto": "Para camuflarse entre la vegetación vertical y pasar desapercibido ante depredadores.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Así es! Sus rayas y la postura vertical lo confunden con los juncos. Se alimenta de peces pequeños e insectos acuáticos."
+      },
+      {
+        "texto": "Para calentarse con el sol.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La postura vertical es una estrategia de camuflaje, no de termorregulación."
+      },
+      {
+        "texto": "Para llamar a su pareja con un canto.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Aquí el ave se queda en silencio: busca pasar desapercibida."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_teresa_01",
+    "id_especie": 38,
+    "nombre_especie": "Teresa",
+    "id_bioma": 3,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Una planta de sombra",
+    "situacion_narrativa": "Bajo la sombra de grandes árboles descubres una pequeña hierba que solo crece donde el suelo está siempre húmedo.",
+    "pregunta": "¿Qué necesita la Teresa para sobrevivir?",
+    "pista_narrativa": "Su ficha dice que es higrófila.",
+    "opciones": [
+      {
+        "texto": "Sombra húmeda y continua bajo árboles de gran tamaño.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Si se tala el bosque que le da sombra, la Teresa desaparece; por eso está En Peligro."
+      },
+      {
+        "texto": "Pleno sol y suelos secos.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La Teresa es higrófila: necesita humedad y sombra."
+      },
+      {
+        "texto": "Crecer sobre las rocas de la costa.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Crece en el interior del bosque húmedo, no en la costa."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_pitao_01",
+    "id_especie": 37,
+    "nombre_especie": "Pitao",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Un árbol que casi desaparece",
+    "situacion_narrativa": "En la Cordillera de la Costa encuentras un Pitao, un árbol endémico de hojas aromáticas. Quedan muy pocos ejemplares.",
+    "pregunta": "¿Cuál es la principal causa de que el Pitao esté En Peligro?",
+    "pista_narrativa": "Piensa en qué reemplazó a gran parte del bosque nativo de la Cordillera de la Costa.",
+    "opciones": [
+      {
+        "texto": "La pérdida de su hábitat por el reemplazo del bosque nativo con plantaciones y usos agrícolas.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Sus poblaciones quedaron fragmentadas y pequeñas. Protegerlo también ayuda a los insectos que dependen de él."
+      },
+      {
+        "texto": "Los incendios provocados por volcanes en la costa.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La principal amenaza es la sustitución del bosque nativo por actividades humanas."
+      },
+      {
+        "texto": "La sobrepesca en los ríos cercanos.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La pesca no afecta directamente al Pitao; su problema es la pérdida de hábitat."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_callecalle_01",
+    "id_especie": 39,
+    "nombre_especie": "Calle-calle de Nahuelbuta",
+    "id_bioma": 3,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "Una cuna para anfibios",
+    "situacion_narrativa": "Entre matas de hojas largas y flores blancas escuchas el croar de pequeñas ranas.",
+    "pregunta": "¿Qué relación ecológica tiene la Calle-calle con los anfibios del bosque?",
+    "pista_narrativa": "Revisa su ficha: ofrece microhábitats.",
+    "opciones": [
+      {
+        "texto": "Sus matas crean microhábitats húmedos y protegidos donde anfibios terrestres, como la Rana de Darwin, pueden desovar.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente! Plantar Calle-calle en tu refugio ayuda a atraer anfibios."
+      },
+      {
+        "texto": "Es la presa principal de las ranas del bosque.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Las ranas comen insectos, no plantas. La Calle-calle les brinda refugio."
+      },
+      {
+        "texto": "Libera sustancias que alejan a las ranas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Al contrario: su follaje ofrece humedad y protección a los anfibios."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "bosque_rana_espinoso_01",
+    "id_especie": 36,
+    "nombre_especie": "Rana de pecho espinoso",
+    "id_bioma": 3,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Arroyos limpios",
+    "situacion_narrativa": "Una ladera se deforestó y la lluvia arrastró lodo hacia el arroyo donde vive la Rana de pecho espinoso.",
+    "pregunta": "¿Por qué este evento amenaza a la Rana de pecho espinoso?",
+    "pista_narrativa": "Su ficha dice que es sensible a los contaminantes del lodo.",
+    "opciones": [
+      {
+        "texto": "Porque depende de arroyos limpios de cordillera, y el sedimento y los contaminantes dañan su hábitat y a sus larvas.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Proteger la vegetación de las riberas evita la erosión y mantiene los arroyos limpios."
+      },
+      {
+        "texto": "Porque el lodo le sirve de alimento y se vuelve demasiado abundante.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El lodo no es su alimento; ensucia el agua y daña su hábitat."
+      },
+      {
+        "texto": "Porque las ranas no pueden nadar en agua turbia y se ahogan.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El problema no es ahogarse, sino la degradación del agua y del hábitat de sus larvas."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
   }
 ]

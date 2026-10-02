@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://ac8df52101e7"]
 
 [ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+[ext_resource type="PackedScene" path="res://entities/especies/animales/chinchilla_costina.tscn" id="2_escena"]
 
 [resource]
 script = ExtResource("1_n7w5m")
@@ -11,5 +12,6 @@ tipo = "vertebrado"
 estado_conservacion = "EN"
 rol_ecologico = "Roedor especialista de laderas semiáridas expuestas al sol. Atractora de carnívoros medianos."
 umbral_desbloqueo = 0
-id_bioma = 2
+id_bioma = 1
+escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

@@ -8,7 +8,8 @@ size = Vector2(64, 64)
 [node name="Especie" type="Node2D" unique_id=1097816329]
 script = ExtResource("1_especie")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=685855157]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=685855157]
+texture_filter = 1
 
 [node name="Area2D" type="Area2D" parent="." unique_id=2045439089]
 

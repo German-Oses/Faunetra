@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://c4kokf1jtudcr"
+path="res://.godot/imported/decoracion.aseprite-6c3958b05153727ce09ff7915e60977b.res"
+
+[deps]
+
+source_file="res://Assets/decoracion/decoracion.aseprite"
+dest_files=["res://.godot/imported/decoracion.aseprite-6c3958b05153727ce09ff7915e60977b.res"]
+
+[params]
+

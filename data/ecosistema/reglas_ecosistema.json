@@ -1,0 +1,300 @@
+{
+  "costos": {
+    "niebla": 20,
+    "sanar": 15
+  },
+  "costo_plantar_por_estado": {
+    "LC": 30,
+    "NT": 35,
+    "VU": 40,
+    "EN": 50,
+    "CR": 60,
+    "EW": 70
+  },
+  "bono_biodiversidad": 0.1,
+  "bloqueadores": {
+    "1": [
+      {
+        "id": "microbasural",
+        "nombre": "Microbasural",
+        "forma": "basura",
+        "costo": 35,
+        "color": "#7d6b55"
+      },
+      {
+        "id": "zarzamora",
+        "nombre": "Zarzamora (especie exótica invasora)",
+        "forma": "invasora",
+        "costo": 50,
+        "color": "#5e2f5a"
+      }
+    ],
+    "2": [
+      {
+        "id": "chatarra",
+        "nombre": "Chatarra y neumáticos abandonados",
+        "forma": "basura",
+        "costo": 40,
+        "color": "#5b5b5b"
+      },
+      {
+        "id": "tamarisco",
+        "nombre": "Tamarisco (especie exótica invasora)",
+        "forma": "invasora",
+        "costo": 50,
+        "color": "#8a5a6a"
+      }
+    ],
+    "3": [
+      {
+        "id": "microbasural",
+        "nombre": "Microbasural",
+        "forma": "basura",
+        "costo": 35,
+        "color": "#7d6b55"
+      },
+      {
+        "id": "pino",
+        "nombre": "Pino insigne (especie exótica invasora)",
+        "forma": "invasora",
+        "costo": 55,
+        "color": "#2c4a3a"
+      }
+    ],
+    "4": [
+      {
+        "id": "basura_campamento",
+        "nombre": "Basura de campamento",
+        "forma": "basura",
+        "costo": 35,
+        "color": "#6f6a60"
+      },
+      {
+        "id": "rosa_mosqueta",
+        "nombre": "Rosa mosqueta (especie exótica invasora)",
+        "forma": "invasora",
+        "costo": 50,
+        "color": "#9a3a3a"
+      }
+    ],
+    "5": [
+      {
+        "id": "plasticos",
+        "nombre": "Plásticos marinos",
+        "forma": "basura",
+        "costo": 40,
+        "color": "#4f7fa0"
+      },
+      {
+        "id": "maqui_invasor",
+        "nombre": "Maqui invasor (especie exótica en Juan Fernández)",
+        "forma": "invasora",
+        "costo": 55,
+        "color": "#3a2a4a"
+      }
+    ],
+    "default": [
+      {
+        "id": "microbasural",
+        "nombre": "Microbasural",
+        "forma": "basura",
+        "costo": 35,
+        "color": "#7d6b55"
+      }
+    ]
+  },
+  "sinergias": [
+    {
+      "fuente": "Peumo",
+      "objetivo": "Quillay",
+      "bono": 0.2,
+      "nombre": "Aura de Humedad"
+    },
+    {
+      "fuente": "Guayacán",
+      "objetivo": "Orquídea de la zona central",
+      "bono": 0.2,
+      "nombre": "Sombra protectora"
+    },
+    {
+      "fuente": "Palma chilena",
+      "objetivo": "Guayacán",
+      "bono": 0.15,
+      "nombre": "Dosel estructurador"
+    },
+    {
+      "fuente": "Queñoa de altura",
+      "objetivo": "Cactus de la costa norte",
+      "bono": 0.2,
+      "nombre": "Planta nodriza"
+    },
+    {
+      "fuente": "Queñoa de altura",
+      "objetivo": "Chayotillo del norte",
+      "bono": 0.2,
+      "nombre": "Planta nodriza"
+    },
+    {
+      "fuente": "Alerce",
+      "objetivo": "Teresa",
+      "bono": 0.25,
+      "nombre": "Sombra húmeda"
+    },
+    {
+      "fuente": "Alerce",
+      "objetivo": "Luma",
+      "bono": 0.2,
+      "nombre": "Aura de Humedad"
+    },
+    {
+      "fuente": "Alerce",
+      "objetivo": "Arrayán",
+      "bono": 0.2,
+      "nombre": "Aura de Humedad"
+    },
+    {
+      "fuente": "Luma",
+      "objetivo": "Arrayán",
+      "bono": 0.15,
+      "nombre": "Mirtáceas hermanas"
+    },
+    {
+      "fuente": "Arrayán",
+      "objetivo": "Luma",
+      "bono": 0.15,
+      "nombre": "Mirtáceas hermanas"
+    },
+    {
+      "fuente": "Luma",
+      "objetivo": "Quila",
+      "bono": 0.2,
+      "nombre": "Sotobosque protegido"
+    },
+    {
+      "fuente": "Luma",
+      "objetivo": "Hongo subterráneo",
+      "bono": 0.25,
+      "nombre": "Red micorrícica"
+    },
+    {
+      "fuente": "Pitao",
+      "objetivo": "Teresa",
+      "bono": 0.2,
+      "nombre": "Sombra húmeda"
+    },
+    {
+      "fuente": "Arrayán",
+      "objetivo": "Calle-calle de Nahuelbuta",
+      "bono": 0.2,
+      "nombre": "Ribera húmeda"
+    },
+    {
+      "fuente": "Lenga",
+      "objetivo": "Calafate",
+      "bono": 0.2,
+      "nombre": "Refugio del viento"
+    },
+    {
+      "fuente": "Luma de Juan Fernández",
+      "objetivo": "Toromiro (Rapa Nui)",
+      "bono": 0.15,
+      "nombre": "Aura de Humedad"
+    }
+  ],
+  "atracciones": [
+    {
+      "animal": "Loro tricahue",
+      "requiere": [
+        "Palma chilena",
+        "Guayacán"
+      ]
+    },
+    {
+      "animal": "Camarón de vega",
+      "requiere": [
+        "Arrayán"
+      ]
+    },
+    {
+      "animal": "Loro choroy",
+      "requiere": [
+        "Alerce",
+        "Luma"
+      ]
+    },
+    {
+      "animal": "Huairavillo",
+      "requiere": [
+        "Arrayán",
+        "Calle-calle de Nahuelbuta"
+      ]
+    },
+    {
+      "animal": "Pudú",
+      "requiere": [
+        "Quila",
+        "Arrayán"
+      ],
+      "min_salud": 20
+    },
+    {
+      "animal": "Mosca florícola valdiviana",
+      "requiere": [
+        "Pitao",
+        "Luma"
+      ],
+      "min_salud": 25
+    },
+    {
+      "animal": "Rana de pecho espinoso",
+      "requiere": [
+        "Calle-calle de Nahuelbuta",
+        "Arrayán"
+      ],
+      "min_salud": 35
+    },
+    {
+      "animal": "Rana de Darwin",
+      "requiere": [
+        "Calle-calle de Nahuelbuta",
+        "Alerce",
+        "Teresa"
+      ],
+      "min_salud": 45
+    },
+    {
+      "animal": "Zorro de Chiloé / Darwin",
+      "requiere": [
+        "Hongo subterráneo",
+        "Luma",
+        "Alerce"
+      ],
+      "min_salud": 60
+    },
+    {
+      "animal": "Huemul",
+      "requiere": [
+        "Lenga",
+        "Calafate"
+      ]
+    },
+    {
+      "animal": "Cometocino patagónico",
+      "requiere": [
+        "Calafate"
+      ]
+    },
+    {
+      "animal": "Vicuña",
+      "requiere": [
+        "Queñoa de altura"
+      ]
+    },
+    {
+      "animal": "Fardela de Juan Fernández",
+      "requiere": [
+        "Cortadera insular"
+      ]
+    }
+  ]
+}

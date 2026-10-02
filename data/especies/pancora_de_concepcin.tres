@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="EspecieData" format=3 uid="uid://59ed01140a0a"]
 
 [ext_resource type="Script" uid="uid://hj44annjt7bk" path="res://entities/especies/Especie_data.gd" id="1_n7w5m"]
+[ext_resource type="PackedScene" path="res://entities/especies/animales/pancora_de_concepcion.tscn" id="2_escena"]
 
 [resource]
 script = ExtResource("1_n7w5m")
@@ -11,5 +12,6 @@ tipo = "invertebrado"
 estado_conservacion = "EN"
 rol_ecologico = "Crustáceo dulceacuícola bentónico. Limpiador de microdetritos orgánicos en esteros de la zona central."
 umbral_desbloqueo = 0
-id_bioma = 2
+id_bioma = 1
+escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

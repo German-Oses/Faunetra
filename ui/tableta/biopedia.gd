@@ -1,0 +1,469 @@
+extends HBoxContainer
+
+## Biopedia: catálogo de especies nativas con filtros por bioma, búsqueda, tarjetas de
+## especies descubiertas (con check) y no descubiertas (silueta con candado) y una ficha
+## de detalle con estado de conservación, rol ecológico y relaciones ecológicas.
+## Con `solo_descubiertas = true` funciona como "Mis especies".
+
+const COLOR_SILUETA := Color(0.16, 0.2, 0.17, 0.85)
+const FILTROS := [
+	{"id": -1, "texto": "Todos", "icono": ""},
+	{"id": 2, "texto": "Norte Árido", "icono": "cactus"},
+	{"id": 1, "texto": "Zona Central", "icono": "arbol"},
+	{"id": 3, "texto": "Sur", "icono": "pino"},
+	{"id": 4, "texto": "Patagonia", "icono": "montana"},
+	{"id": 5, "texto": "Insular", "icono": "palmera"},
+]
+const COLORES_TIPO := {
+	"vertebrado": Color(0.55, 0.85, 0.5),
+	"ave": Color(0.55, 0.78, 0.95),
+	"planta": Color(0.25, 0.6, 0.3),
+	"hongo": Color(0.85, 0.65, 0.4),
+	"invertebrado": Color(0.95, 0.65, 0.3),
+}
+
+var solo_descubiertas := false
+
+var _filtro_bioma := -1
+var _contador: Label
+var _busqueda: LineEdit
+var _grilla_descubiertas: GridContainer
+var _grilla_ocultas: GridContainer
+var _titulo_ocultas: HBoxContainer
+var _detalle: VBoxContainer
+var _seleccionada: EspecieData
+var _botones_filtro: Array[Button] = []
+var _placeholders: Dictionary = {}
+
+
+func _ready() -> void:
+	theme = TemaFaunetra.obtener()
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	size_flags_vertical = Control.SIZE_EXPAND_FILL
+	add_theme_constant_override("separation", 12)
+
+	var izquierda := VBoxContainer.new()
+	izquierda.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	izquierda.size_flags_stretch_ratio = 1.5
+	izquierda.add_theme_constant_override("separation", 10)
+	add_child(izquierda)
+	izquierda.add_child(_crear_cabecera())
+	izquierda.add_child(_crear_filtros())
+
+	_busqueda = LineEdit.new()
+	_busqueda.placeholder_text = "Buscar especie…"
+	_busqueda.right_icon = TemaFaunetra.icono("lupa")
+	_busqueda.clear_button_enabled = true
+	_busqueda.text_changed.connect(func(_t: String) -> void: refrescar())
+	izquierda.add_child(_busqueda)
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	izquierda.add_child(scroll)
+	var listas := VBoxContainer.new()
+	listas.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	listas.add_theme_constant_override("separation", 8)
+	scroll.add_child(listas)
+	listas.add_child(_titulo_seccion("check", "Especies descubiertas"))
+	_grilla_descubiertas = _crear_grilla()
+	listas.add_child(_grilla_descubiertas)
+	_titulo_ocultas = _titulo_seccion("candado", "Especies no descubiertas")
+	listas.add_child(_titulo_ocultas)
+	_grilla_ocultas = _crear_grilla()
+	listas.add_child(_grilla_ocultas)
+
+	var panel_detalle := PanelContainer.new()
+	panel_detalle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	add_child(panel_detalle)
+	var scroll_detalle := ScrollContainer.new()
+	scroll_detalle.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel_detalle.add_child(scroll_detalle)
+	_detalle = VBoxContainer.new()
+	_detalle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_detalle.add_theme_constant_override("separation", 8)
+	scroll_detalle.add_child(_detalle)
+
+	GameState.especie_descubierta.connect(_on_especie_descubierta)
+	_seleccionar_filtro(-1)
+
+
+# --- Construcción -----------------------------------------------------------------------
+
+func _crear_cabecera() -> Control:
+	var fila := HBoxContainer.new()
+	fila.add_theme_constant_override("separation", 10)
+	var icono := TextureRect.new()
+	icono.texture = TemaFaunetra.icono("huella" if solo_descubiertas else "libro")
+	icono.custom_minimum_size = Vector2(48, 48)
+	icono.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	fila.add_child(icono)
+	var textos := VBoxContainer.new()
+	textos.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	textos.add_theme_constant_override("separation", 0)
+	var titulo := Label.new()
+	titulo.text = "Mis especies" if solo_descubiertas else "Biopedia"
+	titulo.add_theme_font_size_override("font_size", 26)
+	titulo.add_theme_color_override("font_color", TemaFaunetra.VERDE)
+	textos.add_child(titulo)
+	var subtitulo := Label.new()
+	subtitulo.text = "Las especies que ya conoces" if solo_descubiertas else "Catálogo de especies nativas de Chile"
+	subtitulo.add_theme_color_override("font_color", TemaFaunetra.TEXTO_SUAVE)
+	textos.add_child(subtitulo)
+	fila.add_child(textos)
+
+	var chip := PanelContainer.new()
+	chip.add_theme_stylebox_override("panel", TemaFaunetra.caja(Color.WHITE, TemaFaunetra.VERDE, 12, 2, 6))
+	var chip_fila := HBoxContainer.new()
+	chip.add_child(chip_fila)
+	var hoja := TextureRect.new()
+	hoja.texture = TemaFaunetra.icono("hoja")
+	hoja.custom_minimum_size = Vector2(28, 28)
+	hoja.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	chip_fila.add_child(hoja)
+	_contador = Label.new()
+	_contador.add_theme_color_override("font_color", TemaFaunetra.VERDE)
+	chip_fila.add_child(_contador)
+	fila.add_child(chip)
+	return fila
+
+
+func _crear_filtros() -> Control:
+	var fila := HBoxContainer.new()
+	fila.add_theme_constant_override("separation", 6)
+	var grupo := ButtonGroup.new()
+	for f in FILTROS:
+		var b := Button.new()
+		b.text = f["texto"]
+		b.toggle_mode = true
+		b.button_group = grupo
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if f["icono"] != "":
+			b.icon = TemaFaunetra.icono(f["icono"])
+			b.expand_icon = false
+		TemaFaunetra.estilizar_chip(b)
+		b.add_theme_font_size_override("font_size", 13)
+		b.pressed.connect(_seleccionar_filtro.bind(f["id"]))
+		b.set_meta("id_bioma", f["id"])
+		fila.add_child(b)
+		_botones_filtro.append(b)
+	return fila
+
+
+func _titulo_seccion(icono: String, texto: String) -> HBoxContainer:
+	var fila := HBoxContainer.new()
+	var t := TextureRect.new()
+	t.texture = TemaFaunetra.icono(icono)
+	t.custom_minimum_size = Vector2(22, 22)
+	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	fila.add_child(t)
+	var l := Label.new()
+	l.text = texto
+	l.add_theme_font_size_override("font_size", 17)
+	fila.add_child(l)
+	return fila
+
+
+func _crear_grilla() -> GridContainer:
+	var g := GridContainer.new()
+	g.columns = 5
+	g.add_theme_constant_override("h_separation", 8)
+	g.add_theme_constant_override("v_separation", 8)
+	return g
+
+
+# --- Datos ---------------------------------------------------------------------------------
+
+func _seleccionar_filtro(id_bioma: int) -> void:
+	_filtro_bioma = id_bioma
+	for b in _botones_filtro:
+		b.set_pressed_no_signal(int(b.get_meta("id_bioma")) == id_bioma)
+	refrescar()
+
+
+## Abre la Biopedia directamente en una especie (filtrando por su bioma).
+func mostrar_especie(data: EspecieData) -> void:
+	_seleccionada = data
+	_busqueda.text = ""
+	_seleccionar_filtro(data.id_bioma)
+
+
+func _on_especie_descubierta(_data: EspecieData) -> void:
+	if is_visible_in_tree():
+		refrescar()
+
+
+func refrescar() -> void:
+	for g in [_grilla_descubiertas, _grilla_ocultas]:
+		for hijo in g.get_children():
+			hijo.queue_free()
+
+	var texto := ReglasEcosistema.normalizar(_busqueda.text)
+	var total := 0
+	var conocidas := 0
+	var visibles: Array[EspecieData] = []
+	for data in EspecieLoader.cargar_todas():
+		if _filtro_bioma >= 0 and data.id_bioma != _filtro_bioma:
+			continue
+		total += 1
+		var conocida := GameState.esta_descubierta(data.id_especie)
+		if conocida:
+			conocidas += 1
+		elif solo_descubiertas:
+			continue
+		# Solo se puede buscar por nombre lo que ya se conoce.
+		if texto != "" and not (conocida and (ReglasEcosistema.normalizar(data.nombre_comun).contains(texto)
+				or ReglasEcosistema.normalizar(data.nombre_cientifico).contains(texto))):
+			continue
+		visibles.append(data)
+		(_grilla_descubiertas if conocida else _grilla_ocultas).add_child(_crear_tarjeta(data, conocida))
+
+	_contador.text = "%d/%d descubiertas" % [conocidas, total]
+	_titulo_ocultas.visible = not solo_descubiertas and _grilla_ocultas.get_child_count() > 0
+	_grilla_ocultas.visible = _titulo_ocultas.visible
+	if _seleccionada and visibles.has(_seleccionada):
+		_mostrar_detalle(_seleccionada)
+	elif not visibles.is_empty():
+		_mostrar_detalle(visibles[0])
+	else:
+		_limpiar_detalle()
+		var vacio := Label.new()
+		vacio.text = "Aún no hay especies aquí. ¡Explora, planta y responde trivias para descubrirlas!"
+		vacio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_detalle.add_child(vacio)
+
+
+func _crear_tarjeta(data: EspecieData, conocida: bool) -> Button:
+	var boton := Button.new()
+	boton.custom_minimum_size = Vector2(104, 112)
+	boton.toggle_mode = true
+	boton.set_pressed_no_signal(data == _seleccionada)
+	TemaFaunetra.estilizar_chip(boton)
+	var fondo: Color = TemaFaunetra.COLOR_BIOMA.get(data.id_bioma, Color.WHITE) if conocida else TemaFaunetra.CREMA_OSCURA
+	boton.add_theme_stylebox_override("normal", TemaFaunetra.caja(fondo, TemaFaunetra.BORDE, 12, 2, 6))
+	boton.add_theme_stylebox_override("pressed", TemaFaunetra.caja(fondo, TemaFaunetra.VERDE, 12, 3, 6))
+	boton.add_theme_stylebox_override("hover_pressed", TemaFaunetra.caja(fondo, TemaFaunetra.VERDE, 12, 3, 6))
+	boton.add_theme_color_override("font_pressed_color", TemaFaunetra.TEXTO)
+	boton.add_theme_color_override("font_hover_pressed_color", TemaFaunetra.TEXTO)
+	boton.pressed.connect(_mostrar_detalle.bind(data))
+	boton.set_meta("id_especie", data.id_especie)
+
+	var caja := VBoxContainer.new()
+	caja.set_anchors_preset(Control.PRESET_FULL_RECT)
+	caja.offset_left = 6
+	caja.offset_right = -6
+	caja.offset_top = 6
+	caja.offset_bottom = -6
+	caja.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	boton.add_child(caja)
+	var imagen := TextureRect.new()
+	imagen.texture = _imagen_de(data)
+	imagen.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	imagen.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	imagen.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	imagen.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not conocida:
+		imagen.modulate = COLOR_SILUETA
+	caja.add_child(imagen)
+	var nombre := Label.new()
+	nombre.text = data.nombre_comun if conocida else "???"
+	nombre.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	nombre.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nombre.add_theme_font_size_override("font_size", 12)
+	nombre.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	caja.add_child(nombre)
+
+	var insignia := TextureRect.new()
+	insignia.texture = TemaFaunetra.icono("check" if conocida else "candado")
+	insignia.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	insignia.custom_minimum_size = Vector2(22, 22)
+	insignia.size = Vector2(22, 22)
+	insignia.position = Vector2(76, 4)
+	insignia.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	boton.add_child(insignia)
+	return boton
+
+
+# --- Ficha de detalle --------------------------------------------------------------------
+
+func _limpiar_detalle() -> void:
+	for hijo in _detalle.get_children():
+		_detalle.remove_child(hijo)
+		hijo.queue_free()
+
+
+func _mostrar_detalle(data: EspecieData) -> void:
+	_seleccionada = data
+	for g in [_grilla_descubiertas, _grilla_ocultas]:
+		for tarjeta in g.get_children():
+			(tarjeta as Button).set_pressed_no_signal(int(tarjeta.get_meta("id_especie", -1)) == data.id_especie)
+	_limpiar_detalle()
+	var conocida := GameState.esta_descubierta(data.id_especie)
+	var flora := EspecieLoader.es_flora(data)
+
+	var cabecera := HBoxContainer.new()
+	cabecera.add_theme_constant_override("separation", 12)
+	_detalle.add_child(cabecera)
+	var marco := PanelContainer.new()
+	marco.add_theme_stylebox_override("panel", TemaFaunetra.caja(TemaFaunetra.COLOR_BIOMA.get(data.id_bioma, Color.WHITE), TemaFaunetra.BORDE, 12, 2, 6))
+	cabecera.add_child(marco)
+	var imagen := TextureRect.new()
+	imagen.texture = _imagen_de(data)
+	imagen.custom_minimum_size = Vector2(128, 128)
+	imagen.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	imagen.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	if not conocida:
+		imagen.modulate = COLOR_SILUETA
+	marco.add_child(imagen)
+
+	var datos := VBoxContainer.new()
+	datos.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cabecera.add_child(datos)
+	var nombre := Label.new()
+	nombre.text = data.nombre_comun if conocida else "Especie no descubierta"
+	nombre.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	nombre.add_theme_font_size_override("font_size", 22)
+	datos.add_child(nombre)
+	if conocida:
+		var cientifico := RichTextLabel.new()
+		cientifico.bbcode_enabled = true
+		cientifico.fit_content = true
+		cientifico.text = "[i]%s[/i]" % data.nombre_cientifico
+		datos.add_child(cientifico)
+		datos.add_child(TemaFaunetra.insignia_estado(data.estado_conservacion))
+	datos.add_child(_fila_dato(TemaFaunetra.ICONO_BIOMA.get(data.id_bioma, "arbol"), "Bioma", GameState.nombre_bioma(data.id_bioma)))
+	datos.add_child(_fila_dato("hoja" if flora else "huella", "Tipo", data.tipo.capitalize()))
+
+	if conocida:
+		_detalle.add_child(_parrafo("Rol ecológico", data.rol_ecologico))
+		var fecha := _fecha(float(GameState.descubiertas[str(data.id_especie)]))
+		_detalle.add_child(_parrafo("Registro", "Primer avistamiento: %s · Validaciones: %d/%d" % [
+			fecha, GameState.etapa_validacion(data.id_especie), GameState.INTERVALOS_REPASO_DIAS.size()]))
+		_detalle.add_child(_relaciones(data))
+	else:
+		var pista := ""
+		if flora:
+			pista = "Esta especie ya no existe en la naturaleza: conócela resolviendo su pista conceptual." if data.estado_conservacion == "EX" \
+				else "Plántala desde la barra de plantación de su bioma o resuelve su pista conceptual."
+		else:
+			pista = ReglasEcosistema.texto_requisitos(data)
+		_detalle.add_child(_parrafo("Pista", pista))
+		var boton := Button.new()
+		boton.text = "Resolver pista conceptual"
+		boton.icon = TemaFaunetra.icono("lupa")
+		boton.pressed.connect(func() -> void: EventBus.solicitar_trivia.emit("especie", data.id_especie))
+		_detalle.add_child(boton)
+
+
+func _fila_dato(icono: String, etiqueta: String, valor: String) -> HBoxContainer:
+	var fila := HBoxContainer.new()
+	var t := TextureRect.new()
+	t.texture = TemaFaunetra.icono(icono)
+	t.custom_minimum_size = Vector2(20, 20)
+	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	fila.add_child(t)
+	var l := Label.new()
+	l.text = "%s: %s" % [etiqueta, valor]
+	l.add_theme_font_size_override("font_size", 14)
+	fila.add_child(l)
+	return fila
+
+
+func _parrafo(titulo: String, texto: String) -> RichTextLabel:
+	var r := RichTextLabel.new()
+	r.bbcode_enabled = true
+	r.fit_content = true
+	r.text = "[b]%s[/b]\n%s" % [titulo, texto]
+	return r
+
+
+## Relaciones ecológicas: sinergias de la planta, o las plantas que el animal necesita.
+func _relaciones(data: EspecieData) -> Control:
+	var caja := VBoxContainer.new()
+	caja.add_child(_titulo_seccion("hoja", "Relaciones ecológicas"))
+	var hay := false
+	if EspecieLoader.es_flora(data):
+		for s in ReglasEcosistema.datos().get("sinergias", []):
+			var fuente := _por_nombre(str(s["fuente"]), data.id_bioma)
+			var objetivo := _por_nombre(str(s["objetivo"]), data.id_bioma)
+			if fuente == null or objetivo == null or (fuente != data and objetivo != data):
+				continue
+			caja.add_child(_fila_relacion(fuente, objetivo, "«%s» +%d%% de crecimiento" % [s.get("nombre", "Sinergia"), int(round(float(s.get("bono", 0.2)) * 100))]))
+			hay = true
+		for animal in EspecieLoader.fauna_del_bioma(data.id_bioma):
+			if (ReglasEcosistema.requisitos_fauna(animal)["plantas"] as Array).has(data.nombre_comun):
+				caja.add_child(_fila_relacion(data, animal, "atrae a %s" % _nombre_visible(animal)))
+				hay = true
+	else:
+		for nombre in ReglasEcosistema.requisitos_fauna(data)["plantas"]:
+			var planta := _por_nombre(nombre, data.id_bioma)
+			if planta:
+				caja.add_child(_fila_relacion(planta, data, "%s le da hábitat" % nombre))
+				hay = true
+	if not hay:
+		var l := Label.new()
+		l.text = "Crece mejor junto a especies distintas (+10% por biodiversidad)." if EspecieLoader.es_flora(data) \
+			else ReglasEcosistema.texto_requisitos(data)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.add_theme_font_size_override("font_size", 13)
+		caja.add_child(l)
+	return caja
+
+
+func _fila_relacion(origen: EspecieData, destino: EspecieData, texto: String) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", TemaFaunetra.caja(Color.WHITE, TemaFaunetra.BORDE, 10, 1, 6))
+	var fila := HBoxContainer.new()
+	fila.add_theme_constant_override("separation", 6)
+	panel.add_child(fila)
+	for d in [origen, destino]:
+		var t := TextureRect.new()
+		t.texture = _imagen_de(d)
+		t.custom_minimum_size = Vector2(36, 36)
+		t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		if not GameState.esta_descubierta(d.id_especie):
+			t.modulate = COLOR_SILUETA
+		fila.add_child(t)
+		if d == origen:
+			var flecha := Label.new()
+			flecha.text = "→"
+			flecha.add_theme_font_size_override("font_size", 20)
+			fila.add_child(flecha)
+	var l := Label.new()
+	l.text = texto
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.add_theme_font_size_override("font_size", 13)
+	fila.add_child(l)
+	return panel
+
+
+func _por_nombre(nombre: String, id_bioma: int) -> EspecieData:
+	var buscado := ReglasEcosistema.normalizar(nombre)
+	for d in EspecieLoader.cargar_especies_del_bioma(id_bioma):
+		if ReglasEcosistema.normalizar(d.nombre_comun) == buscado:
+			return d
+	return null
+
+
+func _nombre_visible(data: EspecieData) -> String:
+	return data.nombre_comun if GameState.esta_descubierta(data.id_especie) else "una especie por descubrir"
+
+
+func _imagen_de(data: EspecieData) -> Texture2D:
+	var tex := EspecieLoader.textura_de(data)
+	if tex:
+		return tex
+	if not _placeholders.has(data.tipo):
+		var imagen := Image.create(32, 32, false, Image.FORMAT_RGBA8)
+		imagen.fill(COLORES_TIPO.get(data.tipo, Color.WHITE))
+		_placeholders[data.tipo] = ImageTexture.create_from_image(imagen)
+	return _placeholders[data.tipo]
+
+
+func _fecha(timestamp: float) -> String:
+	var local := int(timestamp) + int(Time.get_time_zone_from_system().get("bias", 0)) * 60
+	var f := Time.get_datetime_dict_from_unix_time(local)
+	return "%02d/%02d/%d" % [f["day"], f["month"], f["year"]]

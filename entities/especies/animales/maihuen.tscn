@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://bpduxc71ddndd" path="res://entities/especies/especie.tscn" id="1_molde"]
+[ext_resource type="SpriteFrames" path="res://Assets/Plantas/maihuen.aseprite" id="2_anim"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_maihuen"]
+radius = 34.0
+
+[node name="Maihuen" instance=ExtResource("1_molde")]
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+sprite_frames = ExtResource("2_anim")
+animation = &"idle"
+autoplay = "idle"
+scale = Vector2(3, 3)
+
+[node name="CollisionShape2D" parent="Area2D" index="0"]
+shape = SubResource("CircleShape2D_maihuen")
