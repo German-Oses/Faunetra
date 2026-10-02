@@ -500,9 +500,14 @@ class VisorEscaner extends Control:
 		queue_redraw()
 
 	func _gui_input(event: InputEvent) -> void:
+		# Funciona con mouse y con el dedo: el retículo sigue al puntero (o al dedo al arrastrar)
+		# y la búsqueda se confirma al soltar, para poder explorar el paisaje antes de elegir.
 		if event is InputEventMouseMotion:
 			_mouse = event.position
-		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and _activo:
+		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			_mouse = event.position
+		elif event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_LEFT and _activo:
+			_mouse = event.position
 			if event.position.distance_to(_centro_objetivo()) <= _tam_objetivo().length() * 0.42:
 				_revelado = true
 				_activo = false

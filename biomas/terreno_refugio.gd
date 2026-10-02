@@ -45,6 +45,7 @@ var _paseos: Dictionary = {}         # id_especie -> estado del paseo (ver _inic
 var _auras: Dictionary = {}          # Vector2i -> nombre de la sinergia explícita que recibe
 var _celda_hover := Vector2i.ZERO
 var _hay_hover := false
+var _presionado := false
 var _acumulador := 0.0
 var _tiempo := 0.0
 var _centro := Vector2i.ZERO
@@ -242,17 +243,29 @@ func _aplicar_niebla_pendiente() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		var celda := _celda_bajo_mouse()
+		var celda := _celda_en(event.position)
 		_hay_hover = celdas.has(celda)
 		_celda_hover = celda
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var celda := _celda_bajo_mouse()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		# Se actúa al soltar (no al presionar) para distinguir un toque de un arrastre de cámara.
+		if event.pressed:
+			_presionado = true
+			return
+		if not _presionado:
+			return
+		_presionado = false
+		if Bioma.arrastrando:
+			get_viewport().set_input_as_handled()
+			return
+		var celda := _celda_en(event.position)
 		if celdas.has(celda) and _usar_herramienta(celda):
 			get_viewport().set_input_as_handled()
 
 
-func _celda_bajo_mouse() -> Vector2i:
-	return tilemap.local_to_map(tilemap.to_local(get_global_mouse_position()))
+## Celda bajo una posición de pantalla (la del evento: sirve igual para mouse y para toques).
+func _celda_en(pos_pantalla: Vector2) -> Vector2i:
+	var mundo := get_viewport().get_canvas_transform().affine_inverse() * pos_pantalla
+	return tilemap.local_to_map(tilemap.to_local(mundo))
 
 
 ## Devuelve true si la acción consumió el clic.

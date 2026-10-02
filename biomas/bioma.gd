@@ -22,6 +22,13 @@ var camara: Camera2D
 @onready var contenedor_especies: Node2D = $Especies
 
 var _arrastrando := false
+## Marca compartida: true mientras el gesto actual es un arrastre o pellizco (no un toque).
+static var arrastrando := false
+const UMBRAL_ARRASTRE := 12.0
+var _boton_izquierdo := false
+var _inicio_presion := Vector2.ZERO
+var _toques: Dictionary = {}       # índice del dedo -> posición
+var _distancia_pellizco := 0.0
 
 
 func _ready() -> void:
@@ -94,11 +101,35 @@ func _configurar_camara() -> void:
 	camara.make_current()
 
 
-## Rueda del mouse: zoom. Botón derecho o central arrastrando: mover la cámara.
+## Controles de cámara para mouse, trackpad y pantallas táctiles:
+## - Arrastrar con un dedo o con el botón izquierdo (también derecho/central) mueve la cámara.
+## - Pellizcar con dos dedos, la rueda del mouse o el gesto de pellizco del trackpad hacen zoom.
+## Un toque solo cuenta como "clic" si no hubo arrastre (ver Bioma.arrastrando).
 func _unhandled_input(event: InputEvent) -> void:
 	if camara == null:
 		return
-	if event is InputEventMouseButton:
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			_toques[event.index] = event.position
+		else:
+			_toques.erase(event.index)
+			if _toques.is_empty():
+				_terminar_arrastre.call_deferred()
+		if _toques.size() >= 2:
+			arrastrando = true
+			_distancia_pellizco = _distancia_entre_toques()
+	elif event is InputEventScreenDrag:
+		_toques[event.index] = event.position
+		if _toques.size() >= 2:
+			var d := _distancia_entre_toques()
+			if _distancia_pellizco > 0.0:
+				_zoom(d / _distancia_pellizco)
+			_distancia_pellizco = d
+	elif event is InputEventMagnifyGesture:
+		_zoom(event.factor)
+	elif event is InputEventPanGesture:
+		_mover(event.delta * 12.0)
+	elif event is InputEventMouseButton:
 		match event.button_index:
 			MOUSE_BUTTON_WHEEL_UP:
 				_zoom(1.1)
@@ -106,8 +137,40 @@ func _unhandled_input(event: InputEvent) -> void:
 				_zoom(1.0 / 1.1)
 			MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE:
 				_arrastrando = event.pressed
-	elif event is InputEventMouseMotion and _arrastrando:
-		camara.position -= event.relative / camara.zoom
+			MOUSE_BUTTON_LEFT:
+				if event.pressed:
+					_boton_izquierdo = true
+					_inicio_presion = event.position
+					arrastrando = false
+				else:
+					_boton_izquierdo = false
+					# Se limpia al final del cuadro: el terreno y las especies leen la marca al soltar.
+					_terminar_arrastre.call_deferred()
+	elif event is InputEventMouseMotion:
+		if _arrastrando:
+			_mover(-event.relative / camara.zoom)
+		elif _boton_izquierdo and _toques.size() < 2:
+			if not arrastrando and event.position.distance_to(_inicio_presion) > UMBRAL_ARRASTRE:
+				arrastrando = true
+			if arrastrando:
+				_mover(-event.relative / camara.zoom)
+
+
+func _terminar_arrastre() -> void:
+	if _toques.size() < 2:
+		arrastrando = false
+		_distancia_pellizco = 0.0
+
+
+func _distancia_entre_toques() -> float:
+	var puntos := _toques.values()
+	return (puntos[0] as Vector2).distance_to(puntos[1])
+
+
+## Mueve la cámara sin dejar que el refugio salga de la pantalla.
+func _mover(desplazamiento: Vector2) -> void:
+	var limite := terreno.rect_global().grow(200) if terreno else Rect2(camara.position - Vector2.ONE * 2000, Vector2.ONE * 4000)
+	camara.position = (camara.position + desplazamiento).clamp(limite.position, limite.end)
 
 
 func _zoom(factor: float) -> void:
