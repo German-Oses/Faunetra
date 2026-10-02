@@ -6,11 +6,11 @@
 [resource]
 script = ExtResource("1_n7w5m")
 id_especie = 32
-nombre_cientifico = "Bletia catenulata"
+nombre_cientifico = "Gavilea venosa"
 nombre_comun = "Orquídea de la zona central"
 tipo = "planta"
 estado_conservacion = "VU"
-rol_ecologico = "Planta geófita ornamental. Requiere la presencia de micelios específicos en el suelo para florecer."
+rol_ecologico = "Orquídea terrestre endémica del bosque esclerófilo de Chile central (gavilú). Depende de hongos del suelo para germinar y crecer."
 umbral_desbloqueo = 0
 id_bioma = 1
 escena = ExtResource("2_escena")
