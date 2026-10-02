@@ -10,7 +10,7 @@ extends RefCounted
 const RUTA := "res://data/ecosistema/reglas_ecosistema.json"
 const COSTO_NIEBLA_DEFECTO := 20
 const COSTO_SANAR_DEFECTO := 15
-const COSTO_PLANTAR_DEFECTO := 40
+const COSTO_PLANTAR_DEFECTO := 30
 
 static var _datos: Dictionary = {}
 

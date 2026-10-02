@@ -11,3 +11,6 @@
 
 # Copia duplicada de las imágenes de referencia (ya están en Assets/sprites/desierto)
 Desierto FAUNA/
+
+# Exportaciones
+build/

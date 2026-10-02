@@ -658,5 +658,995 @@
     ],
     "recompensa_xp": 75,
     "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_flamenco_01",
+    "id_especie": 3,
+    "nombre_especie": "Flamenco andino",
+    "id_bioma": 2,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Plumas color atardecer",
+    "situacion_narrativa": "En una laguna salada del altiplano, una bandada de flamencos camina lentamente con la cabeza sumergida en el agua.",
+    "pregunta": "¿De dónde viene el color rosado de las plumas del Flamenco andino?",
+    "pista_narrativa": "Piensa en lo que filtra del agua con su pico.",
+    "opciones": [
+      {
+        "texto": "De los pigmentos (carotenoides) de las microalgas y pequeños organismos que filtra del agua.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Los carotenoides de su alimento tiñen sus plumas. Un flamenco mal alimentado se vuelve pálido."
+      },
+      {
+        "texto": "Nace rosado y el color no cambia en toda su vida.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Los polluelos nacen grises o blancos: el rosado aparece gracias a su dieta."
+      },
+      {
+        "texto": "Se tiñe al revolcarse en el barro rojizo del salar.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No es barro: el color viene de los pigmentos de lo que come."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": "insignia_guardian_altiplano"
+  },
+  {
+    "id_trivia": "norte_flamenco_02",
+    "id_especie": 3,
+    "nombre_especie": "Flamenco andino",
+    "id_bioma": 2,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Un pico al revés",
+    "situacion_narrativa": "Observas que el flamenco hunde la cabeza invertida y mueve el pico de lado a lado dentro del agua.",
+    "pregunta": "¿Para qué le sirve al Flamenco andino su pico curvo con láminas internas?",
+    "pista_narrativa": "Funciona parecido a un colador.",
+    "opciones": [
+      {
+        "texto": "Para filtrar el agua y retener microalgas y diminutos invertebrados.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Exacto! Es un filtrador: por eso depende de lagunas altiplánicas sanas y sin contaminación."
+      },
+      {
+        "texto": "Para romper las conchas de caracoles grandes.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Su pico no es para triturar: es un filtro."
+      },
+      {
+        "texto": "Para cavar nidos profundos en la sal.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Construye nidos de barro, pero su pico está especializado en filtrar alimento."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_vicuna_01",
+    "id_especie": 2,
+    "nombre_especie": "Vicuña",
+    "id_bioma": 2,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "El tesoro del altiplano",
+    "situacion_narrativa": "A más de 4.000 metros de altura, un grupo de vicuñas pasta tranquilo. Hace 60 años quedaban muy pocas.",
+    "pregunta": "¿Por qué la Vicuña estuvo al borde de la extinción y cómo se recuperó?",
+    "pista_narrativa": "Su lana es de las más finas del mundo.",
+    "opciones": [
+      {
+        "texto": "Fue cazada por su finísima lana; se recuperó gracias a su protección legal y a áreas protegidas como el Parque Nacional Lauca.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Muy bien! Su recuperación es uno de los grandes éxitos de conservación de Sudamérica."
+      },
+      {
+        "texto": "Por una sequía que secó todos los bofedales; se recuperó sola con las lluvias.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La causa principal fue la caza por su lana, y la recuperación se debió a la protección."
+      },
+      {
+        "texto": "Porque los cóndores cazaban a todas sus crías.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El cóndor es carroñero; la amenaza real fue la caza humana."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_chinchilla_01",
+    "id_especie": 1,
+    "nombre_especie": "Chinchilla cordillerana",
+    "id_bioma": 2,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Un abrigo demasiado valioso",
+    "situacion_narrativa": "Entre las rocas de la cordillera ves una pequeña chinchilla de pelaje muy denso. Hoy es una de las especies más amenazadas de Chile.",
+    "pregunta": "¿Cuál fue la principal causa de la disminución de la Chinchilla cordillerana?",
+    "pista_narrativa": "Su pelaje es extremadamente suave y denso.",
+    "opciones": [
+      {
+        "texto": "La caza masiva para comercializar su piel.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Millones de pieles se exportaron en el pasado. Hoy está protegida."
+      },
+      {
+        "texto": "La competencia con los flamencos por el agua.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No compiten: la causa fue la caza por su piel."
+      },
+      {
+        "texto": "El exceso de lluvias en el desierto.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El problema fue la cacería, no el clima."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_quenoa_01",
+    "id_especie": 4,
+    "nombre_especie": "Queñoa de altura",
+    "id_bioma": 2,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "El bosque más alto del mundo",
+    "situacion_narrativa": "Subiendo hacia un volcán, a casi 5.000 metros, encuentras pequeños árboles de corteza rojiza que se desprende en capas.",
+    "pregunta": "¿Qué tiene de especial la Queñoa de altura?",
+    "pista_narrativa": "Mira la altura a la que crece y su corteza en capas.",
+    "opciones": [
+      {
+        "texto": "Forma uno de los bosques que crecen a mayor altura del planeta; su corteza en capas lo protege del frío extremo.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente! Además sirve de 'árbol nodriza' para otras plantas y refugio para fauna."
+      },
+      {
+        "texto": "Es un árbol tropical traído para dar sombra a los pueblos.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es nativa del altiplano y está adaptada a heladas extremas."
+      },
+      {
+        "texto": "Solo crece a orillas del mar.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Crece en la alta cordillera, no en la costa."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_cactus_01",
+    "id_especie": 9,
+    "nombre_especie": "Cactus de la costa norte",
+    "id_bioma": 2,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Agua que viene del mar",
+    "situacion_narrativa": "En la costa del desierto casi nunca llueve, pero cada mañana una espesa neblina sube desde el océano.",
+    "pregunta": "¿Cómo obtienen agua los cactus y otras plantas de la costa desértica?",
+    "pista_narrativa": "En el norte a esta neblina le llaman 'camanchaca'.",
+    "opciones": [
+      {
+        "texto": "Capturan la humedad de la camanchaca, la neblina costera, que condensa sobre ellos.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! La camanchaca sostiene ecosistemas enteros: los oasis de niebla."
+      },
+      {
+        "texto": "Absorben agua salada del mar con raíces muy largas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No pueden usar agua de mar: aprovechan la niebla."
+      },
+      {
+        "texto": "Reciben agua de las lluvias diarias del verano.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "En la costa del desierto casi no llueve; la clave es la niebla."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_guanaco_01",
+    "id_especie": 15,
+    "nombre_especie": "Guanaco norteño",
+    "id_bioma": 2,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "Parientes salvajes y domésticos",
+    "situacion_narrativa": "Un pastor aymara te muestra sus llamas y alpacas. A lo lejos pasan guanacos y vicuñas salvajes.",
+    "pregunta": "¿Qué relación hay entre los camélidos salvajes y los domésticos?",
+    "pista_narrativa": "Dos especies salvajes, dos domesticadas.",
+    "opciones": [
+      {
+        "texto": "La llama fue domesticada a partir del guanaco y la alpaca a partir de la vicuña.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente! Proteger a los camélidos salvajes también protege la diversidad genética de los domésticos."
+      },
+      {
+        "texto": "Las vicuñas son llamas que escaparon de los corrales.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La vicuña es una especie salvaje; la alpaca desciende de ella."
+      },
+      {
+        "texto": "No tienen ningún parentesco; solo se parecen.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Son parientes cercanos: llama y alpaca provienen de guanaco y vicuña."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_cuervo_01",
+    "id_especie": 8,
+    "nombre_especie": "Cuervo de pantano de la puna",
+    "id_bioma": 2,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Buscando en el barro",
+    "situacion_narrativa": "En un bofedal (humedal altoandino) un ave oscura de pico largo y curvo lo hunde una y otra vez en el barro.",
+    "pregunta": "¿Para qué usa su pico curvo el Cuervo de pantano de la puna?",
+    "pista_narrativa": "Busca alimento escondido bajo la superficie.",
+    "opciones": [
+      {
+        "texto": "Para sondear el barro y atrapar larvas, gusanos e insectos acuáticos.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Así es! Depende de bofedales sanos: si se secan, pierde su alimento."
+      },
+      {
+        "texto": "Para cortar ramas y construir nidos en los árboles.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "En el altiplano hay pocos árboles; usa el pico para buscar alimento en el barro."
+      },
+      {
+        "texto": "Para cazar vicuñas jóvenes.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es un ave que se alimenta de pequeños invertebrados."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_corredor_01",
+    "id_especie": 7,
+    "nombre_especie": "Corredor de Tarapacá",
+    "id_bioma": 2,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Sangre fría al sol",
+    "situacion_narrativa": "Al amanecer, una lagartija se queda inmóvil sobre una roca, de cara al sol, antes de empezar a cazar.",
+    "pregunta": "¿Por qué el Corredor de Tarapacá se asolea antes de moverse?",
+    "pista_narrativa": "Los reptiles no producen suficiente calor propio.",
+    "opciones": [
+      {
+        "texto": "Porque es ectotermo: necesita el calor del sol para elevar su temperatura y poder moverse y cazar.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Por eso también se esconde en las horas de más calor."
+      },
+      {
+        "texto": "Para broncear su piel y camuflarse mejor.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Lo hace para calentarse: regula su temperatura con el ambiente."
+      },
+      {
+        "texto": "Para atraer a sus presas con el reflejo de sus escamas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Se asolea para alcanzar la temperatura que necesita su cuerpo."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "norte_tintero_01",
+    "id_especie": 11,
+    "nombre_especie": "Tintero del desierto",
+    "id_bioma": 2,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Tinta entre la arena",
+    "situacion_narrativa": "En un suelo arenoso aparece un hongo alto con un sombrero oscuro que suelta un polvo negro.",
+    "pregunta": "¿Qué es el polvo negro que libera el Tintero del desierto?",
+    "pista_narrativa": "Los hongos se reproducen sin semillas.",
+    "opciones": [
+      {
+        "texto": "Sus esporas, con las que se reproduce y dispersa con el viento.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Que existan hongos en el desierto muestra que la vida se adapta a condiciones extremas."
+      },
+      {
+        "texto": "Ceniza de un incendio reciente.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Son esporas: así se reproducen los hongos."
+      },
+      {
+        "texto": "Tinta que usa para defenderse de las aves.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El nombre viene del color de sus esporas, que dispersa el viento."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "central_palma_01",
+    "id_especie": 17,
+    "nombre_especie": "Palma chilena",
+    "id_bioma": 1,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Miel que costaba una vida",
+    "situacion_narrativa": "En Ocoa ves palmas enormes de tronco grueso. Una señora te cuenta que antes se talaban para hacer 'miel de palma'.",
+    "pregunta": "¿Por qué la extracción tradicional de miel de palma amenazó a la Palma chilena?",
+    "pista_narrativa": "Piensa en cuánto tarda en crecer una palma de este tamaño.",
+    "opciones": [
+      {
+        "texto": "Porque se talaba la palma para extraer su savia, y es una especie de crecimiento muy lento.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Una palma puede tardar décadas en crecer. Hoy la extracción está regulada."
+      },
+      {
+        "texto": "Porque las abejas abandonaban las palmas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La 'miel de palma' es savia concentrada, no miel de abejas."
+      },
+      {
+        "texto": "Porque la miel secaba el suelo alrededor.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El problema era talar palmas muy longevas para obtener su savia."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "central_guayacan_01",
+    "id_especie": 24,
+    "nombre_especie": "Guayacán",
+    "id_bioma": 1,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Madera de hierro",
+    "situacion_narrativa": "Un campesino golpea un trozo de madera oscura: suena casi como metal.",
+    "pregunta": "¿Por qué el Guayacán está amenazado?",
+    "pista_narrativa": "Su madera es extremadamente dura y arde por mucho tiempo.",
+    "opciones": [
+      {
+        "texto": "Por la tala para leña y carbón, debido a la dureza de su madera.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Así es! Es un árbol del matorral central que crece lento y necesita protección."
+      },
+      {
+        "texto": "Porque sus flores son venenosas para las abejas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Su amenaza es la tala, no sus flores."
+      },
+      {
+        "texto": "Porque solo crece en la Antártica.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Crece en el matorral de la zona central."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "central_matorral_01",
+    "id_especie": 24,
+    "nombre_especie": "Guayacán",
+    "id_bioma": 1,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Hojas duras para el verano seco",
+    "situacion_narrativa": "En pleno verano no llueve en meses, pero los arbustos del cerro siguen verdes, con hojas pequeñas y duras.",
+    "pregunta": "¿Para qué sirven las hojas duras y cerosas de las plantas del matorral esclerófilo?",
+    "pista_narrativa": "La zona central tiene clima mediterráneo: inviernos lluviosos y veranos secos.",
+    "opciones": [
+      {
+        "texto": "Para perder menos agua durante el largo verano seco.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! 'Esclerófilo' significa 'hoja dura': una adaptación a la sequía estival."
+      },
+      {
+        "texto": "Para resistir la nieve que cubre el cerro todo el año.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La adaptación es a la sequía del verano, no a la nieve."
+      },
+      {
+        "texto": "Para que los animales no puedan verlas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Las hojas duras evitan la pérdida de agua."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "central_monito_01",
+    "id_especie": 18,
+    "nombre_especie": "Monito del monte",
+    "id_bioma": 1,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "Un jardinero nocturno",
+    "situacion_narrativa": "De noche, un pequeño marsupial de ojos grandes come los frutos pegajosos del quintral, una planta que vive sobre otros árboles.",
+    "pregunta": "¿Qué relación tiene el Monito del monte con el quintral?",
+    "pista_narrativa": "Las semillas del quintral necesitan llegar a la rama de otro árbol.",
+    "opciones": [
+      {
+        "texto": "Es un mutualismo: el monito come sus frutos y dispersa las semillas, que germinan sobre otras ramas.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente! Sin el monito, el quintral casi no podría dispersarse. Por eso le llaman 'fósil viviente' clave del bosque."
+      },
+      {
+        "texto": "Es depredación: el monito destruye todas las semillas del quintral.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Al contrario, las dispersa y ayuda a la planta."
+      },
+      {
+        "texto": "No tienen relación: el monito solo come insectos.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Además de insectos, come frutos del quintral y dispersa sus semillas."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": "insignia_cadena_trofica"
+  },
+  {
+    "id_trivia": "central_culpeo_01",
+    "id_especie": 21,
+    "nombre_especie": "Zorro culpeo",
+    "id_bioma": 1,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "El regulador de los cerros",
+    "situacion_narrativa": "Al atardecer, un zorro de pelaje rojizo recorre el cerro olfateando entre los matorrales.",
+    "pregunta": "¿Qué rol cumple el Zorro culpeo en el ecosistema?",
+    "pista_narrativa": "Es el zorro más grande de Chile.",
+    "opciones": [
+      {
+        "texto": "Es un depredador que regula poblaciones de roedores y conejos.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Al controlar roedores ayuda a mantener el equilibrio del matorral."
+      },
+      {
+        "texto": "Es un herbívoro que poliniza flores.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es carnívoro; regula poblaciones de presas."
+      },
+      {
+        "texto": "Es un ave rapaz nocturna.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es un mamífero, el zorro más grande de Chile."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "central_costina_01",
+    "id_especie": 19,
+    "nombre_especie": "Chinchilla costina",
+    "id_bioma": 1,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Las últimas silvestres",
+    "situacion_narrativa": "Un guardaparque te cuenta que casi todas las chinchillas del mundo viven en jaulas, pero quedan pocas poblaciones silvestres en Chile.",
+    "pregunta": "¿Dónde se protege a una de las últimas poblaciones silvestres de Chinchilla costina?",
+    "pista_narrativa": "Es una reserva nacional que lleva su nombre, en la región de Coquimbo.",
+    "opciones": [
+      {
+        "texto": "En la Reserva Nacional Las Chinchillas, en Illapel.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Muy bien! Esa reserva protege laderas semiáridas donde aún vive la especie."
+      },
+      {
+        "texto": "En el Parque Nacional Torres del Paine.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Torres del Paine está en la Patagonia; la chinchilla costina vive en la zona centro-norte."
+      },
+      {
+        "texto": "En Isla de Pascua.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Vive en laderas semiáridas del continente, en Coquimbo."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "central_pancora_01",
+    "id_especie": 29,
+    "nombre_especie": "Pancora de Concepción",
+    "id_bioma": 1,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Un termómetro en el estero",
+    "situacion_narrativa": "En un estero de agua clara, levantas una piedra y aparece un pequeño cangrejo de río.",
+    "pregunta": "¿Por qué las pancoras son buenas indicadoras de la calidad del agua?",
+    "pista_narrativa": "Necesitan agua limpia y oxigenada.",
+    "opciones": [
+      {
+        "texto": "Porque son sensibles a la contaminación: si desaparecen, el estero probablemente está degradado.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Además limpian detritos del fondo."
+      },
+      {
+        "texto": "Porque cambian de color según la temperatura.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Son indicadoras por su sensibilidad a la contaminación."
+      },
+      {
+        "texto": "Porque solo viven en agua salada.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Las pancoras (Aegla) son de agua dulce."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "patagonia_lenga_01",
+    "id_especie": 63,
+    "nombre_especie": "Lenga",
+    "id_bioma": 4,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "El bosque se pinta de rojo",
+    "situacion_narrativa": "En otoño, las laderas patagónicas se cubren de tonos rojos, naranjos y amarillos.",
+    "pregunta": "¿Por qué cambian de color los bosques de Lenga en otoño?",
+    "pista_narrativa": "La lenga es caducifolia.",
+    "opciones": [
+      {
+        "texto": "Porque la lenga pierde sus hojas en invierno y, antes de caer, cambian de color.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Exacto! Es el árbol dominante de los bosques subantárticos."
+      },
+      {
+        "texto": "Porque una plaga quema las hojas cada año.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es un proceso natural de los árboles caducifolios."
+      },
+      {
+        "texto": "Porque la nieve tiñe las hojas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El cambio de color ocurre antes del invierno y es natural."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "patagonia_calafate_01",
+    "id_especie": 64,
+    "nombre_especie": "Calafate",
+    "id_bioma": 4,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Una baya con leyenda",
+    "situacion_narrativa": "Un baqueano te ofrece unas bayas moradas de un arbusto espinoso y te dice: 'Quien come calafate...'.",
+    "pregunta": "¿Cómo termina el dicho patagónico sobre el Calafate?",
+    "pista_narrativa": "Tiene que ver con volver.",
+    "opciones": [
+      {
+        "texto": "…vuelve a la Patagonia.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Además de su leyenda, sus bayas alimentan a aves e insectos en primavera y verano."
+      },
+      {
+        "texto": "…nunca más siente frío.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El dicho es: quien come calafate, vuelve a la Patagonia."
+      },
+      {
+        "texto": "…puede hablar con los huemules.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El dicho dice que quien lo come vuelve a la Patagonia."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "patagonia_huemul_02",
+    "id_especie": 49,
+    "nombre_especie": "Huemul",
+    "id_bioma": 4,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Un símbolo nacional",
+    "situacion_narrativa": "En el escudo de Chile aparecen dos animales sosteniendo la estrella.",
+    "pregunta": "¿Qué animales aparecen en el escudo de Chile?",
+    "pista_narrativa": "Uno vuela sobre la cordillera y el otro vive en los bosques del sur.",
+    "opciones": [
+      {
+        "texto": "El cóndor y el huemul.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Hoy el huemul está En Peligro: protegerlo es cuidar un símbolo del país."
+      },
+      {
+        "texto": "El puma y el zorro.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Son el cóndor y el huemul."
+      },
+      {
+        "texto": "El pudú y el flamenco.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Son el cóndor y el huemul."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": "insignia_amigo_del_huemul"
+  },
+  {
+    "id_trivia": "patagonia_gato_01",
+    "id_especie": 51,
+    "nombre_especie": "Gato montés argentino",
+    "id_bioma": 4,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Cazador de la estepa",
+    "situacion_narrativa": "Por la noche, unos ojos brillan entre los coirones. Un pequeño felino manchado acecha a un roedor.",
+    "pregunta": "¿Qué beneficio aporta el Gato montés al ecosistema de la estepa?",
+    "pista_narrativa": "Piensa en qué ocurriría si los roedores no tuvieran depredadores.",
+    "opciones": [
+      {
+        "texto": "Controla las poblaciones de roedores, evitando que se vuelvan plaga.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Los depredadores pequeños son clave para el equilibrio."
+      },
+      {
+        "texto": "Dispersa semillas de lenga en sus fecas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es carnívoro: su rol es controlar roedores."
+      },
+      {
+        "texto": "Construye madrigueras que usan los huemules.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Su principal aporte es el control de roedores."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "patagonia_delfin_01",
+    "id_especie": 50,
+    "nombre_especie": "Delfín austral",
+    "id_bioma": 4,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Saltos en los canales",
+    "situacion_narrativa": "Navegando por los fiordos, un grupo de delfines blanco y negro salta junto a los bosques de algas.",
+    "pregunta": "¿Dónde vive habitualmente el Delfín austral?",
+    "pista_narrativa": "Prefiere aguas costeras y protegidas.",
+    "opciones": [
+      {
+        "texto": "En canales, fiordos y costas del sur, a menudo cerca de bosques de huiro (algas).",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Depende de ecosistemas costeros sanos."
+      },
+      {
+        "texto": "En ríos de la Cordillera de los Andes.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es un cetáceo marino de aguas costeras australes."
+      },
+      {
+        "texto": "En mar abierto del trópico.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Vive en las frías aguas costeras del sur de Chile y Argentina."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "patagonia_liquen_01",
+    "id_especie": 60,
+    "nombre_especie": "Liquen de la estepa",
+    "id_bioma": 4,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "Dos organismos en uno",
+    "situacion_narrativa": "Sobre una rama de lenga crece algo gris verdoso, parecido a una lechuga seca.",
+    "pregunta": "¿Qué es un liquen y por qué sirve para medir la calidad del aire?",
+    "pista_narrativa": "No es una planta: son dos organismos que viven juntos.",
+    "opciones": [
+      {
+        "texto": "Es una asociación entre un hongo y un alga (o cianobacteria); al absorber todo del aire, desaparece donde hay contaminación.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente! Los líquenes son bioindicadores de aire limpio."
+      },
+      {
+        "texto": "Es un musgo que solo crece donde hay mucho humo.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es una simbiosis de hongo y alga, sensible a la contaminación."
+      },
+      {
+        "texto": "Es un parásito que mata a los árboles.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Solo usa la rama como soporte; no es parásito."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "patagonia_maihuen_01",
+    "id_especie": 54,
+    "nombre_especie": "Chupa sangre / Maihuén",
+    "id_bioma": 4,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Un cojín contra el viento",
+    "situacion_narrativa": "En la estepa, el viento sopla con fuerza. A ras de suelo crecen plantas espinosas en forma de cojín compacto.",
+    "pregunta": "¿Por qué el Maihuén crece en forma de cojín bajo y apretado?",
+    "pista_narrativa": "Piensa en el viento y el frío de la estepa patagónica.",
+    "opciones": [
+      {
+        "texto": "Porque así resiste el viento y la desecación, y protege a pequeñas plántulas a su alrededor.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Es una forma de 'planta nodriza' de la estepa."
+      },
+      {
+        "texto": "Porque no tiene raíces y flota sobre la arena.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Tiene raíces; su forma es una adaptación al viento."
+      },
+      {
+        "texto": "Porque los guanacos lo aplastan al pasar.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es una adaptación propia de la planta al clima extremo."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "patagonia_sapo_01",
+    "id_especie": 52,
+    "nombre_especie": "Sapo de cuatro ojos del sur",
+    "id_bioma": 4,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "Ojos que no ven",
+    "situacion_narrativa": "Un pequeño sapo asustado levanta la parte trasera de su cuerpo y muestra dos grandes manchas oscuras.",
+    "pregunta": "¿Para qué sirven las manchas en forma de ojos del Sapo de cuatro ojos?",
+    "pista_narrativa": "No ven nada: sirven para engañar.",
+    "opciones": [
+      {
+        "texto": "Son glándulas que imitan ojos grandes y asustan o confunden a los depredadores.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Muy bien! Es una defensa por apariencia, además de las secreciones de esas glándulas."
+      },
+      {
+        "texto": "Le permiten ver hacia atrás mientras salta.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No son ojos verdaderos: imitan ojos para asustar."
+      },
+      {
+        "texto": "Son heridas que deja el frío.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Son glándulas con forma de ojos que sirven de defensa."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "insular_toromiro_01",
+    "id_especie": 77,
+    "nombre_especie": "Toromiro (Rapa Nui)",
+    "id_bioma": 5,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "El árbol que volvió de lejos",
+    "situacion_narrativa": "En un vivero de Rapa Nui cuidan pequeños árboles de flores amarillas. El último toromiro silvestre de la isla murió hace décadas.",
+    "pregunta": "¿Cómo sobrevivió el Toromiro después de extinguirse en la naturaleza?",
+    "pista_narrativa": "Alguien se llevó semillas antes de que fuera tarde.",
+    "opciones": [
+      {
+        "texto": "Gracias a semillas recolectadas en la isla que se cultivaron en jardines botánicos, desde donde se intenta reintroducirlo.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Es un ejemplo de conservación fuera de su hábitat (ex situ)."
+      },
+      {
+        "texto": "Siempre siguió creciendo en la cima del volcán Rano Kau sin ayuda.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Se extinguió en estado silvestre; sobrevivió en jardines botánicos."
+      },
+      {
+        "texto": "Fue clonado a partir de un moái de madera.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Sobrevivió gracias a semillas cultivadas en jardines botánicos."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "insular_palma_rapanui_01",
+    "id_especie": 78,
+    "nombre_especie": "Palma de Rapa Nui",
+    "id_bioma": 5,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Un bosque desaparecido",
+    "situacion_narrativa": "Unos científicos encuentran en una cueva de Rapa Nui semillas fosilizadas de una palma que ya no existe.",
+    "pregunta": "¿Qué nos enseña la extinción de la Palma de Rapa Nui?",
+    "pista_narrativa": "La isla estuvo cubierta de palmas hace siglos.",
+    "opciones": [
+      {
+        "texto": "Que las islas son frágiles: la pérdida del bosque y factores como las ratas introducidas pueden extinguir especies.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Hoy se estudia cómo pasó para no repetirlo en otras islas."
+      },
+      {
+        "texto": "Que las palmas solo pueden vivir en desiertos.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "La palma formaba bosques en la isla antes de extinguirse."
+      },
+      {
+        "texto": "Que todavía quedan miles escondidas en la isla.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Está extinta; solo se conoce por restos y polen."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "insular_fardela_01",
+    "id_especie": 65,
+    "nombre_especie": "Fardela de Juan Fernández",
+    "id_bioma": 5,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "Abono que viene del mar",
+    "situacion_narrativa": "Al anochecer, miles de fardelas regresan del océano a sus madrigueras en las laderas de la isla.",
+    "pregunta": "¿Cómo ayudan las fardelas al ecosistema terrestre de la isla?",
+    "pista_narrativa": "Comen en el mar, pero duermen y anidan en tierra.",
+    "opciones": [
+      {
+        "texto": "Llevan nutrientes del océano a la tierra con sus fecas y restos, fertilizando el suelo de las laderas.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente! Por eso las ratas y gatos que atacan sus nidos dañan todo el ecosistema."
+      },
+      {
+        "texto": "Polinizan las flores del toromiro con su pico.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Son aves marinas; su gran aporte es llevar nutrientes del mar al suelo."
+      },
+      {
+        "texto": "Evitan que llueva sobre la isla.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Su rol es transportar nutrientes del mar a la tierra."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "insular_caracol_01",
+    "id_especie": 69,
+    "nombre_especie": "Caracol terrestre de J. F.",
+    "id_bioma": 5,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Tesoros indefensos",
+    "situacion_narrativa": "En la hojarasca del bosque de Juan Fernández encuentras un caracol que no existe en ningún otro lugar del mundo.",
+    "pregunta": "¿Por qué las especies endémicas de islas, como estos caracoles, son tan vulnerables?",
+    "pista_narrativa": "Evolucionaron durante miles de años sin ciertos depredadores.",
+    "opciones": [
+      {
+        "texto": "Porque evolucionaron sin depredadores como ratas, y no tienen defensas frente a las especies introducidas.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Controlar especies invasoras es clave para proteger la fauna isleña."
+      },
+      {
+        "texto": "Porque las islas son demasiado frías para los caracoles.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El problema son las especies introducidas, no el clima."
+      },
+      {
+        "texto": "Porque se alimentan solo de moáis.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Viven en la hojarasca; su amenaza son los depredadores introducidos."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "insular_luma_jf_01",
+    "id_especie": 66,
+    "nombre_especie": "Luma de Juan Fernández",
+    "id_bioma": 5,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "Un bosque invadido",
+    "situacion_narrativa": "En Robinson Crusoe, los guardaparques arrancan maqui y zarzamora que crecen entre los árboles nativos.",
+    "pregunta": "¿Por qué es necesario controlar las plantas invasoras en el bosque de Juan Fernández?",
+    "pista_narrativa": "Las invasoras compiten por luz y espacio.",
+    "opciones": [
+      {
+        "texto": "Porque desplazan a especies endémicas como la Luma de Juan Fernández al ocupar su espacio y luz.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Muy bien! Como en tu refugio: limpiar invasoras permite que la flora nativa vuelva."
+      },
+      {
+        "texto": "Porque las invasoras atraen a los delfines a la costa.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El problema es la competencia con la flora nativa."
+      },
+      {
+        "texto": "Porque las invasoras son más bonitas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Se controlan porque desplazan a las especies endémicas."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "insular_serpiente_01",
+    "id_especie": 80,
+    "nombre_especie": "Serpiente marina pelágica",
+    "id_bioma": 5,
+    "dificultad": "DIFICIL",
+    "titulo_narrativo": "Colores de advertencia",
+    "situacion_narrativa": "Flotando a la deriva en el mar cálido ves una serpiente de dorso negro y vientre amarillo intenso.",
+    "pregunta": "¿Qué significan los colores llamativos de la Serpiente marina pelágica?",
+    "pista_narrativa": "En la naturaleza, los colores intensos a veces son un aviso.",
+    "opciones": [
+      {
+        "texto": "Son colores de advertencia (aposematismo): avisan a los depredadores que es venenosa.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Por eso, si ves una, obsérvala de lejos y nunca la toques."
+      },
+      {
+        "texto": "Le sirven para camuflarse entre la arena blanca.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "No son de camuflaje: son una advertencia."
+      },
+      {
+        "texto": "Indican que es una cría que aún no aprende a nadar.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Los adultos tienen esos colores: advierten que es venenosa."
+      }
+    ],
+    "recompensa_xp": 100,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "insular_gecko_01",
+    "id_especie": 72,
+    "nombre_especie": "Gecko de escamas lisas",
+    "id_bioma": 5,
+    "dificultad": "FACIL",
+    "titulo_narrativo": "Un aliado nocturno",
+    "situacion_narrativa": "De noche, junto a una lámpara, un pequeño gecko caza insectos atraídos por la luz.",
+    "pregunta": "¿Qué beneficio aporta el Gecko de escamas lisas?",
+    "pista_narrativa": "Observa qué está cazando.",
+    "opciones": [
+      {
+        "texto": "Se alimenta de mosquitos y otros insectos, ayudando a controlar sus poblaciones.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Correcto! Es un control natural de insectos."
+      },
+      {
+        "texto": "Poliniza las palmas durante el día.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Es nocturno e insectívoro."
+      },
+      {
+        "texto": "Se alimenta de los huevos de las fardelas.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Come pequeños insectos como mosquitos."
+      }
+    ],
+    "recompensa_xp": 50,
+    "insignia_id": ""
+  },
+  {
+    "id_trivia": "insular_liquen_ins_01",
+    "id_especie": 79,
+    "nombre_especie": "Liquen insular gigante",
+    "id_bioma": 5,
+    "dificultad": "MEDIO",
+    "titulo_narrativo": "El aire más limpio",
+    "situacion_narrativa": "Sobre los troncos del bosque de la isla crecen grandes líquenes verdes con forma de hojas de lechuga.",
+    "pregunta": "¿Qué indica la presencia abundante del Liquen insular gigante?",
+    "pista_narrativa": "Los líquenes absorben todo lo que trae el aire.",
+    "opciones": [
+      {
+        "texto": "Que el aire de la isla es muy limpio, porque los líquenes desaparecen con la contaminación.",
+        "es_correcta": true,
+        "retroalimentacion_narrativa": "¡Excelente! Son excelentes bioindicadores."
+      },
+      {
+        "texto": "Que los árboles están enfermos y van a morir.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "El liquen no daña al árbol; indica aire limpio."
+      },
+      {
+        "texto": "Que hay mucha sal en el suelo.",
+        "es_correcta": false,
+        "retroalimentacion_narrativa": "Indica buena calidad del aire."
+      }
+    ],
+    "recompensa_xp": 75,
+    "insignia_id": ""
   }
 ]

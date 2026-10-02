@@ -185,6 +185,8 @@ func _crear_pagina_refugio() -> Control:
 	_mapa.size_flags_stretch_ratio = 2.3
 	_mapa.clip_contents = true
 	fila.add_child(_mapa)
+	# Las islas se ubican según el tamaño del área del mapa, que se conoce recién tras el primer acomodo.
+	_mapa.resized.connect(_ubicar_islas)
 	for id in GameState.ORDEN_BIOMAS:
 		_crear_isla(id)
 

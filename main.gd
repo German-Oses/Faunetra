@@ -70,14 +70,10 @@ func _mostrar_avisos_de_inicio() -> void:
 	if GameState.primera_partida:
 		GameState.primera_partida = false
 		GameState.marcar_cambios()
-		hud.mostrar_dialogo("Bienvenida, Guardiana o Guardián",
-			"La Niebla del Olvido cubre los refugios de Chile.\n\n" +
-			"1. APRENDE: abre la Tableta, consulta la Biopedia y responde trivias para ganar Esencia Vital (PR). Cada bioma tiene sus propios PR.\n" +
-			"2. SANA: usa los PR para disipar la niebla, limpiar basura y especies invasoras, y plantar flora nativa. Algunas plantas crecen más rápido junto a otras.\n" +
-			"3. ATRAE: la flora sana atrae fauna nativa, que se registra en tu Biopedia.\n\n" +
-			"Sana el bioma hasta %d%% para desbloquear el siguiente. ¡Vuelve seguido: los refugios abandonados se marchitan!" % int(GameState.UMBRAL_DESBLOQUEO))
 	else:
 		_mostrar_informe_degradacion()
+	# El tutorial guiado reemplaza el texto de bienvenida y se retoma si quedó a medias.
+	hud.iniciar_tutorial()
 
 
 func _mostrar_informe_degradacion() -> void:

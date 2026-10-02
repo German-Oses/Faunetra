@@ -284,6 +284,7 @@ func _disipar(celda: Vector2i) -> void:
 			celdas[otra]["n"] = false
 			_sincronizar_planta(otra)
 			despejadas += 1
+	EventBus.accion_terreno.emit("disipar")
 	_tras_cambio("La Niebla del Olvido se disipa en %d parcelas (−%d PR)." % [despejadas, costo])
 
 
@@ -300,6 +301,7 @@ func _limpiar(celda: Vector2i) -> void:
 	if not _pagar(costo):
 		return
 	c["b"] = ""
+	EventBus.accion_terreno.emit("limpiar")
 	_tras_cambio("Retiraste: %s (−%d PR)." % [info.get("nombre", "bloqueador"), costo])
 
 
@@ -335,6 +337,7 @@ func _plantar(celda: Vector2i) -> void:
 		if b["explicita"]:
 			detalle = " Sinergia activa: «%s» (+%d%%)." % [b["nombre"], int(b["bono"] * 100)]
 			break
+	EventBus.accion_terreno.emit("plantar")
 	_tras_cambio("Plantaste %s (−%d PR).%s" % [data.nombre_comun, costo, detalle])
 
 
@@ -348,6 +351,7 @@ func _sanar(celda: Vector2i) -> void:
 		return
 	c["m"] = false
 	_sincronizar_planta(celda)
+	EventBus.accion_terreno.emit("sanar")
 	_tras_cambio("La planta recupera su vitalidad (−%d PR)." % costo)
 
 

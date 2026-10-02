@@ -11,7 +11,7 @@ signal nivel_dificultad_cambiado(nuevo_nivel: TriviaData.Dificultad)
 
 const RUTA_BANCO_JSON := "res://data/trivias/banco_trivias.json"
 ## PR (Esencia Vital) que entrega una respuesta correcta según su dificultad.
-const PR_POR_DIFICULTAD: Array[int] = [40, 60, 90]
+const PR_POR_DIFICULTAD: Array[int] = [60, 90, 130]
 const XP_GENERADA: Array[int] = [30, 50, 75]
 const PR_BONO_REPASO := 30
 const NOMBRES_DIFICULTAD: Array[String] = ["Fácil", "Medio", "Difícil"]

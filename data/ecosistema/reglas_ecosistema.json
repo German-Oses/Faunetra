@@ -4,12 +4,12 @@
     "sanar": 15
   },
   "costo_plantar_por_estado": {
-    "LC": 30,
-    "NT": 35,
-    "VU": 40,
-    "EN": 50,
-    "CR": 60,
-    "EW": 70
+    "LC": 20,
+    "NT": 25,
+    "VU": 30,
+    "EN": 35,
+    "CR": 40,
+    "EW": 45
   },
   "bono_biodiversidad": 0.1,
   "bloqueadores": {
@@ -111,30 +111,6 @@
       "nombre": "Aura de Humedad"
     },
     {
-      "fuente": "Guayacán",
-      "objetivo": "Orquídea de la zona central",
-      "bono": 0.2,
-      "nombre": "Sombra protectora"
-    },
-    {
-      "fuente": "Palma chilena",
-      "objetivo": "Guayacán",
-      "bono": 0.15,
-      "nombre": "Dosel estructurador"
-    },
-    {
-      "fuente": "Queñoa de altura",
-      "objetivo": "Cactus de la costa norte",
-      "bono": 0.2,
-      "nombre": "Planta nodriza"
-    },
-    {
-      "fuente": "Queñoa de altura",
-      "objetivo": "Chayotillo del norte",
-      "bono": 0.2,
-      "nombre": "Planta nodriza"
-    },
-    {
       "fuente": "Alerce",
       "objetivo": "Teresa",
       "bono": 0.25,
@@ -189,26 +165,109 @@
       "nombre": "Ribera húmeda"
     },
     {
+      "fuente": "Queñoa de altura",
+      "objetivo": "Cactus de la costa norte",
+      "bono": 0.2,
+      "nombre": "Planta nodriza"
+    },
+    {
+      "fuente": "Queñoa de altura",
+      "objetivo": "Chayotillo del norte",
+      "bono": 0.2,
+      "nombre": "Planta nodriza"
+    },
+    {
+      "fuente": "Queñoa de altura",
+      "objetivo": "Sandillón de los Andes",
+      "bono": 0.2,
+      "nombre": "Planta nodriza"
+    },
+    {
+      "fuente": "Cactus de la costa norte",
+      "objetivo": "Ají de zorra",
+      "bono": 0.15,
+      "nombre": "Gotas de camanchaca"
+    },
+    {
+      "fuente": "Chayotillo del norte",
+      "objetivo": "Tintero del desierto",
+      "bono": 0.15,
+      "nombre": "Suelo sombreado"
+    },
+    {
+      "fuente": "Guayacán",
+      "objetivo": "Orquídea de la zona central",
+      "bono": 0.2,
+      "nombre": "Sombra protectora"
+    },
+    {
+      "fuente": "Palma chilena",
+      "objetivo": "Guayacán",
+      "bono": 0.15,
+      "nombre": "Dosel estructurador"
+    },
+    {
+      "fuente": "Guayacán",
+      "objetivo": "Seta del roble maule",
+      "bono": 0.2,
+      "nombre": "Hojarasca húmeda"
+    },
+    {
+      "fuente": "Palo gordo",
+      "objetivo": "Chilenito (Cactus)",
+      "bono": 0.2,
+      "nombre": "Ladera estabilizada"
+    },
+    {
       "fuente": "Lenga",
       "objetivo": "Calafate",
       "bono": 0.2,
       "nombre": "Refugio del viento"
     },
     {
+      "fuente": "Lenga",
+      "objetivo": "Helecho película patagónico",
+      "bono": 0.25,
+      "nombre": "Sombra húmeda"
+    },
+    {
+      "fuente": "Lenga",
+      "objetivo": "Liquen de la estepa",
+      "bono": 0.2,
+      "nombre": "Corteza de lenga"
+    },
+    {
+      "fuente": "Chupa sangre / Maihuén",
+      "objetivo": "Cactus patagónico",
+      "bono": 0.2,
+      "nombre": "Planta nodriza"
+    },
+    {
       "fuente": "Luma de Juan Fernández",
       "objetivo": "Toromiro (Rapa Nui)",
       "bono": 0.15,
       "nombre": "Aura de Humedad"
+    },
+    {
+      "fuente": "Luma de Juan Fernández",
+      "objetivo": "Peperomia de Skottsberg",
+      "bono": 0.25,
+      "nombre": "Dosel cerrado"
+    },
+    {
+      "fuente": "Luma de Juan Fernández",
+      "objetivo": "Liquen insular gigante",
+      "bono": 0.2,
+      "nombre": "Corteza húmeda"
+    },
+    {
+      "fuente": "Cortadera insular",
+      "objetivo": "Abrojo de Más Afuera",
+      "bono": 0.2,
+      "nombre": "Ladera retenida"
     }
   ],
   "atracciones": [
-    {
-      "animal": "Loro tricahue",
-      "requiere": [
-        "Palma chilena",
-        "Guayacán"
-      ]
-    },
     {
       "animal": "Camarón de vega",
       "requiere": [
@@ -272,11 +331,162 @@
       "min_salud": 60
     },
     {
-      "animal": "Huemul",
+      "animal": "Balita de Barriga",
       "requiere": [
-        "Lenga",
-        "Calafate"
+        "Ají de zorra"
       ]
+    },
+    {
+      "animal": "Lagartija de Constanza",
+      "requiere": [
+        "Cactus de la costa norte"
+      ],
+      "min_salud": 10
+    },
+    {
+      "animal": "Corredor de Tarapacá",
+      "requiere": [
+        "Cactus de la costa norte",
+        "Sandillón de los Andes"
+      ],
+      "min_salud": 15
+    },
+    {
+      "animal": "Ratón chinchilla ceniciente",
+      "requiere": [
+        "Chayotillo del norte",
+        "Queñoa de altura"
+      ],
+      "min_salud": 20
+    },
+    {
+      "animal": "Caracol de vertiente norte",
+      "requiere": [
+        "Chayotillo del norte",
+        "Tintero del desierto"
+      ],
+      "min_salud": 25
+    },
+    {
+      "animal": "Cuervo de pantano de la puna",
+      "requiere": [
+        "Queñoa de altura",
+        "Chayotillo del norte"
+      ],
+      "min_salud": 30
+    },
+    {
+      "animal": "Guanaco norteño",
+      "requiere": [
+        "Queñoa de altura",
+        "Ají de zorra"
+      ],
+      "min_salud": 35
+    },
+    {
+      "animal": "Vicuña",
+      "requiere": [
+        "Queñoa de altura",
+        "Sandillón de los Andes"
+      ],
+      "min_salud": 40
+    },
+    {
+      "animal": "Flamenco andino",
+      "requiere": [
+        "Queñoa de altura",
+        "Cactus de la costa norte",
+        "Chayotillo del norte"
+      ],
+      "min_salud": 50
+    },
+    {
+      "animal": "Chinchilla cordillerana",
+      "requiere": [
+        "Queñoa de altura",
+        "Sandillón de los Andes",
+        "Ají de zorra"
+      ],
+      "min_salud": 60
+    },
+    {
+      "animal": "Araña de Hualpén",
+      "requiere": [
+        "Guayacán"
+      ]
+    },
+    {
+      "animal": "Camarón almeja",
+      "requiere": [
+        "Orquídea de la zona central"
+      ],
+      "min_salud": 10
+    },
+    {
+      "animal": "Pancora de Concepción",
+      "requiere": [
+        "Guayacán",
+        "Seta del roble maule"
+      ],
+      "min_salud": 15
+    },
+    {
+      "animal": "Lagartija de Curicó",
+      "requiere": [
+        "Chilenito (Cactus)",
+        "Palo gordo"
+      ],
+      "min_salud": 20
+    },
+    {
+      "animal": "Ratón chinchilla común",
+      "requiere": [
+        "Chilenito (Cactus)",
+        "Guayacán"
+      ],
+      "min_salud": 25
+    },
+    {
+      "animal": "Monito del monte",
+      "requiere": [
+        "Guayacán",
+        "Orquídea de la zona central"
+      ],
+      "min_salud": 35
+    },
+    {
+      "animal": "Loro tricahue",
+      "requiere": [
+        "Palma chilena",
+        "Guayacán"
+      ],
+      "min_salud": 40
+    },
+    {
+      "animal": "Chinchilla costina",
+      "requiere": [
+        "Chilenito (Cactus)",
+        "Palo gordo",
+        "Guayacán"
+      ],
+      "min_salud": 45
+    },
+    {
+      "animal": "Zorro culpeo",
+      "requiere": [
+        "Guayacán",
+        "Palma chilena"
+      ],
+      "min_salud": 55
+    },
+    {
+      "animal": "Cóndor andino",
+      "requiere": [
+        "Palma chilena",
+        "Guayacán",
+        "Palo gordo"
+      ],
+      "min_salud": 65
     },
     {
       "animal": "Cometocino patagónico",
@@ -285,16 +495,136 @@
       ]
     },
     {
-      "animal": "Vicuña",
+      "animal": "Pancora alacalufi",
       "requiere": [
-        "Queñoa de altura"
+        "Lenga"
+      ],
+      "min_salud": 10
+    },
+    {
+      "animal": "Pancora patagónica",
+      "requiere": [
+        "Lenga",
+        "Helecho película patagónico"
+      ],
+      "min_salud": 20
+    },
+    {
+      "animal": "Camarón de río del sur",
+      "requiere": [
+        "Lenga",
+        "Calafate"
+      ],
+      "min_salud": 25
+    },
+    {
+      "animal": "Sapo de cuatro ojos del sur",
+      "requiere": [
+        "Chupa sangre / Maihuén",
+        "Liquen de roca patagónico"
+      ],
+      "min_salud": 30
+    },
+    {
+      "animal": "Camarón pintado austral",
+      "requiere": [
+        "Helecho película patagónico",
+        "Liquen de la estepa"
+      ],
+      "min_salud": 35
+    },
+    {
+      "animal": "Gato montés argentino",
+      "requiere": [
+        "Calafate",
+        "Chupa sangre / Maihuén",
+        "Cactus patagónico"
+      ],
+      "min_salud": 45
+    },
+    {
+      "animal": "Delfín austral",
+      "requiere": [
+        "Lenga",
+        "Liquen de la estepa"
+      ],
+      "min_salud": 50
+    },
+    {
+      "animal": "Huemul",
+      "requiere": [
+        "Lenga",
+        "Calafate"
+      ],
+      "min_salud": 60
+    },
+    {
+      "animal": "Caracol terrestre de J. F.",
+      "requiere": [
+        "Luma de Juan Fernández"
       ]
+    },
+    {
+      "animal": "Caracol terrestre gordo",
+      "requiere": [
+        "Peperomia de Skottsberg"
+      ],
+      "min_salud": 10
+    },
+    {
+      "animal": "Caracol terrestre oculto",
+      "requiere": [
+        "Luma de Juan Fernández",
+        "Liquen insular gigante"
+      ],
+      "min_salud": 20
+    },
+    {
+      "animal": "Gecko de escamas lisas",
+      "requiere": [
+        "Toromiro (Rapa Nui)"
+      ],
+      "min_salud": 20
+    },
+    {
+      "animal": "Caracol terrestre de Selkirk",
+      "requiere": [
+        "Cortadera insular",
+        "Luma de Juan Fernández"
+      ],
+      "min_salud": 25
+    },
+    {
+      "animal": "Seudoescorpión insular",
+      "requiere": [
+        "Liquen insular gigante",
+        "Luma de Juan Fernández"
+      ],
+      "min_salud": 30
+    },
+    {
+      "animal": "Caracol de Más Afuera",
+      "requiere": [
+        "Luma de Juan Fernández",
+        "Peperomia de Skottsberg",
+        "Liquen insular gigante"
+      ],
+      "min_salud": 35
     },
     {
       "animal": "Fardela de Juan Fernández",
       "requiere": [
         "Cortadera insular"
-      ]
+      ],
+      "min_salud": 40
+    },
+    {
+      "animal": "Serpiente marina pelágica",
+      "requiere": [
+        "Cortadera insular",
+        "Abrojo de Más Afuera"
+      ],
+      "min_salud": 55
     }
   ]
 }

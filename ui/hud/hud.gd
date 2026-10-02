@@ -5,6 +5,7 @@ extends Control
 
 const Tableta := preload("res://ui/tableta/tableta.gd")
 const MenuMundos := preload("res://ui/menu_mundos/menu_mundos.gd")
+const Tutorial := preload("res://ui/hud/tutorial.gd")
 
 const HERRAMIENTAS := [
 	{"id": "identificar", "texto": "Identificar"},
@@ -30,6 +31,7 @@ var _tableta: Tableta
 var _menu: MenuMundos
 var _dialogos_pendientes: Array = []
 var _dialogo_abierto: Control
+var _tutorial: Tutorial
 
 
 func _ready() -> void:
@@ -258,6 +260,36 @@ func mostrar_aviso(texto: String) -> void:
 	_tween_aviso = create_tween()
 	_tween_aviso.tween_interval(DURACION_AVISO)
 	_tween_aviso.tween_property(_aviso, "modulate:a", 0.0, 0.6)
+
+
+## Inicia (o retoma) el tutorial guiado si el jugador no lo ha completado.
+func iniciar_tutorial() -> void:
+	if _tutorial != null or GameState.tutorial_paso >= Tutorial.PASOS.size():
+		return
+	_tutorial = Tutorial.new()
+	_tutorial.hud = self
+	_tutorial.terminado.connect(func() -> void: _tutorial = null)
+	add_child(_tutorial)
+	if not _menu.visibility_changed.is_connected(_on_menu_visibilidad):
+		_menu.visibility_changed.connect(_on_menu_visibilidad)
+		_tableta.visibility_changed.connect(_on_tableta_visibilidad)
+
+
+func _on_menu_visibilidad() -> void:
+	if _tutorial and not _menu.visible:
+		_tutorial.avisar("explorar")
+
+
+func _on_tableta_visibilidad() -> void:
+	if _tutorial and _tableta.visible:
+		_tutorial.avisar("tableta")
+
+
+## Control que el tutorial hace parpadear en cada paso.
+func objetivo_tutorial(nombre: String) -> CanvasItem:
+	if nombre == "tableta":
+		return _boton_tableta
+	return _botones_herramienta.get(nombre)
 
 
 ## Abre el menú de mundos (pantalla de inicio).

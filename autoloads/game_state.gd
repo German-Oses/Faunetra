@@ -26,7 +26,7 @@ const NOMBRES_BIOMAS := {
 	5: "Territorios Insulares",
 }
 const UMBRAL_DESBLOQUEO := 75.0
-const PR_INICIAL := 120
+const PR_INICIAL := 150
 const SEGUNDOS_DIA := 86400
 ## Días sin jugar que se toleran antes de que el refugio comience a degradarse.
 const DIAS_DE_GRACIA := 1
@@ -54,6 +54,8 @@ var desbloqueados: Array[int] = []
 var ultimo_bioma: int = -1
 var sesion: int = 0
 var primera_partida := true
+## Paso actual del tutorial guiado (ver ui/hud/tutorial.gd); al completarlo queda en el total de pasos.
+var tutorial_paso := 0
 var datos_trivia: Dictionary = {}
 
 ## Resumen de lo que ocurrió mientras el jugador no estuvo (se muestra al iniciar).
@@ -161,7 +163,7 @@ func calcular_salud(id_bioma: int) -> float:
 
 ## Cantidad de plantas adultas sanas para completar el componente de flora de la salud.
 func meta_flora(total_celdas: int) -> float:
-	return clampf(total_celdas * 0.08, 6.0, 20.0)
+	return clampf(total_celdas * 0.05, 6.0, 14.0)
 
 
 func actualizar_salud(id_bioma: int) -> float:
@@ -355,6 +357,7 @@ func reiniciar_partida() -> void:
 	herramienta_activa = "identificar"
 	sesion = 1
 	primera_partida = true
+	tutorial_paso = 0
 	informe_degradacion.clear()
 	dias_inactivo = 0
 	var trivia := get_node_or_null("/root/TriviaManager")
@@ -379,6 +382,7 @@ func guardar() -> void:
 		"ultima_sesion": _ultima_sesion,
 		"sesion": sesion,
 		"primera_partida": primera_partida,
+		"tutorial_paso": tutorial_paso,
 		"ultimo_bioma": ultimo_bioma,
 		"desbloqueados": desbloqueados,
 		"biomas": biomas,
@@ -396,8 +400,19 @@ func guardar() -> void:
 	_tiempo_sin_guardar = 0.0
 
 
+## El proyecto se llamó "New Game Project" durante el prototipo; Godot guarda los datos en una
+## carpeta con el nombre del proyecto, así que traemos la partida antigua si existe.
+func _migrar_guardado_antiguo() -> void:
+	if FileAccess.file_exists(RUTA_GUARDADO):
+		return
+	var antiguo := OS.get_user_data_dir().get_base_dir().path_join("New Game Project/faunetra_guardado.json")
+	if FileAccess.file_exists(antiguo):
+		DirAccess.copy_absolute(antiguo, ProjectSettings.globalize_path(RUTA_GUARDADO))
+
+
 func cargar() -> void:
 	desbloqueados = [ORDEN_BIOMAS[0]]
+	_migrar_guardado_antiguo()
 	if not FileAccess.file_exists(RUTA_GUARDADO):
 		return
 	var datos = JSON.parse_string(FileAccess.get_file_as_string(RUTA_GUARDADO))
@@ -408,6 +423,7 @@ func cargar() -> void:
 	_ultima_sesion = float(datos.get("ultima_sesion", 0.0))
 	sesion = int(datos.get("sesion", 0))
 	primera_partida = bool(datos.get("primera_partida", true))
+	tutorial_paso = int(datos.get("tutorial_paso", 0))
 	ultimo_bioma = int(datos.get("ultimo_bioma", -1))
 	for id in datos.get("desbloqueados", []):
 		if not desbloqueados.has(int(id)):
