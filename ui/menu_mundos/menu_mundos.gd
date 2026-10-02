@@ -329,12 +329,12 @@ func _refrescar_mapa() -> void:
 			descubiertas += 1
 	if GameState.esta_desbloqueado(id):
 		_estado_bioma.text = "Salud %d%% · %d/%d especies descubiertas · %d PR\nMeta: %d%% para abrir el siguiente bioma." % [
-			int(salud), descubiertas, total, GameState.obtener_pr(id), int(GameState.UMBRAL_DESBLOQUEO)]
+			int(salud), descubiertas, total, GameState.obtener_pr(id), int(GameState.umbral_desbloqueo())]
 		_explorar.disabled = false
 		_explorar.text = "Volver al refugio" if id == GameState.bioma_actual_id else "Explorar"
 	else:
 		_estado_bioma.text = "Bloqueado: sana %s hasta %d%% para llegar aquí." % [
-			GameState.nombre_bioma(GameState.bioma_anterior(id)), int(GameState.UMBRAL_DESBLOQUEO)]
+			GameState.nombre_bioma(GameState.bioma_anterior(id)), int(GameState.umbral_desbloqueo())]
 		_explorar.disabled = true
 		_explorar.text = "Bloqueado"
 	_refrescar_especies_cercanas(id)

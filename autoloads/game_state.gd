@@ -2,7 +2,9 @@ extends Node
 
 ## GameState - Estado persistente de Faunetra.
 ## - Economía local: los Puntos de Restauración (PR) se guardan y gastan por bioma.
-## - Salud 0-100% por bioma y desbloqueo secuencial al superar UMBRAL_DESBLOQUEO.
+## - Modo de juego (Explorador / Guardaparques / Científico) que fija la presión del refugio
+##   y el punto de partida del DDA de trivias (ver MODOS y ajuste()).
+## - Salud 0-100% por bioma y desbloqueo secuencial al superar umbral_desbloqueo().
 ## - Estado de la grilla de cada refugio (niebla, bloqueadores, plantas, fauna presente).
 ## - Biopedia (especies descubiertas) y validaciones de repetición espaciada (24 h, 3 y 7 días).
 ## - Degradación por abandono calculada con timestamps entre sesiones.
@@ -25,11 +27,7 @@ const NOMBRES_BIOMAS := {
 	4: "Patagonia",
 	5: "Territorios Insulares",
 }
-const UMBRAL_DESBLOQUEO := 75.0
-const PR_INICIAL := 150
 const SEGUNDOS_DIA := 86400
-## Días sin jugar que se toleran antes de que el refugio comience a degradarse.
-const DIAS_DE_GRACIA := 1
 const MAX_SEVERIDAD := 7
 const INTERVALOS_REPASO_DIAS: Array[int] = [1, 3, 7]
 const SEGUNDOS_ENTRE_GUARDADOS := 3.0
@@ -39,6 +37,44 @@ const PESO_DESPEJE := 30.0
 const PESO_LIMPIEZA := 20.0
 const PESO_FLORA := 30.0
 const PESO_FAUNA := 20.0
+
+## Modos de juego. El modo fija la presión de gestión del refugio y desde dónde parte el DDA;
+## la dificultad del contenido la sigue ajustando TriviaManager según el desempeño.
+## - pr_inicial: PR con que comienza cada bioma.
+## - costo_mult: multiplica los costos en PR del terreno (niebla, limpiar, plantar, sanar).
+## - tiempo_crecimiento: segundos para que una planta madure sin bonificaciones.
+## - umbral_desbloqueo: salud (%) que abre el siguiente bioma.
+## - dias_gracia: días sin jugar tolerados antes de degradarse; severidad_mult escala la degradación.
+## - nivel_inicial_dda: 0 Fácil, 1 Medio, 2 Difícil. racha_para_subir: aciertos seguidos para subir.
+## - distractores: opciones incorrectas en las preguntas generadas desde las fichas.
+## - pista_inmediata: la pista se muestra siempre. pr_con_pista: factor de PR si se pidió la pista.
+const MODO_POR_DEFECTO := "guardaparques"
+const MODOS := {
+	"explorador": {
+		"nombre": "Explorador", "icono": "brujula",
+		"descripcion": "Para conocer Chile con calma: más PR, costos bajos, plantas que crecen rápido y pistas siempre visibles.",
+		"pr_inicial": 200, "costo_mult": 0.75, "tiempo_crecimiento": 30.0, "umbral_desbloqueo": 65.0,
+		"dias_gracia": 3, "severidad_mult": 0.5,
+		"nivel_inicial_dda": 0, "racha_para_subir": 3, "distractores": 2,
+		"pista_inmediata": true, "pr_con_pista": 1.0,
+	},
+	"guardaparques": {
+		"nombre": "Guardaparques", "icono": "hoja",
+		"descripcion": "La experiencia equilibrada: el refugio exige cuidado constante y las trivias se adaptan a ti.",
+		"pr_inicial": 150, "costo_mult": 1.0, "tiempo_crecimiento": 40.0, "umbral_desbloqueo": 75.0,
+		"dias_gracia": 1, "severidad_mult": 1.0,
+		"nivel_inicial_dda": 0, "racha_para_subir": 2, "distractores": 2,
+		"pista_inmediata": false, "pr_con_pista": 1.0,
+	},
+	"cientifico": {
+		"nombre": "Científico", "icono": "libro",
+		"descripcion": "Para expertos: menos PR, costos altos, preguntas desde nivel Medio con más opciones y pistas que restan PR.",
+		"pr_inicial": 100, "costo_mult": 1.25, "tiempo_crecimiento": 55.0, "umbral_desbloqueo": 85.0,
+		"dias_gracia": 1, "severidad_mult": 1.3,
+		"nivel_inicial_dda": 1, "racha_para_subir": 2, "distractores": 3,
+		"pista_inmediata": false, "pr_con_pista": 0.5,
+	},
+}
 
 var bioma_actual_id: int = -1
 var herramienta_activa: String = "identificar":
@@ -54,6 +90,9 @@ var desbloqueados: Array[int] = []
 var ultimo_bioma: int = -1
 var sesion: int = 0
 var primera_partida := true
+## Modo de juego de la partida (clave de MODOS). Se elige al comenzar y no cambia hasta una partida nueva.
+var modo: String = MODO_POR_DEFECTO
+var modo_elegido := false
 ## Paso actual del tutorial guiado (ver ui/hud/tutorial.gd); al completarlo queda en el total de pasos.
 var tutorial_paso := 0
 ## Opciones del jugador (se aplican al cargar).
@@ -101,7 +140,7 @@ func estado_bioma(id_bioma: int) -> Dictionary:
 	var clave := str(id_bioma)
 	if not biomas.has(clave):
 		biomas[clave] = {
-			"pr": PR_INICIAL,
+			"pr": int(ajuste("pr_inicial")),
 			"salud": 0.0,
 			"celdas": {},
 			"fauna": [],
@@ -110,6 +149,44 @@ func estado_bioma(id_bioma: int) -> Dictionary:
 			"niebla_pendiente": 0,
 		}
 	return biomas[clave]
+
+
+# --- Modo de juego -----------------------------------------------------------------------
+
+## Valor de un parámetro del modo actual (ver MODOS).
+func ajuste(parametro: String) -> Variant:
+	return MODOS.get(modo, MODOS[MODO_POR_DEFECTO])[parametro]
+
+
+func nombre_modo(id_modo: String = "") -> String:
+	return str(MODOS.get(id_modo if id_modo != "" else modo, MODOS[MODO_POR_DEFECTO])["nombre"])
+
+
+func umbral_desbloqueo() -> float:
+	return float(ajuste("umbral_desbloqueo"))
+
+
+## Costo en PR ajustado al modo, redondeado a múltiplos de 5.
+func costo(base: int) -> int:
+	return maxi(5, roundi(base * float(ajuste("costo_mult")) / 5.0) * 5)
+
+
+## Elección del modo al comenzar la partida. Los biomas aún intactos reciben los PR iniciales del nuevo modo.
+func elegir_modo(id_modo: String) -> void:
+	if not MODOS.has(id_modo):
+		return
+	var pr_anterior := int(ajuste("pr_inicial"))
+	modo = id_modo
+	modo_elegido = true
+	for clave in biomas:
+		var estado: Dictionary = biomas[clave]
+		if int(estado.get("pr", 0)) == pr_anterior and float(estado.get("salud", 0.0)) <= 0.0:
+			agregar_pr(int(ajuste("pr_inicial")) - pr_anterior, int(clave))
+	var trivia := get_node_or_null("/root/TriviaManager")
+	if trivia and trivia.total_trivias_respondidas == 0:
+		trivia.reiniciar()
+	registrar({"tipo": "eleccion_modo", "detalle": id_modo})
+	marcar_cambios()
 
 
 func nombre_bioma(id_bioma: int) -> String:
@@ -181,7 +258,7 @@ func actualizar_salud(id_bioma: int) -> float:
 		estado["salud"] = valor
 		marcar_cambios()
 	salud_actualizada.emit(id_bioma, valor)
-	if valor >= UMBRAL_DESBLOQUEO:
+	if valor >= umbral_desbloqueo():
 		_desbloquear_siguiente(id_bioma)
 	return valor
 
@@ -300,11 +377,13 @@ func _aplicar_degradacion_por_inactividad(ahora: float) -> void:
 	if _ultima_sesion <= 0.0:
 		return
 	dias_inactivo = int((ahora - _ultima_sesion) / SEGUNDOS_DIA)
-	if dias_inactivo <= DIAS_DE_GRACIA:
+	var dias_gracia := int(ajuste("dias_gracia"))
+	if dias_inactivo <= dias_gracia:
 		return
 
-	var severidad := mini(dias_inactivo - DIAS_DE_GRACIA, MAX_SEVERIDAD)
-	var prob_marchitar := minf(0.9, 0.25 * severidad)
+	var severidad := mini(dias_inactivo - dias_gracia, MAX_SEVERIDAD)
+	var factor := float(ajuste("severidad_mult"))
+	var prob_marchitar := minf(0.9, 0.25 * severidad * factor)
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	for clave in biomas:
@@ -321,7 +400,7 @@ func _aplicar_degradacion_por_inactividad(ahora: float) -> void:
 		var fauna: Array = estado.get("fauna", [])
 		var se_fueron := fauna.size()
 		fauna.clear()
-		var niebla := 3 * severidad
+		var niebla := roundi(3 * severidad * factor)
 		estado["niebla_pendiente"] = int(estado.get("niebla_pendiente", 0)) + niebla
 		var antes := float(estado.get("salud", 0.0))
 		estado["salud"] = calcular_salud(int(clave))
@@ -370,7 +449,7 @@ func aplicar_volumen() -> void:
 
 # --- Registro de aprendizaje (para la tesis) ------------------------------------------
 
-const COLUMNAS_REGISTRO: Array[String] = ["fecha_hora", "participante", "sesion", "tipo", "id_bioma", "bioma",
+const COLUMNAS_REGISTRO: Array[String] = ["fecha_hora", "participante", "sesion", "modo_juego", "tipo", "id_bioma", "bioma",
 	"id_especie", "especie", "id_trivia", "dificultad", "modo", "correcta", "tiempo_s", "uso_pista",
 	"apoyo_tutor", "nivel_dda", "pr", "detalle"]
 
@@ -381,6 +460,7 @@ func registrar(evento: Dictionary) -> void:
 	e["fecha_hora"] = Time.get_datetime_string_from_system(false, true)
 	e["participante"] = codigo_participante
 	e["sesion"] = sesion
+	e["modo_juego"] = modo
 	if not e.has("id_bioma"):
 		e["id_bioma"] = bioma_actual_id
 	e["bioma"] = nombre_bioma(int(e["id_bioma"])) if int(e["id_bioma"]) > 0 else ""
@@ -405,8 +485,10 @@ func registro_csv() -> String:
 
 # --- Persistencia -------------------------------------------------------------------
 
-## Borra todo el progreso y vuelve a cargar la escena principal desde cero.
-func reiniciar_partida() -> void:
+## Borra todo el progreso y vuelve a cargar la escena principal desde cero con el modo indicado.
+func reiniciar_partida(id_modo: String = "") -> void:
+	modo = id_modo if MODOS.has(id_modo) else modo
+	modo_elegido = MODOS.has(id_modo)
 	biomas = {}
 	descubiertas = {}
 	validaciones = {}
@@ -444,6 +526,8 @@ func guardar() -> void:
 		"sesion": sesion,
 		"primera_partida": primera_partida,
 		"tutorial_paso": tutorial_paso,
+		"modo": modo,
+		"modo_elegido": modo_elegido,
 		"opciones": opciones,
 		"codigo_participante": codigo_participante,
 		"registro": registro,
@@ -488,6 +572,11 @@ func cargar() -> void:
 	sesion = int(datos.get("sesion", 0))
 	primera_partida = bool(datos.get("primera_partida", true))
 	tutorial_paso = int(datos.get("tutorial_paso", 0))
+	modo = str(datos.get("modo", MODO_POR_DEFECTO))
+	if not MODOS.has(modo):
+		modo = MODO_POR_DEFECTO
+	# Las partidas anteriores a los modos siguen en Guardaparques sin volver a preguntar.
+	modo_elegido = bool(datos.get("modo_elegido", not primera_partida))
 	opciones.merge(datos.get("opciones", {}), true)
 	codigo_participante = str(datos.get("codigo_participante", ""))
 	registro = datos.get("registro", [])
@@ -507,7 +596,7 @@ func cargar() -> void:
 		for id in estado.get("fauna", []):
 			fauna.append(int(id))
 		estado["fauna"] = fauna
-		estado["pr"] = int(estado.get("pr", PR_INICIAL))
+		estado["pr"] = int(estado.get("pr", ajuste("pr_inicial")))
 		for k in estado.get("celdas", {}):
 			var c: Dictionary = estado["celdas"][k]
 			c["e"] = int(c.get("e", 0))

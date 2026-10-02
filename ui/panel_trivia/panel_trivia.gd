@@ -213,8 +213,12 @@ func _mostrar_trivia(trivia: TriviaData) -> void:
 	pregunta_label.text = trivia.pregunta
 	pista_label.text = "Pista: " + trivia.pista_narrativa
 	pista_button.visible = not trivia.pista_narrativa.is_empty()
-	# El tutor inteligente ofrece la pista de inmediato si detecta dificultades.
-	pista_label.visible = pista_button.visible and TriviaManager.necesita_apoyo(trivia.id_especie)
+	var factor_pista := float(GameState.ajuste("pr_con_pista"))
+	pista_button.text = "Pedir pista formativa" if factor_pista >= 1.0 \
+		else "Pedir pista formativa (−%d%% PR)" % roundi((1.0 - factor_pista) * 100)
+	# El tutor inteligente ofrece la pista de inmediato si detecta dificultades (y el modo Explorador siempre).
+	pista_label.visible = pista_button.visible and (bool(GameState.ajuste("pista_inmediata")) \
+		or TriviaManager.necesita_apoyo(trivia.id_especie))
 	_uso_pista = pista_label.visible
 	retroalimentacion_panel.visible = false
 	_siguiente_button.visible = false

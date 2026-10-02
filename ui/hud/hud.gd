@@ -7,6 +7,7 @@ const Tableta := preload("res://ui/tableta/tableta.gd")
 const MenuMundos := preload("res://ui/menu_mundos/menu_mundos.gd")
 const Tutorial := preload("res://ui/hud/tutorial.gd")
 const Opciones := preload("res://ui/opciones/opciones.gd")
+const VentanaModo := preload("res://ui/hud/ventana_modo.gd")
 
 const HERRAMIENTAS := [
 	{"id": "identificar", "texto": "Identificar"},
@@ -109,7 +110,7 @@ func _construir_barra_superior() -> void:
 	_salud_barra.custom_minimum_size = Vector2(160, 18)
 	_salud_barra.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_salud_barra.show_percentage = false
-	_salud_barra.tooltip_text = "Sana el bioma hasta %d%% para desbloquear el siguiente." % int(GameState.UMBRAL_DESBLOQUEO)
+	_salud_barra.tooltip_text = "Sana el bioma hasta %d%% para desbloquear el siguiente." % int(GameState.umbral_desbloqueo())
 	fila.add_child(_salud_barra)
 
 	var mapa := Button.new()
@@ -255,14 +256,14 @@ func _on_salud_actualizada(id_bioma: int, salud: float) -> void:
 	if id_bioma != GameState.bioma_actual_id:
 		return
 	_salud_barra.value = salud
-	_salud_label.text = "Salud %d%% (meta %d%%)" % [int(salud), int(GameState.UMBRAL_DESBLOQUEO)]
-	_salud_barra.modulate = Color(0.55, 1.0, 0.6) if salud >= GameState.UMBRAL_DESBLOQUEO else Color.WHITE
+	_salud_label.text = "Salud %d%% (meta %d%%)" % [int(salud), int(GameState.umbral_desbloqueo())]
+	_salud_barra.modulate = Color(0.55, 1.0, 0.6) if salud >= GameState.umbral_desbloqueo() else Color.WHITE
 
 
 func _on_bioma_desbloqueado(id_bioma: int) -> void:
 	mostrar_dialogo("¡Nuevo bioma desbloqueado!",
 		"Tu refugio alcanzó %d%% de salud. Ahora puedes viajar a %s desde Mundos." % [
-			int(GameState.UMBRAL_DESBLOQUEO), GameState.nombre_bioma(id_bioma)])
+			int(GameState.umbral_desbloqueo()), GameState.nombre_bioma(id_bioma)])
 
 
 func _actualizar_boton_tableta() -> void:
@@ -283,6 +284,14 @@ func mostrar_aviso(texto: String) -> void:
 
 
 ## Inicia (o retoma) el tutorial guiado si el jugador no lo ha completado.
+## Primera partida: pide elegir el modo de juego y luego comienza el tutorial.
+func elegir_modo_inicial() -> void:
+	var ventana := VentanaModo.new()
+	ventana.terminado.connect(iniciar_tutorial)
+	add_child(ventana)
+	ventana.abrir()
+
+
 func iniciar_tutorial() -> void:
 	if _tutorial != null or GameState.tutorial_paso >= Tutorial.PASOS.size():
 		return

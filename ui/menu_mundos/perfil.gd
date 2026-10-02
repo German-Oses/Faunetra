@@ -1,13 +1,16 @@
 extends VBoxContainer
 
 ## Perfil del Guardián: nivel (según XP), progreso de aprendizaje, salud de cada bioma,
-## insignias y la opción de comenzar una partida nueva.
+## insignias, el modo de juego y la opción de comenzar una partida nueva (eligiendo su modo).
 
 const XP_POR_NIVEL := 250
 
 var _resumen: GridContainer
 var _biomas: VBoxContainer
 var _insignias: Label
+var _modo: Label
+var _nueva_partida: VBoxContainer
+var _selector: SelectorModo
 var _confirmar: Button
 var _participante: LineEdit
 var _registros: Label
@@ -46,6 +49,10 @@ func _ready() -> void:
 	_insignias.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(_insignias)
 
+	_modo = Label.new()
+	_modo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	add_child(_modo)
+
 	add_child(_crear_seccion_investigacion())
 
 	var espacio := Control.new()
@@ -58,14 +65,23 @@ func _ready() -> void:
 	nueva.text = "Nueva partida"
 	nueva.add_theme_stylebox_override("normal", TemaFaunetra.caja(Color("#B5553F"), Color("#8E3A2A"), 10, 2, 8))
 	nueva.add_theme_stylebox_override("hover", TemaFaunetra.caja(Color("#C8634C"), Color("#8E3A2A"), 10, 2, 8))
-	nueva.pressed.connect(func() -> void: _confirmar.visible = true)
+	nueva.pressed.connect(func() -> void: _nueva_partida.visible = true)
 	fila.add_child(nueva)
+
+	_nueva_partida = VBoxContainer.new()
+	_nueva_partida.visible = false
+	add_child(_nueva_partida)
+	var t_modo := Label.new()
+	t_modo.text = "Elige el modo de la nueva partida:"
+	_nueva_partida.add_child(t_modo)
+	_selector = SelectorModo.new()
+	_selector.cambiado.connect(func(_id: String) -> void: _actualizar_confirmar())
+	_nueva_partida.add_child(_selector)
 	_confirmar = Button.new()
-	_confirmar.text = "¿Seguro? Se borrará todo el progreso — Confirmar"
+	_confirmar.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_confirmar.add_theme_stylebox_override("normal", TemaFaunetra.caja(Color("#8E3A2A"), Color("#6E2A1E"), 10, 2, 8))
-	_confirmar.visible = false
-	_confirmar.pressed.connect(GameState.reiniciar_partida)
-	fila.add_child(_confirmar)
+	_confirmar.pressed.connect(func() -> void: GameState.reiniciar_partida(_selector.seleccionado))
+	_nueva_partida.add_child(_confirmar)
 
 
 ## Datos para la investigación: código anónimo del participante y exportación del registro.
@@ -122,8 +138,15 @@ func _exportar_csv() -> void:
 	OS.shell_open(ProjectSettings.globalize_path("user://"))
 
 
+func _actualizar_confirmar() -> void:
+	_confirmar.text = "¿Seguro? Se borrará todo el progreso — Confirmar partida nueva en modo %s" % GameState.nombre_modo(_selector.seleccionado)
+
+
 func refrescar() -> void:
-	_confirmar.visible = false
+	_nueva_partida.visible = false
+	_selector.seleccionar(GameState.modo)
+	_actualizar_confirmar()
+	_modo.text = "Modo de juego: %s. %s" % [GameState.nombre_modo(), GameState.MODOS[GameState.modo]["descripcion"]]
 	_participante.text = GameState.codigo_participante
 	_registros.text = "%d eventos registrados" % GameState.registro.size()
 	for hijo in _resumen.get_children():

@@ -7,7 +7,6 @@ extends Node2D
 ## recibe sinergias de sus vecinas y puede marchitarse. La flora sana atrae fauna pasivamente.
 ## El estado de cada parcela vive en GameState, así que se guarda entre sesiones.
 
-const TIEMPO_CRECIMIENTO := 40.0      ## Segundos para que una planta madure sin bonificaciones.
 const RADIO_CLARO_INICIAL := 2.0      ## Claro sin niebla alrededor del centro al comenzar.
 const RADIO_DISIPAR := 1.0            ## Parcelas que despeja cada uso de «Disipar» (3x3).
 ## En mapas más grandes que esto, el refugio jugable se limita a RADIO_REFUGIO alrededor del centro;
@@ -310,7 +309,7 @@ func _limpiar(celda: Vector2i) -> void:
 		_avisar("No hay nada que limpiar aquí.")
 		return
 	var info := ReglasEcosistema.bloqueador(id_bioma, str(c["b"]))
-	var costo := int(info.get("costo", 35))
+	var costo := ReglasEcosistema.costo_limpiar(info)
 	if not _pagar(costo):
 		return
 	c["b"] = ""
@@ -375,7 +374,7 @@ func _identificar(celda: Vector2i) -> bool:
 		return true
 	if str(c["b"]) != "":
 		var info := ReglasEcosistema.bloqueador(id_bioma, str(c["b"]))
-		_avisar("%s: retíralo con «Limpiar» (%d PR)." % [info.get("nombre", "Bloqueador"), int(info.get("costo", 35))])
+		_avisar("%s: retíralo con «Limpiar» (%d PR)." % [info.get("nombre", "Bloqueador"), ReglasEcosistema.costo_limpiar(info)])
 		return true
 	if not es_plantable(celda):
 		_avisar(_descripcion_tipo(celda).capitalize() + ".")
@@ -449,11 +448,12 @@ func accion_valida(celda: Vector2i) -> bool:
 func _process(delta: float) -> void:
 	_tiempo += delta
 	var crecio := false
+	var tiempo_crecimiento := float(GameState.ajuste("tiempo_crecimiento"))
 	for celda in _nodos_plantas:
 		var c: Dictionary = celdas[celda]
 		if c["m"] or float(c["c"]) >= 1.0:
 			continue
-		c["c"] = minf(1.0, float(c["c"]) + delta / TIEMPO_CRECIMIENTO * _multiplicador_crecimiento(celda))
+		c["c"] = minf(1.0, float(c["c"]) + delta / tiempo_crecimiento * _multiplicador_crecimiento(celda))
 		_nodos_plantas[celda].aplicar_estado_planta(float(c["c"]), false)
 		crecio = true
 

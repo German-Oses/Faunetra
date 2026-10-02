@@ -72,8 +72,12 @@ func _mostrar_avisos_de_inicio() -> void:
 		GameState.marcar_cambios()
 	else:
 		_mostrar_informe_degradacion()
-	# El tutorial guiado reemplaza el texto de bienvenida y se retoma si quedó a medias.
-	hud.iniciar_tutorial()
+	# El tutorial guiado reemplaza el texto de bienvenida y se retoma si quedó a medias;
+	# en una partida nueva primero se elige el modo de juego.
+	if GameState.modo_elegido:
+		hud.iniciar_tutorial()
+	else:
+		hud.elegir_modo_inicial()
 
 
 func _mostrar_informe_degradacion() -> void:

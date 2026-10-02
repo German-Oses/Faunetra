@@ -2,7 +2,7 @@ class_name ReglasEcosistema
 extends RefCounted
 
 ## Reglas del ecosistema leídas desde data/ecosistema/reglas_ecosistema.json:
-## costos en PR, bloqueadores ambientales por bioma, sinergias de adyacencia y
+## costos en PR (ajustados al modo de juego), bloqueadores ambientales por bioma, sinergias de adyacencia y
 ## combinaciones de flora que atraen a cada especie de fauna.
 ## Las especies se referencian por su nombre común (sin importar tildes ni mayúsculas);
 ## una regla que nombra una especie inexistente simplemente se ignora.
@@ -33,17 +33,21 @@ static func normalizar(texto: String) -> String:
 
 
 static func costo_niebla() -> int:
-	return int(datos().get("costos", {}).get("niebla", COSTO_NIEBLA_DEFECTO))
+	return GameState.costo(int(datos().get("costos", {}).get("niebla", COSTO_NIEBLA_DEFECTO)))
 
 
 static func costo_sanar() -> int:
-	return int(datos().get("costos", {}).get("sanar", COSTO_SANAR_DEFECTO))
+	return GameState.costo(int(datos().get("costos", {}).get("sanar", COSTO_SANAR_DEFECTO)))
 
 
 ## Plantar especies más amenazadas cuesta más: su reintroducción es más delicada.
 static func costo_plantar(data: EspecieData) -> int:
 	var tabla: Dictionary = datos().get("costo_plantar_por_estado", {})
-	return int(tabla.get(data.estado_conservacion, COSTO_PLANTAR_DEFECTO))
+	return GameState.costo(int(tabla.get(data.estado_conservacion, COSTO_PLANTAR_DEFECTO)))
+
+
+static func costo_limpiar(info_bloqueador: Dictionary) -> int:
+	return GameState.costo(int(info_bloqueador.get("costo", 35)))
 
 
 static func bloqueadores_del_bioma(id_bioma: int) -> Array:

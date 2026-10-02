@@ -26,7 +26,7 @@ const PASOS := [
 	 "texto": "Elige «Plantar», escoge una especie en la barra y haz clic en una parcela libre. Algunas crecen más rápido junto a otras.",
 	 "espera": "plantar", "resaltar": "plantar"},
 	{"titulo": "6 · Atrae la fauna",
-	 "texto": "Cuando tus plantas crezcan sanas llegarán animales nativos. En la Biopedia, cada animal te dice qué plantas necesita. ¡Sana el refugio hasta 75% para abrir el siguiente!",
+	 "texto": "Cuando tus plantas crezcan sanas llegarán animales nativos. En la Biopedia, cada animal te dice qué plantas necesita. ¡Sana el refugio hasta {umbral}% para abrir el siguiente!",
 	 "espera": "boton"},
 ]
 
@@ -109,7 +109,7 @@ func avisar(evento: String) -> void:
 func _mostrar_paso() -> void:
 	var paso: Dictionary = PASOS[GameState.tutorial_paso]
 	_titulo.text = paso["titulo"]
-	_texto.text = paso["texto"]
+	_texto.text = str(paso["texto"]).replace("{umbral}", str(int(GameState.umbral_desbloqueo())))
 	_contador.text = "%d/%d" % [GameState.tutorial_paso + 1, PASOS.size()]
 	_boton.visible = paso["espera"] == "boton"
 	# En el menú de mundos la tarjeta va sobre la lista de especies cercanas, para no tapar las islas.

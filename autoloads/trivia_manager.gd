@@ -174,7 +174,7 @@ func responder_trivia(trivia: TriviaData, opcion: TriviaOption, es_repaso: bool 
 		reg["aciertos"] = int(reg.get("aciertos", 0)) + 1
 		if trivia.insignia_id != "" and not insignias_desbloqueadas.has(trivia.insignia_id):
 			insignias_desbloqueadas.append(trivia.insignia_id)
-		pr = PR_POR_DIFICULTAD[trivia.dificultad] + (PR_BONO_REPASO if es_repaso else 0)
+		pr = pr_por_acierto(trivia, es_repaso, bool(meta.get("uso_pista", false)) and not apoyo)
 		GameState.agregar_pr(pr)
 		# Resolver una pista conceptual sobre una especie la registra en la Biopedia.
 		descubierta = GameState.descubrir_especie(EspecieLoader.por_id(trivia.id_especie))
@@ -201,9 +201,19 @@ func responder_trivia(trivia: TriviaData, opcion: TriviaOption, es_repaso: bool 
 	return {"correcta": es_correcta, "pr": pr, "xp": xp, "descubierta": descubierta}
 
 
-## Algoritmo DDA (Dynamic Difficulty Adaptivity - Chen 2006)
+## PR de un acierto. En el modo Científico, pedir la pista reduce la recompensa
+## (salvo cuando la ofrece el tutor por detectar dificultades).
+func pr_por_acierto(trivia: TriviaData, es_repaso: bool, pidio_pista: bool) -> int:
+	var pr := PR_POR_DIFICULTAD[trivia.dificultad]
+	if pidio_pista:
+		pr = roundi(pr * float(GameState.ajuste("pr_con_pista")))
+	return pr + (PR_BONO_REPASO if es_repaso else 0)
+
+
+## Algoritmo DDA (Dynamic Difficulty Adaptivity - Chen 2006). El modo de juego fija
+## cuántos aciertos seguidos hacen falta para subir de nivel.
 func _ajustar_dificultad_adaptativa() -> void:
-	if racha_aciertos >= 2 and nivel_actual_jugador < TriviaData.Dificultad.DIFICIL:
+	if racha_aciertos >= int(GameState.ajuste("racha_para_subir")) and nivel_actual_jugador < TriviaData.Dificultad.DIFICIL:
 		nivel_actual_jugador = (nivel_actual_jugador + 1) as TriviaData.Dificultad
 		racha_aciertos = 0
 		nivel_dificultad_cambiado.emit(nivel_actual_jugador)
@@ -258,6 +268,7 @@ func generar_trivia(data: EspecieData, nivel: TriviaData.Dificultad) -> TriviaDa
 	var otras := _otras_especies(data)
 	var correcta := ""
 	var distractores: Array[String] = []
+	var cantidad := int(GameState.ajuste("distractores"))
 	var bioma := GameState.nombre_bioma(data.id_bioma)
 	match nivel:
 		TriviaData.Dificultad.FACIL:
@@ -266,28 +277,28 @@ func generar_trivia(data: EspecieData, nivel: TriviaData.Dificultad) -> TriviaDa
 			t.pregunta = "¿Qué especie tiene el nombre científico %s?" % data.nombre_cientifico
 			t.pista_narrativa = "Es de tipo «%s» y su estado de conservación es %s." % [data.tipo, _estado(data)]
 			correcta = data.nombre_comun
-			distractores = _valores(otras, func(d: EspecieData) -> String: return d.nombre_comun, correcta)
+			distractores = _valores(otras, func(d: EspecieData) -> String: return d.nombre_comun, correcta, cantidad)
 		TriviaData.Dificultad.MEDIO:
 			t.titulo_narrativo = "Nomenclatura científica"
 			t.situacion_narrativa = "Para registrar tu avistamiento de %s en la Biopedia necesitas su nombre científico." % data.nombre_comun
 			t.pregunta = "¿Cuál es el nombre científico de %s?" % data.nombre_comun
 			t.pista_narrativa = "Su nombre científico comienza con «%s…»." % data.nombre_cientifico.left(3)
 			correcta = data.nombre_cientifico
-			distractores = _valores(otras, func(d: EspecieData) -> String: return d.nombre_cientifico, correcta)
+			distractores = _valores(otras, func(d: EspecieData) -> String: return d.nombre_cientifico, correcta, cantidad)
 		_:
 			t.titulo_narrativo = "Rol en la trama ecológica"
 			t.situacion_narrativa = "Observas a %s interactuar con su entorno en %s." % [data.nombre_comun, bioma]
 			t.pregunta = "¿Qué rol ecológico cumple %s en su ecosistema?" % data.nombre_comun
 			t.pista_narrativa = "Es de tipo «%s» y está clasificada como %s." % [data.tipo, _estado(data)]
 			correcta = data.rol_ecologico
-			distractores = _valores(otras, func(d: EspecieData) -> String: return d.rol_ecologico, correcta)
+			distractores = _valores(otras, func(d: EspecieData) -> String: return d.rol_ecologico, correcta, cantidad)
 
 	if distractores.is_empty():
 		# Sin especies suficientes para distractores: preguntamos por el tipo de organismo.
 		t.pregunta = "¿Qué tipo de organismo es %s?" % data.nombre_comun
 		correcta = data.tipo
 		for tipo in ["vertebrado", "ave", "planta", "hongo", "invertebrado"]:
-			if tipo != correcta and distractores.size() < 2:
+			if tipo != correcta and distractores.size() < cantidad:
 				distractores.append(tipo)
 
 	var ficha := "%s (%s) — %s: %s" % [data.nombre_comun, data.nombre_cientifico, _estado(data), data.rol_ecologico]
@@ -324,14 +335,14 @@ func _otras_especies(data: EspecieData) -> Array[EspecieData]:
 	return mismo_bioma
 
 
-func _valores(especies: Array[EspecieData], campo: Callable, excluir: String) -> Array[String]:
+func _valores(especies: Array[EspecieData], campo: Callable, excluir: String, cantidad: int) -> Array[String]:
 	var resultado: Array[String] = []
 	for d in especies:
 		var valor: String = campo.call(d)
 		if valor.strip_edges() == "" or valor == excluir or resultado.has(valor):
 			continue
 		resultado.append(valor)
-		if resultado.size() >= 2:
+		if resultado.size() >= cantidad:
 			break
 	return resultado
 
@@ -343,7 +354,7 @@ func _estado(data: EspecieData) -> String:
 # --- Persistencia ---------------------------------------------------------------------
 
 func reiniciar() -> void:
-	nivel_actual_jugador = TriviaData.Dificultad.FACIL
+	nivel_actual_jugador = int(GameState.ajuste("nivel_inicial_dda")) as TriviaData.Dificultad
 	racha_aciertos = 0
 	racha_errores = 0
 	total_trivias_respondidas = 0
