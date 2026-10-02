@@ -12,6 +12,6 @@ tipo = "vertebrado"
 estado_conservacion = "NT"
 rol_ecologico = "Fósil viviente, marsupial arborícola. Principal dispersor de semillas del quintral; activa cadenas tróficas."
 umbral_desbloqueo = 0
-id_bioma = 1
+id_bioma = 3
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"
