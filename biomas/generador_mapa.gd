@@ -25,9 +25,16 @@ const RADIO_EXTERIOR := RADIO_MAPA + 8
 const DESNIVEL_AGUA := 8
 ## Biomas con agua dulce tranquila donde crecen nenúfares.
 const BIOMAS_CON_NENUFARES: Array[int] = [1, 3, 4]
-## Los árboles del paisaje se dibujan al doble (escala entera para no deformar los píxeles),
-## así un árbol ocupa el ancho de una parcela como en los juegos isométricos de referencia.
-const ESCALA_ARBOLES := 2.0
+## Árboles nativos del paisaje, dos por bioma (arbol_<bioma>_a/b.png, 64x96, generados con
+## herramientas/aseprite/arboles_paisaje.lua). La variante "a" es la más común.
+const ARBOLES_PAISAJE := {
+	1: ["arbol_1_a", "arbol_1_b"],  # Zona Central: quillay y espino
+	2: ["arbol_2_a", "arbol_2_b"],  # Norte Árido: cardón adulto y joven
+	3: ["arbol_3_a", "arbol_3_b"],  # Bosques del Sur: coigüe y alerce
+	4: ["arbol_4_a", "arbol_4_b"],  # Patagonia: lenga y ñirre en otoño
+	5: ["arbol_5_a", "arbol_5_b"],  # Islas (Juan Fernández): chonta y helecho arborescente
+}
+const PROPORCION_VARIANTE_A := 0.6
 
 # Columnas del tileset Assets/tilesets/mapa_<id>.png (cada baldosa mide 64x48).
 const SUELO: Array[Vector2i] = [Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0)]
@@ -249,7 +256,7 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 
 	# Borde del mundo: bosquecitos del árbol típico del bioma, agrupados con ruido y con
 	# claros entre ellos, más rocas sueltas. Nunca dentro de la zona jugable.
-	var densidad := {1: 0.4, 2: 0.16, 3: 0.6, 4: 0.45, 5: 0.35}
+	var densidad := {1: 0.5, 2: 0.2, 3: 0.75, 4: 0.55, 5: 0.45}
 	for c in tipos:
 		if absi(c.x) <= RADIO_JUGABLE and absi(c.y) <= RADIO_JUGABLE:
 			continue
@@ -260,8 +267,10 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 		var bosque := smoothstep(-0.3, 0.7, _ruido(c.x, c.y, 11 * id_bioma + 3))
 		var r := rng_exterior.randf()
 		if r < lerpf(0.03, densidad.get(id_bioma, 0.5), bosque):
-			var arbol := _sprite(contenedor, tilemap, "arbol_%d" % id_bioma, c,
-				Vector2(rng_exterior.randi_range(-8, 8), rng_exterior.randi_range(2, 10)), ESCALA_ARBOLES)
+			var especies: Array = ARBOLES_PAISAJE.get(id_bioma, ARBOLES_PAISAJE[3])
+			var nombre: String = especies[0] if rng_exterior.randf() < PROPORCION_VARIANTE_A else especies[1]
+			var arbol := _sprite(contenedor, tilemap, nombre, c,
+				Vector2(rng_exterior.randi_range(-8, 8), rng_exterior.randi_range(2, 10)))
 			arbol.flip_h = rng_exterior.randf() < 0.5
 			_sombra(arbol)
 		elif r > 0.97:
@@ -322,6 +331,7 @@ static func _sprite(contenedor: Node2D, tilemap: TileMapLayer, nombre: String, c
 
 
 static var _textura_sombra: Texture2D
+static var _ancho_visible: Dictionary = {}  # ruta de textura -> ancho de la parte dibujada (px)
 
 ## Sombra ovalada bajo una decoración, corrida hacia la derecha (la luz viene de arriba a la izquierda).
 static func _sombra(s: Sprite2D) -> void:
@@ -337,7 +347,11 @@ static func _sombra(s: Sprite2D) -> void:
 	sombra.texture = _textura_sombra
 	sombra.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sombra.show_behind_parent = true
-	# La sombra es hija del sprite: hereda su escala, así que solo se ajusta al ancho de la textura.
-	sombra.scale = Vector2(s.texture.get_width() / 28.0, 1.0)
+	# La sombra es hija del sprite (hereda su escala) y se ajusta al ancho de lo dibujado, no del lienzo:
+	# un cardón angosto no lleva la sombra de un árbol frondoso.
+	var ruta := s.texture.resource_path
+	if not _ancho_visible.has(ruta):
+		_ancho_visible[ruta] = s.texture.get_image().get_used_rect().size.x
+	sombra.scale = Vector2(maxf(12.0, _ancho_visible[ruta] * 0.9) / 28.0, 1.0)
 	sombra.position = Vector2(4, -3)
 	s.add_child(sombra)
