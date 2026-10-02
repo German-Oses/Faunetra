@@ -14,6 +14,8 @@ var trivia_actual: TriviaData
 var _modo := Modo.BIOMA
 var _especie: EspecieData
 var _respondida := false
+var _inicio_ms := 0
+var _uso_pista := false
 
 var _encabezado_label: Label
 var titulo_narrativo_label: Label
@@ -190,6 +192,8 @@ func _abrir(trivia: TriviaData) -> void:
 
 func _mostrar_trivia(trivia: TriviaData) -> void:
 	_respondida = false
+	_inicio_ms = Time.get_ticks_msec()
+	_uso_pista = false
 	_scroll.scroll_vertical = 0
 	var nivel: String = TriviaManager.NOMBRES_DIFICULTAD[trivia.dificultad]
 	var pr: int = TriviaManager.PR_POR_DIFICULTAD[trivia.dificultad]
@@ -211,6 +215,7 @@ func _mostrar_trivia(trivia: TriviaData) -> void:
 	pista_button.visible = not trivia.pista_narrativa.is_empty()
 	# El tutor inteligente ofrece la pista de inmediato si detecta dificultades.
 	pista_label.visible = pista_button.visible and TriviaManager.necesita_apoyo(trivia.id_especie)
+	_uso_pista = pista_label.visible
 	retroalimentacion_panel.visible = false
 	_siguiente_button.visible = false
 
@@ -253,6 +258,7 @@ func _limpiar_opciones() -> void:
 
 func _on_pista_pressed() -> void:
 	pista_label.visible = true
+	_uso_pista = true
 
 
 func _al_seleccionar_opcion(opcion: TriviaOption, boton: Button) -> void:
@@ -268,7 +274,9 @@ func _al_seleccionar_opcion(opcion: TriviaOption, boton: Button) -> void:
 	if not opcion.es_correcta:
 		boton.modulate = COLOR_INCORRECTA
 
-	var resultado := TriviaManager.responder_trivia(trivia_actual, opcion, _modo == Modo.REPASO)
+	var meta := {"tiempo_s": (Time.get_ticks_msec() - _inicio_ms) / 1000.0, "uso_pista": _uso_pista,
+		"modo": ["especie", "bioma", "repaso"][_modo]}
+	var resultado := TriviaManager.responder_trivia(trivia_actual, opcion, _modo == Modo.REPASO, meta)
 	var texto := ""
 	if resultado["correcta"]:
 		texto = "¡RESPUESTA CORRECTA!\n\n%s\n\n+%d PR para %s · +%d XP Biodiversidad" % [

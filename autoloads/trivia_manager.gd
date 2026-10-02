@@ -153,7 +153,10 @@ func necesita_apoyo(id_especie: int = 0) -> bool:
 
 ## Evalúa la respuesta elegida, entrega recompensas y ajusta la curva de dificultad (DDA).
 ## Fallar nunca descuenta PR ni salud.
-func responder_trivia(trivia: TriviaData, opcion: TriviaOption, es_repaso: bool = false) -> Dictionary:
+## `meta` (opcional): {"tiempo_s": float, "uso_pista": bool, "modo": String} para el registro de aprendizaje.
+func responder_trivia(trivia: TriviaData, opcion: TriviaOption, es_repaso: bool = false, meta: Dictionary = {}) -> Dictionary:
+	var apoyo := necesita_apoyo(trivia.id_especie)
+	var nivel_antes := int(nivel_actual_jugador)
 	total_trivias_respondidas += 1
 	var es_correcta := opcion.es_correcta
 	var pr := 0
@@ -183,6 +186,14 @@ func responder_trivia(trivia: TriviaData, opcion: TriviaOption, es_repaso: bool 
 
 	if es_repaso:
 		GameState.registrar_repaso(trivia.id_especie, es_correcta)
+	GameState.registrar({
+		"tipo": "repaso" if es_repaso else "trivia",
+		"id_bioma": trivia.id_bioma, "id_especie": trivia.id_especie, "especie": trivia.nombre_especie,
+		"id_trivia": trivia.id_trivia, "dificultad": NOMBRES_DIFICULTAD[trivia.dificultad],
+		"modo": meta.get("modo", ""), "correcta": es_correcta, "tiempo_s": snappedf(float(meta.get("tiempo_s", 0.0)), 0.1),
+		"uso_pista": bool(meta.get("uso_pista", false)), "apoyo_tutor": apoyo,
+		"nivel_dda": NOMBRES_DIFICULTAD[nivel_antes], "pr": pr,
+	})
 
 	_ajustar_dificultad_adaptativa()
 	GameState.marcar_cambios()

@@ -13,6 +13,7 @@ var _resultado: Label
 var _reproductor: AudioStreamPlayer
 var _objetivo: EspecieData
 var _respondida := false
+var _inicio_ms := 0
 
 
 func _ready() -> void:
@@ -69,6 +70,7 @@ func nueva_ronda() -> void:
 	_objetivo = fauna.pick_random()
 	_reproductor.stream = _objetivo.audio_canto if _objetivo.audio_canto else SintetizadorFauna.generar(_objetivo)
 	_reproductor.play()
+	_inicio_ms = Time.get_ticks_msec()
 	_instrucciones.text = "Escucha con atención y elige la ficha de la especie que produce este sonido. (+%d PR)" % RECOMPENSA_PR
 
 	for d in _elegir_opciones(fauna):
@@ -109,6 +111,9 @@ func _on_ficha(elegida: EspecieData, boton: Button) -> void:
 	for b in _fichas.get_children():
 		(b as Button).disabled = true
 	var explicacion := SintetizadorFauna.descripcion(_objetivo) if _objetivo.audio_canto == null else ""
+	GameState.registrar({"tipo": "sonido", "id_especie": _objetivo.id_especie, "especie": _objetivo.nombre_comun,
+		"correcta": elegida == _objetivo, "tiempo_s": snappedf((Time.get_ticks_msec() - _inicio_ms) / 1000.0, 0.1),
+		"pr": RECOMPENSA_PR if elegida == _objetivo else 0, "detalle": "eligio=%s" % elegida.nombre_comun})
 	if elegida == _objetivo:
 		boton.modulate = Color(0.55, 1.0, 0.6)
 		GameState.agregar_pr(RECOMPENSA_PR)

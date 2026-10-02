@@ -33,6 +33,7 @@ var _usadas: Array[EspecieData] = []
 var _pr_ganados := 0
 var _respondida := false
 var _ultima_identificada: EspecieData
+var _inicio_ronda_ms := 0
 
 
 func _ready() -> void:
@@ -254,6 +255,7 @@ func _preparar_ronda() -> void:
 		return
 	_objetivo = candidatas.pick_random()
 	_usadas.append(_objetivo)
+	_inicio_ronda_ms = Time.get_ticks_msec()
 	_visor.preparar(_objetivo, GameState.bioma_actual_id)
 	_instruccion_titulo.text = "Identifica la especie oculta · Ronda %d de %d" % [_ronda + 1, RONDAS]
 	_instruccion_texto.text = "Observa bien el entorno y mueve el escáner: cerca de la especie, el camuflaje se disipa. Haz clic sobre ella."
@@ -329,6 +331,9 @@ func _on_opcion(elegida: EspecieData, boton: Button) -> void:
 		boton.add_theme_stylebox_override("disabled", TemaFaunetra.caja(Color("#F6D8CF"), Color("#C8463A"), 12, 3, 6))
 		_resultado.text = "Era %s. Pista para recordarla: %s (Sin castigo.)" % [_objetivo.nombre_comun, _objetivo.rol_ecologico]
 	_ultima_identificada = _objetivo
+	GameState.registrar({"tipo": "escaner", "id_especie": _objetivo.id_especie, "especie": _objetivo.nombre_comun,
+		"correcta": elegida == _objetivo, "tiempo_s": snappedf((Time.get_ticks_msec() - _inicio_ronda_ms) / 1000.0, 0.1),
+		"pr": RECOMPENSA_PR if elegida == _objetivo else 0, "detalle": "eligio=%s" % elegida.nombre_comun})
 	_visor.revelar()
 	_progreso.actualizar(_resultados, _ronda)
 	_refrescar_repaso()

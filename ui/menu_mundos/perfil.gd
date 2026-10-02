@@ -9,6 +9,8 @@ var _resumen: GridContainer
 var _biomas: VBoxContainer
 var _insignias: Label
 var _confirmar: Button
+var _participante: LineEdit
+var _registros: Label
 
 
 func _ready() -> void:
@@ -44,6 +46,8 @@ func _ready() -> void:
 	_insignias.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(_insignias)
 
+	add_child(_crear_seccion_investigacion())
+
 	var espacio := Control.new()
 	espacio.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	add_child(espacio)
@@ -64,8 +68,64 @@ func _ready() -> void:
 	fila.add_child(_confirmar)
 
 
+## Datos para la investigación: código anónimo del participante y exportación del registro.
+func _crear_seccion_investigacion() -> Control:
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", TemaFaunetra.caja(Color.WHITE, TemaFaunetra.BORDE, 12, 2, 10))
+	var fila := HBoxContainer.new()
+	fila.add_theme_constant_override("separation", 10)
+	panel.add_child(fila)
+	var etiqueta := Label.new()
+	etiqueta.text = "Código de participante:"
+	fila.add_child(etiqueta)
+	_participante = LineEdit.new()
+	_participante.placeholder_text = "Ej: P07 (opcional, anónimo)"
+	_participante.custom_minimum_size.x = 200
+	_participante.max_length = 20
+	_participante.text_changed.connect(_on_participante)
+	fila.add_child(_participante)
+	_registros = Label.new()
+	_registros.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_registros.add_theme_color_override("font_color", TemaFaunetra.TEXTO_SUAVE)
+	_registros.add_theme_font_size_override("font_size", 13)
+	fila.add_child(_registros)
+	var exportar := Button.new()
+	exportar.text = "Exportar registro (CSV)"
+	exportar.icon = TemaFaunetra.icono("libro")
+	exportar.pressed.connect(_exportar_csv)
+	fila.add_child(exportar)
+	return panel
+
+
+func _on_participante(texto: String) -> void:
+	GameState.codigo_participante = texto.strip_edges()
+	GameState.marcar_cambios()
+
+
+## En la web descarga el archivo; en PC lo guarda en la carpeta de datos del juego y la abre.
+func _exportar_csv() -> void:
+	var csv := GameState.registro_csv()
+	var sufijo := GameState.codigo_participante if GameState.codigo_participante != "" else "anonimo"
+	var nombre := "faunetra_registro_%s_%s.csv" % [sufijo, Time.get_date_string_from_system()]
+	if OS.has_feature("web"):
+		JavaScriptBridge.download_buffer(csv.to_utf8_buffer(), nombre, "text/csv")
+		EventBus.mensaje.emit("Registro descargado: %s" % nombre)
+		return
+	var ruta := "user://" + nombre
+	var archivo := FileAccess.open(ruta, FileAccess.WRITE)
+	if archivo == null:
+		EventBus.mensaje.emit("No se pudo guardar el registro.")
+		return
+	archivo.store_string(csv)
+	archivo.close()
+	EventBus.mensaje.emit("Registro guardado: %s" % ProjectSettings.globalize_path(ruta))
+	OS.shell_open(ProjectSettings.globalize_path("user://"))
+
+
 func refrescar() -> void:
 	_confirmar.visible = false
+	_participante.text = GameState.codigo_participante
+	_registros.text = "%d eventos registrados" % GameState.registro.size()
 	for hijo in _resumen.get_children():
 		hijo.queue_free()
 	var xp := TriviaManager.xp_acumulada

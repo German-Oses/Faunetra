@@ -56,6 +56,12 @@ var sesion: int = 0
 var primera_partida := true
 ## Paso actual del tutorial guiado (ver ui/hud/tutorial.gd); al completarlo queda en el total de pasos.
 var tutorial_paso := 0
+## Opciones del jugador (se aplican al cargar).
+var opciones: Dictionary = {"volumen": 0.8, "pantalla_completa": false}
+## Código anónimo para cruzar el registro con instrumentos externos (pre/post test).
+var codigo_participante := ""
+## Registro de aprendizaje para la investigación (ver registrar() y registro_csv()).
+var registro: Array = []
 var datos_trivia: Dictionary = {}
 
 ## Resumen de lo que ocurrió mientras el jugador no estuvo (se muestra al iniciar).
@@ -71,6 +77,8 @@ func _ready() -> void:
 	cargar()
 	sesion += 1
 	_aplicar_degradacion_por_inactividad(Time.get_unix_time_from_system())
+	aplicar_opciones()
+	registrar({"tipo": "inicio_sesion", "detalle": "dias_inactivo=%d" % dias_inactivo})
 	guardar()
 
 
@@ -239,6 +247,7 @@ func descubrir_especie(data: EspecieData) -> bool:
 	marcar_cambios()
 	especie_descubierta.emit(data)
 	repasos_actualizados.emit()
+	registrar({"tipo": "descubrimiento", "id_especie": data.id_especie, "especie": data.nombre_comun, "id_bioma": data.id_bioma})
 	return true
 
 
@@ -343,6 +352,57 @@ func simular_inactividad(dias: int) -> void:
 	guardar()
 
 
+# --- Opciones ---------------------------------------------------------------------
+
+func aplicar_opciones() -> void:
+	aplicar_volumen()
+	# En la web la pantalla completa solo puede pedirse tras un toque del jugador (desde Opciones).
+	if not OS.has_feature("web"):
+		var completa := bool(opciones.get("pantalla_completa", false))
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if completa else DisplayServer.WINDOW_MODE_WINDOWED)
+
+
+func aplicar_volumen() -> void:
+	var volumen := clampf(float(opciones.get("volumen", 0.8)), 0.0, 1.0)
+	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(volumen, 0.0001)))
+	AudioServer.set_bus_mute(0, volumen <= 0.001)
+
+
+# --- Registro de aprendizaje (para la tesis) ------------------------------------------
+
+const COLUMNAS_REGISTRO: Array[String] = ["fecha_hora", "participante", "sesion", "tipo", "id_bioma", "bioma",
+	"id_especie", "especie", "id_trivia", "dificultad", "modo", "correcta", "tiempo_s", "uso_pista",
+	"apoyo_tutor", "nivel_dda", "pr", "detalle"]
+
+
+## Agrega un evento al registro. Se completan fecha, sesión, participante y bioma.
+func registrar(evento: Dictionary) -> void:
+	var e := evento.duplicate()
+	e["fecha_hora"] = Time.get_datetime_string_from_system(false, true)
+	e["participante"] = codigo_participante
+	e["sesion"] = sesion
+	if not e.has("id_bioma"):
+		e["id_bioma"] = bioma_actual_id
+	e["bioma"] = nombre_bioma(int(e["id_bioma"])) if int(e["id_bioma"]) > 0 else ""
+	registro.append(e)
+	marcar_cambios()
+
+
+func registro_csv() -> String:
+	var lineas: PackedStringArray = [",".join(PackedStringArray(COLUMNAS_REGISTRO))]
+	for e in registro:
+		var campos: PackedStringArray = []
+		for col in COLUMNAS_REGISTRO:
+			var v = e.get(col, "")
+			if v is bool:
+				v = 1 if v else 0
+			var texto := str(v).replace("\"", "\"\"")
+			campos.append("\"%s\"" % texto if ("," in texto or "\"" in texto or "\n" in texto) else texto)
+		lineas.append(",".join(campos))
+	# BOM para que Excel reconozca los acentos (UTF-8).
+	return "\ufeff" + "\n".join(lineas) + "\n"
+
+
 # --- Persistencia -------------------------------------------------------------------
 
 ## Borra todo el progreso y vuelve a cargar la escena principal desde cero.
@@ -358,6 +418,7 @@ func reiniciar_partida() -> void:
 	sesion = 1
 	primera_partida = true
 	tutorial_paso = 0
+	registro.clear()
 	informe_degradacion.clear()
 	dias_inactivo = 0
 	var trivia := get_node_or_null("/root/TriviaManager")
@@ -383,6 +444,9 @@ func guardar() -> void:
 		"sesion": sesion,
 		"primera_partida": primera_partida,
 		"tutorial_paso": tutorial_paso,
+		"opciones": opciones,
+		"codigo_participante": codigo_participante,
+		"registro": registro,
 		"ultimo_bioma": ultimo_bioma,
 		"desbloqueados": desbloqueados,
 		"biomas": biomas,
@@ -424,6 +488,9 @@ func cargar() -> void:
 	sesion = int(datos.get("sesion", 0))
 	primera_partida = bool(datos.get("primera_partida", true))
 	tutorial_paso = int(datos.get("tutorial_paso", 0))
+	opciones.merge(datos.get("opciones", {}), true)
+	codigo_participante = str(datos.get("codigo_participante", ""))
+	registro = datos.get("registro", [])
 	ultimo_bioma = int(datos.get("ultimo_bioma", -1))
 	for id in datos.get("desbloqueados", []):
 		if not desbloqueados.has(int(id)):

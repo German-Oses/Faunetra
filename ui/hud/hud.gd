@@ -6,6 +6,7 @@ extends Control
 const Tableta := preload("res://ui/tableta/tableta.gd")
 const MenuMundos := preload("res://ui/menu_mundos/menu_mundos.gd")
 const Tutorial := preload("res://ui/hud/tutorial.gd")
+const Opciones := preload("res://ui/opciones/opciones.gd")
 
 const HERRAMIENTAS := [
 	{"id": "identificar", "texto": "Identificar"},
@@ -32,6 +33,7 @@ var _menu: MenuMundos
 var _dialogos_pendientes: Array = []
 var _dialogo_abierto: Control
 var _tutorial: Tutorial
+var _opciones: Opciones
 
 
 func _ready() -> void:
@@ -45,6 +47,9 @@ func _ready() -> void:
 	add_child(_tableta)
 	_menu = MenuMundos.new()
 	add_child(_menu)
+	_opciones = Opciones.new()
+	_opciones.ir_a_mundos.connect(func() -> void: _menu.abrir())
+	add_child(_opciones)
 
 	EventBus.bioma_cargado.connect(_on_bioma_cargado)
 	EventBus.mensaje.connect(mostrar_aviso)
@@ -63,9 +68,18 @@ func _ready() -> void:
 	_on_herramienta_cambiada(GameState.herramienta_activa)
 
 
+## Esc: primero suelta la herramienta activa; si no hay ninguna, abre la pausa.
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
-		GameState.herramienta_activa = "identificar"
+		if GameState.herramienta_activa != "identificar":
+			GameState.herramienta_activa = "identificar"
+		else:
+			abrir_opciones()
+		get_viewport().set_input_as_handled()
+
+
+func abrir_opciones() -> void:
+	_opciones.abrir()
 
 
 # --- Construcción --------------------------------------------------------------------
@@ -108,6 +122,12 @@ func _construir_barra_superior() -> void:
 	_boton_tableta.text = "Tableta"
 	_boton_tableta.pressed.connect(func() -> void: _tableta.abrir())
 	fila.add_child(_boton_tableta)
+
+	var opciones := Button.new()
+	opciones.icon = TemaFaunetra.icono("engranaje")
+	opciones.tooltip_text = "Pausa y opciones (Esc)"
+	opciones.pressed.connect(abrir_opciones)
+	fila.add_child(opciones)
 
 
 func _construir_barra_inferior() -> void:
