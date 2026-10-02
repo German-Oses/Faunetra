@@ -585,7 +585,7 @@ func _aparecer_fauna(animal: EspecieData) -> void:
 		var aguas := _celdas_de_agua()
 		if not aguas.is_empty():
 			aguas.sort()
-			var nodo_agua := _instanciar(animal, aguas[rng.randi() % aguas.size()], Vector2(rng.randf_range(-8, 8), -2))
+			var nodo_agua := _instanciar(animal, aguas[rng.randi() % aguas.size()], Vector2(rng.randf_range(-8, 8), GeneradorMapa.DESNIVEL_AGUA - 2))
 			nodo_agua.scale = Vector2.ONE * ESCALA_FAUNA
 			_nodos_fauna[animal.id_especie] = nodo_agua
 			_iniciar_paseo(animal.id_especie, nodo_agua)
@@ -712,7 +712,7 @@ func _elegir_destino_agua(nodo: Node2D) -> Vector2:
 	if opciones.is_empty():
 		return nodo.global_position
 	var destino: Vector2i = opciones.pick_random()
-	return tilemap.to_global(tilemap.map_to_local(destino)) + Vector2(randf_range(-10, 10), randf_range(-4, 2))
+	return tilemap.to_global(tilemap.map_to_local(destino)) + Vector2(randf_range(-10, 10), GeneradorMapa.DESNIVEL_AGUA + randf_range(-4, 2))
 
 
 func _reanudar(paseo: Dictionary) -> void:

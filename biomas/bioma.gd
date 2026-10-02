@@ -11,6 +11,9 @@ const ZOOM_MAX := 3.0
 ## Espacio de pantalla que ocupan las barras del HUD (arriba y abajo).
 const MARGEN_HUD_SUPERIOR := 56.0
 const MARGEN_HUD_INFERIOR := 120.0
+## Al entrar, la cámara encuadra el claro y su entorno (radio en parcelas), no el mapa completo:
+## el paisaje llena la pantalla y se puede alejar con la rueda o pellizcando.
+const RADIO_VISTA_INICIAL := 5
 
 var id_bioma: int = -1
 ## Si es true, el mapa se arma con GeneradorMapa (río, montañas, caseta…) en lugar del
@@ -91,7 +94,9 @@ func _buscar_tilemap() -> TileMapLayer:
 func _configurar_camara() -> void:
 	camara = Camera2D.new()
 	add_child(camara)
-	var rect := terreno.rect_global()
+	var tilemap := terreno.tilemap
+	var tam := Vector2(tilemap.tile_set.tile_size) * (RADIO_VISTA_INICIAL * 2 + 1)
+	var rect := Rect2(tilemap.to_global(tilemap.map_to_local(Vector2i.ZERO)) - tam * 0.5, tam)
 	var vista := get_viewport_rect().size
 	var alto_util := maxf(100.0, vista.y - MARGEN_HUD_SUPERIOR - MARGEN_HUD_INFERIOR)
 	var zoom := clampf(minf(vista.x / rect.size.x, alto_util / rect.size.y), ZOOM_MIN, ZOOM_MAX)
