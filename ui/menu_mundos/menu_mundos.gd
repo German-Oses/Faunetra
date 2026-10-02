@@ -3,6 +3,8 @@ extends Control
 ## Menú principal de Faunetra: mapa de mundos (los 5 biomas como islas isométricas),
 ## panel del bioma seleccionado con "Explorar" y especies cercanas, y barra de navegación
 ## inferior hacia la Biopedia, Mis especies y el Perfil.
+## En vertical (teléfono) las islas se ordenan de norte a sur en zigzag sobre el panel del
+## bioma, la cabecera usa dos filas y la navegación muestra el ícono sobre el texto.
 
 const Biopedia := preload("res://ui/tableta/biopedia.gd")
 const Perfil := preload("res://ui/menu_mundos/perfil.gd")
@@ -14,6 +16,15 @@ const POSICION_ISLAS := {
 	3: Vector2(0.70, 0.36),
 	4: Vector2(0.40, 0.72),
 	5: Vector2(0.80, 0.78),
+}
+## En vertical el mapa es alto y angosto, como Chile: de norte (arriba) a sur, con las islas
+## oceánicas al oeste (izquierda).
+const POSICION_ISLAS_VERTICAL := {
+	2: Vector2(0.62, 0.18),
+	1: Vector2(0.36, 0.37),
+	3: Vector2(0.66, 0.56),
+	4: Vector2(0.40, 0.79),
+	5: Vector2(0.17, 0.61),
 }
 const ESCALA_ISLA := 2.0
 const TAM_ISLA := Vector2(112, 96)
@@ -39,6 +50,12 @@ var _titulo_bioma: Label
 var _estado_bioma: Label
 var _explorar: Button
 var _especies_cercanas: GridContainer
+var _pagina_refugio_caja: BoxContainer
+var _cabecera_fila1: HBoxContainer
+var _cabecera_fila2: HBoxContainer
+var _lema: Label
+var _tarjeta_salud: PanelContainer
+var _tarjeta_pr: PanelContainer
 
 
 func _ready() -> void:
@@ -70,7 +87,7 @@ func _ready() -> void:
 	_pagina_mis_especies = _envolver(_crear_biopedia(true))
 	_contenido.add_child(_pagina_mis_especies)
 	_perfil = Perfil.new()
-	_pagina_perfil = _envolver(_perfil)
+	_pagina_perfil = _envolver(_perfil, true)
 	_contenido.add_child(_pagina_perfil)
 
 	raiz.add_child(_crear_navegacion())
@@ -78,7 +95,34 @@ func _ready() -> void:
 	GameState.salud_actualizada.connect(_on_estado_cambiado.unbind(2))
 	GameState.bioma_desbloqueado.connect(_on_estado_cambiado.unbind(1))
 	resized.connect(_ubicar_islas)
+	Pantalla.orientacion_cambiada.connect(func(_v: bool) -> void: _reacomodar())
+	_reacomodar()
 	hide()
+
+
+## Reorganiza cabecera, página del mapa y navegación según la orientación.
+func _reacomodar() -> void:
+	var vertical := Pantalla.vertical
+	# Cabecera: en vertical, la salud y los PR bajan a una segunda fila.
+	for tarjeta in [_tarjeta_salud, _tarjeta_pr]:
+		var destino := _cabecera_fila2 if vertical else _cabecera_fila1
+		if tarjeta.get_parent() != destino:
+			tarjeta.get_parent().remove_child(tarjeta)
+			destino.add_child(tarjeta)
+			if not vertical:
+				destino.move_child(tarjeta, destino.get_child_count() - 2)   # antes del perfil
+	_tarjeta_salud.size_flags_horizontal = Control.SIZE_EXPAND_FILL if vertical else Control.SIZE_FILL
+	_cabecera_fila2.visible = vertical
+	_lema.visible = not vertical
+	# Página del mapa: islas arriba y panel del bioma abajo.
+	_pagina_refugio_caja.vertical = vertical
+	_mapa.size_flags_stretch_ratio = 1.7 if vertical else 2.3
+	_especies_cercanas.columns = 5 if vertical else 3
+	for b in _botones_nav.values():
+		(b as Button).vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP if vertical else VERTICAL_ALIGNMENT_CENTER
+		(b as Button).add_theme_font_size_override("font_size", 13 if vertical else 16)
+		(b as Button).custom_minimum_size.y = 58 if vertical else 46
+	_ubicar_islas.call_deferred()
 
 
 func _on_estado_cambiado() -> void:
@@ -105,9 +149,15 @@ func abrir_especie(data: EspecieData) -> void:
 func _crear_cabecera() -> Control:
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", TemaFaunetra.caja(TemaFaunetra.CREMA, TemaFaunetra.BORDE, 0, 0, 10))
+	var filas := VBoxContainer.new()
+	panel.add_child(filas)
 	var fila := HBoxContainer.new()
 	fila.add_theme_constant_override("separation", 16)
-	panel.add_child(fila)
+	filas.add_child(fila)
+	_cabecera_fila1 = fila
+	_cabecera_fila2 = HBoxContainer.new()
+	_cabecera_fila2.add_theme_constant_override("separation", 10)
+	filas.add_child(_cabecera_fila2)
 
 	var logo := TextureRect.new()
 	logo.texture = TemaFaunetra.icono("montana")
@@ -121,11 +171,11 @@ func _crear_cabecera() -> Control:
 	nombre.add_theme_font_size_override("font_size", 30)
 	nombre.add_theme_color_override("font_color", TemaFaunetra.VERDE)
 	marca.add_child(nombre)
-	var lema := Label.new()
-	lema.text = "Conoce · Explora · Protege"
-	lema.add_theme_font_size_override("font_size", 13)
-	lema.add_theme_color_override("font_color", TemaFaunetra.TEXTO_SUAVE)
-	marca.add_child(lema)
+	_lema = Label.new()
+	_lema.text = "Conoce · Explora · Protege"
+	_lema.add_theme_font_size_override("font_size", 13)
+	_lema.add_theme_color_override("font_color", TemaFaunetra.TEXTO_SUAVE)
+	marca.add_child(_lema)
 	fila.add_child(marca)
 
 	var espacio := Control.new()
@@ -135,21 +185,27 @@ func _crear_cabecera() -> Control:
 	var salud := _tarjeta_cabecera("hoja")
 	var columna := VBoxContainer.new()
 	columna.add_theme_constant_override("separation", 2)
+	columna.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_texto_salud = Label.new()
 	_texto_salud.add_theme_font_size_override("font_size", 13)
+	_texto_salud.clip_text = true
+	_texto_salud.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_texto_salud.custom_minimum_size.x = 120
 	columna.add_child(_texto_salud)
 	_barra_salud = ProgressBar.new()
-	_barra_salud.custom_minimum_size = Vector2(170, 12)
+	_barra_salud.custom_minimum_size = Vector2(120, 12)
 	_barra_salud.show_percentage = false
 	columna.add_child(_barra_salud)
 	salud.get_child(0).add_child(columna)
 	fila.add_child(salud)
+	_tarjeta_salud = salud
 
 	var pr := _tarjeta_cabecera("hoja")
 	_texto_pr = Label.new()
 	_texto_pr.add_theme_font_size_override("font_size", 13)
 	pr.get_child(0).add_child(_texto_pr)
 	fila.add_child(pr)
+	_tarjeta_pr = pr
 
 	var perfil := _tarjeta_cabecera("persona")
 	_texto_nivel = Label.new()
@@ -177,11 +233,13 @@ func _tarjeta_cabecera(icono: String) -> PanelContainer:
 # --- Página Refugio (mapa de mundos) ---------------------------------------------------------
 
 func _crear_pagina_refugio() -> Control:
-	var fila := HBoxContainer.new()
+	var fila := BoxContainer.new()   # horizontal en PC; vertical en teléfono (ver _reacomodar)
 	fila.add_theme_constant_override("separation", 12)
+	_pagina_refugio_caja = fila
 
 	_mapa = Control.new()
 	_mapa.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_mapa.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_mapa.size_flags_stretch_ratio = 2.3
 	_mapa.clip_contents = true
 	fila.add_child(_mapa)
@@ -192,6 +250,7 @@ func _crear_pagina_refugio() -> Control:
 
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	fila.add_child(panel)
 	var columna := VBoxContainer.new()
 	columna.add_theme_constant_override("separation", 10)
@@ -292,13 +351,17 @@ func _ubicar_islas() -> void:
 	if _mapa == null:
 		return
 	var area := _mapa.size
-	var escala := clampf(minf(area.x / 640.0, area.y / 470.0) * ESCALA_ISLA, 1.2, 3.0)
+	var vertical := Pantalla.vertical
+	var posiciones: Dictionary = POSICION_ISLAS_VERTICAL if vertical else POSICION_ISLAS
+	# En vertical las islas se apilan: la escala la limita sobre todo el alto disponible.
+	var referencia := Vector2(330, 640) if vertical else Vector2(640, 470)
+	var escala := clampf(minf(area.x / referencia.x, area.y / referencia.y) * ESCALA_ISLA, 1.0, 3.0)
 	for id in _islas:
 		var isla: Dictionary = _islas[id]
 		var boton: TextureButton = isla["boton"]
 		boton.size = TAM_ISLA * escala
 		boton.pivot_offset = boton.size * 0.5
-		var centro: Vector2 = POSICION_ISLAS.get(id, Vector2(0.5, 0.5)) * area
+		var centro: Vector2 = posiciones.get(id, Vector2(0.5, 0.5)) * area
 		boton.position = centro - boton.size * 0.5
 		var burbuja: PanelContainer = isla["burbuja"]
 		burbuja.reset_size()
@@ -485,9 +548,18 @@ func _crear_biopedia(solo_descubiertas: bool) -> Biopedia:
 	return b
 
 
-func _envolver(contenido: Control) -> PanelContainer:
+## `desplazable`: para páginas sin desplazamiento propio que pueden no caber (Perfil en un teléfono).
+func _envolver(contenido: Control, desplazable := false) -> PanelContainer:
 	var panel := PanelContainer.new()
-	panel.add_child(contenido)
+	if desplazable:
+		var scroll := ScrollContainer.new()
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		contenido.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		contenido.size_flags_vertical = Control.SIZE_EXPAND_FILL   # si sobra alto, lo sigue llenando
+		scroll.add_child(contenido)
+		panel.add_child(scroll)
+	else:
+		panel.add_child(contenido)
 	return panel
 
 

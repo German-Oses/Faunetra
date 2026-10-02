@@ -4,8 +4,13 @@ extends HBoxContainer
 ## especies descubiertas (con check) y no descubiertas (silueta con candado) y una ficha
 ## de detalle con estado de conservación, rol ecológico y relaciones ecológicas.
 ## Con `solo_descubiertas = true` funciona como "Mis especies".
+## En vertical (teléfono) la lista y la ficha no caben lado a lado: tocar una tarjeta abre la
+## ficha a pantalla completa con un botón para volver a la lista.
 
 const COLOR_SILUETA := Color(0.16, 0.2, 0.17, 0.85)
+const ANCHO_TARJETA := 104
+const SEPARACION_TARJETAS := 8
+const MARGENES_LISTA_VERTICAL := 72   # márgenes de la ventana y del panel alrededor de la lista
 const FILTROS := [
 	{"id": -1, "texto": "Todos", "icono": ""},
 	{"id": 2, "texto": "Norte Árido", "icono": "cactus"},
@@ -33,6 +38,10 @@ var _titulo_ocultas: HBoxContainer
 var _detalle: VBoxContainer
 var _seleccionada: EspecieData
 var _botones_filtro: Array[Button] = []
+var _lista: VBoxContainer
+var _panel_detalle: PanelContainer
+var _volver: Button
+var _en_ficha := false   # en vertical: true mientras se ve la ficha en lugar de la lista
 var _placeholders: Dictionary = {}
 
 
@@ -47,6 +56,7 @@ func _ready() -> void:
 	izquierda.size_flags_stretch_ratio = 1.5
 	izquierda.add_theme_constant_override("separation", 10)
 	add_child(izquierda)
+	_lista = izquierda
 	izquierda.add_child(_crear_cabecera())
 	izquierda.add_child(_crear_filtros())
 
@@ -73,19 +83,61 @@ func _ready() -> void:
 	_grilla_ocultas = _crear_grilla()
 	listas.add_child(_grilla_ocultas)
 
-	var panel_detalle := PanelContainer.new()
-	panel_detalle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	add_child(panel_detalle)
+	_panel_detalle = PanelContainer.new()
+	_panel_detalle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	add_child(_panel_detalle)
+	var columna_detalle := VBoxContainer.new()
+	_panel_detalle.add_child(columna_detalle)
+	_volver = Button.new()
+	_volver.text = "‹ Volver a la lista"
+	_volver.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_volver.pressed.connect(func() -> void:
+		_en_ficha = false
+		_reacomodar())
+	columna_detalle.add_child(_volver)
 	var scroll_detalle := ScrollContainer.new()
 	scroll_detalle.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	panel_detalle.add_child(scroll_detalle)
+	scroll_detalle.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	columna_detalle.add_child(scroll_detalle)
 	_detalle = VBoxContainer.new()
 	_detalle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_detalle.add_theme_constant_override("separation", 8)
 	scroll_detalle.add_child(_detalle)
 
 	GameState.especie_descubierta.connect(_on_especie_descubierta)
+	Pantalla.orientacion_cambiada.connect(func(_v: bool) -> void: _reacomodar())
+	get_viewport().size_changed.connect(_ajustar_columnas)
+	_reacomodar()
 	_seleccionar_filtro(-1)
+
+
+## En horizontal se ven lista y ficha a la vez; en vertical, una u otra.
+func _reacomodar() -> void:
+	var vertical := Pantalla.vertical
+	_ajustar_columnas()
+	_lista.visible = not vertical or not _en_ficha
+	_panel_detalle.visible = not vertical or _en_ficha
+	_volver.visible = vertical
+
+
+## Tarjeta tocada: muestra la ficha (en vertical, reemplazando a la lista).
+func _abrir_ficha(data: EspecieData) -> void:
+	_mostrar_detalle(data)
+	_en_ficha = true
+	_reacomodar()
+
+
+## En horizontal, 5 columnas junto a la ficha. En vertical la lista ocupa el ancho de la pantalla
+## (menos los márgenes de la ventana y del panel): caben tantas tarjetas como permita.
+## Se calcula desde la pantalla porque una grilla impone su ancho mínimo a quien la contiene.
+func _ajustar_columnas() -> void:
+	var columnas := 5
+	if Pantalla.vertical:
+		var ancho := get_viewport_rect().size.x - MARGENES_LISTA_VERTICAL
+		columnas = maxi(2, floori((ancho + SEPARACION_TARJETAS) / (ANCHO_TARJETA + SEPARACION_TARJETAS)))
+	for g in [_grilla_descubiertas, _grilla_ocultas]:
+		if g.columns != columnas:
+			g.columns = columnas
 
 
 # --- Construcción -----------------------------------------------------------------------
@@ -107,6 +159,7 @@ func _crear_cabecera() -> Control:
 	titulo.add_theme_color_override("font_color", TemaFaunetra.VERDE)
 	textos.add_child(titulo)
 	var subtitulo := Label.new()
+	subtitulo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	subtitulo.text = "Las especies que ya conoces" if solo_descubiertas else "Catálogo de especies nativas de Chile"
 	subtitulo.add_theme_color_override("font_color", TemaFaunetra.TEXTO_SUAVE)
 	textos.add_child(subtitulo)
@@ -129,8 +182,10 @@ func _crear_cabecera() -> Control:
 
 
 func _crear_filtros() -> Control:
-	var fila := HBoxContainer.new()
-	fila.add_theme_constant_override("separation", 6)
+	# Los filtros pasan a una segunda fila si no caben.
+	var fila := HFlowContainer.new()
+	fila.add_theme_constant_override("h_separation", 6)
+	fila.add_theme_constant_override("v_separation", 6)
 	var grupo := ButtonGroup.new()
 	for f in FILTROS:
 		var b := Button.new()
@@ -166,9 +221,9 @@ func _titulo_seccion(icono: String, texto: String) -> HBoxContainer:
 
 func _crear_grilla() -> GridContainer:
 	var g := GridContainer.new()
-	g.columns = 5
-	g.add_theme_constant_override("h_separation", 8)
-	g.add_theme_constant_override("v_separation", 8)
+	g.columns = 5   # se ajusta al ancho disponible en _ajustar_columnas
+	g.add_theme_constant_override("h_separation", SEPARACION_TARJETAS)
+	g.add_theme_constant_override("v_separation", SEPARACION_TARJETAS)
 	return g
 
 
@@ -186,6 +241,8 @@ func mostrar_especie(data: EspecieData) -> void:
 	_seleccionada = data
 	_busqueda.text = ""
 	_seleccionar_filtro(data.id_bioma)
+	_en_ficha = true
+	_reacomodar()
 
 
 func _on_especie_descubierta(_data: EspecieData) -> void:
@@ -235,7 +292,8 @@ func refrescar() -> void:
 
 func _crear_tarjeta(data: EspecieData, conocida: bool) -> Button:
 	var boton := Button.new()
-	boton.custom_minimum_size = Vector2(104, 112)
+	boton.custom_minimum_size = Vector2(ANCHO_TARJETA, 112)
+	boton.size_flags_horizontal = Control.SIZE_EXPAND_FILL   # las columnas se reparten el ancho sobrante
 	boton.toggle_mode = true
 	boton.set_pressed_no_signal(data == _seleccionada)
 	TemaFaunetra.estilizar_chip(boton)
@@ -245,7 +303,7 @@ func _crear_tarjeta(data: EspecieData, conocida: bool) -> Button:
 	boton.add_theme_stylebox_override("hover_pressed", TemaFaunetra.caja(fondo, TemaFaunetra.VERDE, 12, 3, 6))
 	boton.add_theme_color_override("font_pressed_color", TemaFaunetra.TEXTO)
 	boton.add_theme_color_override("font_hover_pressed_color", TemaFaunetra.TEXTO)
-	boton.pressed.connect(_mostrar_detalle.bind(data))
+	boton.pressed.connect(_abrir_ficha.bind(data))
 	boton.set_meta("id_especie", data.id_especie)
 
 	var caja := VBoxContainer.new()
@@ -277,8 +335,11 @@ func _crear_tarjeta(data: EspecieData, conocida: bool) -> Button:
 	insignia.texture = TemaFaunetra.icono("check" if conocida else "candado")
 	insignia.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	insignia.custom_minimum_size = Vector2(22, 22)
-	insignia.size = Vector2(22, 22)
-	insignia.position = Vector2(76, 4)
+	insignia.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	insignia.offset_left = -28
+	insignia.offset_right = -6
+	insignia.offset_top = 4
+	insignia.offset_bottom = 26
 	insignia.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	boton.add_child(insignia)
 	return boton

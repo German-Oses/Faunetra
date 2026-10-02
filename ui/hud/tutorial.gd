@@ -91,6 +91,9 @@ func _ready() -> void:
 	EventBus.accion_terreno.connect(avisar)
 	TriviaManager.respuesta_evaluada.connect(func(_c: bool, _r: String, _x: int) -> void: avisar("trivia"))
 	_mostrar_paso()
+	Pantalla.orientacion_cambiada.connect(func(_v: bool) -> void:
+		if GameState.tutorial_paso < PASOS.size():
+			_mostrar_paso())
 
 
 ## Notifica que ocurrió algo; si es lo que espera el paso actual, avanza.
@@ -113,7 +116,23 @@ func _mostrar_paso() -> void:
 	_contador.text = "%d/%d" % [GameState.tutorial_paso + 1, PASOS.size()]
 	_boton.visible = paso["espera"] == "boton"
 	# En el menú de mundos la tarjeta va sobre la lista de especies cercanas, para no tapar las islas.
-	if paso["espera"] == "explorar":
+	if Pantalla.vertical:
+		# Teléfono: a todo el ancho; abajo en el mapa de mundos, bajo la barra superior en el refugio.
+		var en_mapa: bool = paso["espera"] == "explorar"
+		_texto.custom_minimum_size.x = 0
+		anchor_left = 0.0
+		anchor_right = 1.0
+		offset_left = 10
+		offset_right = -10
+		anchor_top = 1.0 if en_mapa else 0.0
+		anchor_bottom = anchor_top
+		grow_vertical = Control.GROW_DIRECTION_BEGIN if en_mapa else Control.GROW_DIRECTION_END
+		offset_top = -80 if en_mapa else 100
+		offset_bottom = offset_top
+	elif paso["espera"] == "explorar":
+		anchor_top = 0.0
+		anchor_bottom = 0.0
+		grow_vertical = Control.GROW_DIRECTION_END
 		anchor_left = 1.0
 		anchor_right = 1.0
 		offset_left = -346
@@ -121,13 +140,17 @@ func _mostrar_paso() -> void:
 		offset_top = 290
 		_texto.custom_minimum_size.x = 300
 	else:
+		anchor_top = 0.0
+		anchor_bottom = 0.0
+		grow_vertical = Control.GROW_DIRECTION_END
 		_texto.custom_minimum_size.x = 490
 		anchor_left = 0.5
 		anchor_right = 0.5
 		offset_left = -260
 		offset_right = 260
 		offset_top = 64
-	reset_size()
+	if not Pantalla.vertical:
+		reset_size()   # en vertical el ancho lo dan las anclas; reset_size lo achicaría
 	_resaltar(hud.objetivo_tutorial(paso.get("resaltar", "")) if hud else null)
 
 

@@ -22,6 +22,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
+Pantalla="*res://autoloads/pantalla.gd"
 EventBus="*uid://dv8fpbypr2p0h"
 GameState="*uid://c7pgp6eaq6q1x"
 TriviaManager="*res://autoloads/trivia_manager.gd"

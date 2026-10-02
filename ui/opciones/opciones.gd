@@ -24,13 +24,13 @@ func _ready() -> void:
 	fila_volumen.add_child(icono)
 	var etiqueta := Label.new()
 	etiqueta.text = "Volumen"
-	etiqueta.custom_minimum_size.x = 180
 	fila_volumen.add_child(etiqueta)
 	_volumen = HSlider.new()
 	_volumen.min_value = 0.0
 	_volumen.max_value = 1.0
 	_volumen.step = 0.05
-	_volumen.custom_minimum_size = Vector2(260, 32)
+	_volumen.custom_minimum_size = Vector2(120, 32)
+	_volumen.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_volumen.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_volumen.value_changed.connect(_on_volumen)
 	fila_volumen.add_child(_volumen)
@@ -51,8 +51,10 @@ func _ready() -> void:
 	espacio.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	contenido.add_child(espacio)
 
-	var botones := HBoxContainer.new()
-	botones.add_theme_constant_override("separation", 12)
+	# Se reparten en filas si no caben (teléfono en vertical).
+	var botones := HFlowContainer.new()
+	botones.add_theme_constant_override("h_separation", 12)
+	botones.add_theme_constant_override("v_separation", 12)
 	contenido.add_child(botones)
 	var continuar := Button.new()
 	continuar.text = "Continuar"

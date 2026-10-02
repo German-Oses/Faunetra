@@ -2,6 +2,8 @@ extends Control
 
 ## HUD principal: bioma actual, PR locales, salud con la meta de desbloqueo, herramientas
 ## del terreno con sus costos, barra de plantación, accesos a la Tableta y al mapa, y avisos.
+## En vertical (teléfono) la barra superior se divide en dos filas y las herramientas muestran
+## su costo en una segunda línea, para caber en 480 px lógicos (ver Pantalla).
 
 const Tableta := preload("res://ui/tableta/tableta.gd")
 const MenuMundos := preload("res://ui/menu_mundos/menu_mundos.gd")
@@ -23,6 +25,9 @@ var _pr_label: Label
 var _salud_barra: ProgressBar
 var _salud_label: Label
 var _boton_tableta: Button
+var _boton_mapa: Button
+var _fila_superior: HBoxContainer
+var _fila_estado: HBoxContainer      # segunda fila de la barra superior (solo en vertical)
 var _fila_plantas: HBoxContainer
 var _scroll_plantas: ScrollContainer
 var _aviso: Label
@@ -67,6 +72,8 @@ func _ready() -> void:
 	reloj.timeout.connect(_actualizar_boton_tableta)
 	add_child(reloj)
 	_on_herramienta_cambiada(GameState.herramienta_activa)
+	Pantalla.orientacion_cambiada.connect(func(_v: bool) -> void: _reacomodar())
+	_reacomodar()
 
 
 ## Esc: primero suelta la herramienta activa; si no hay ninguna, abre la pausa.
@@ -90,45 +97,48 @@ func _construir_barra_superior() -> void:
 	panel.anchor_right = 1.0
 	panel.grow_vertical = Control.GROW_DIRECTION_END
 	add_child(panel)
-	var fila := HBoxContainer.new()
-	fila.add_theme_constant_override("separation", 14)
-	panel.add_child(fila)
+	var columna := VBoxContainer.new()
+	panel.add_child(columna)
+	_fila_superior = HBoxContainer.new()
+	_fila_superior.add_theme_constant_override("separation", 14)
+	columna.add_child(_fila_superior)
+	_fila_estado = HBoxContainer.new()
+	_fila_estado.add_theme_constant_override("separation", 10)
+	columna.add_child(_fila_estado)
 
 	_nombre_bioma = Label.new()
 	_nombre_bioma.add_theme_font_size_override("font_size", 18)
 	_nombre_bioma.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	fila.add_child(_nombre_bioma)
+	_nombre_bioma.clip_text = true
+	_nombre_bioma.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_fila_superior.add_child(_nombre_bioma)
 
 	_pr_label = Label.new()
 	_pr_label.tooltip_text = "Puntos de Restauración (Esencia Vital) de este bioma. No se comparten entre biomas."
 	_pr_label.mouse_filter = Control.MOUSE_FILTER_PASS
-	fila.add_child(_pr_label)
-
 	_salud_label = Label.new()
-	fila.add_child(_salud_label)
 	_salud_barra = ProgressBar.new()
 	_salud_barra.custom_minimum_size = Vector2(160, 18)
 	_salud_barra.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_salud_barra.show_percentage = false
 	_salud_barra.tooltip_text = "Sana el bioma hasta %d%% para desbloquear el siguiente." % int(GameState.umbral_desbloqueo())
-	fila.add_child(_salud_barra)
 
-	var mapa := Button.new()
-	mapa.text = "Mundos"
-	mapa.icon = TemaFaunetra.icono("casa")
-	mapa.pressed.connect(func() -> void: _menu.abrir())
-	fila.add_child(mapa)
+	_boton_mapa = Button.new()
+	_boton_mapa.icon = TemaFaunetra.icono("casa")
+	_boton_mapa.tooltip_text = "Mapa de mundos"
+	_boton_mapa.pressed.connect(func() -> void: _menu.abrir())
 
 	_boton_tableta = Button.new()
 	_boton_tableta.text = "Tableta"
 	_boton_tableta.pressed.connect(func() -> void: _tableta.abrir())
-	fila.add_child(_boton_tableta)
 
 	var opciones := Button.new()
 	opciones.icon = TemaFaunetra.icono("engranaje")
 	opciones.tooltip_text = "Pausa y opciones (Esc)"
 	opciones.pressed.connect(abrir_opciones)
-	fila.add_child(opciones)
+	# Orden en horizontal: nombre · PR · salud · barra · Mundos · Tableta · opciones.
+	for nodo in [_pr_label, _salud_label, _salud_barra, _boton_mapa, _boton_tableta, opciones]:
+		_fila_superior.add_child(nodo)
 
 
 func _construir_barra_inferior() -> void:
@@ -159,11 +169,9 @@ func _construir_barra_inferior() -> void:
 		var boton := Button.new()
 		boton.toggle_mode = true
 		boton.button_group = grupo
-		boton.custom_minimum_size = Vector2(120, 40)
 		boton.pressed.connect(_seleccionar_herramienta.bind(h["id"]))
 		fila.add_child(boton)
 		_botones_herramienta[h["id"]] = boton
-	_actualizar_textos_herramientas()
 
 
 func _construir_aviso() -> void:
@@ -203,15 +211,53 @@ func _on_herramienta_cambiada(id: String) -> void:
 
 
 func _actualizar_textos_herramientas() -> void:
+	# En vertical el costo va en una segunda línea para que las cinco herramientas quepan.
+	var salto := "\n" if Pantalla.vertical else " "
 	var textos := {
 		"identificar": "Identificar",
-		"disipar": "Disipar niebla (%d PR)" % ReglasEcosistema.costo_niebla(),
+		"disipar": ("Disipar%s(%d PR)" if Pantalla.vertical else "Disipar niebla%s(%d PR)") % [salto, ReglasEcosistema.costo_niebla()],
 		"limpiar": "Limpiar",
 		"plantar": "Plantar",
-		"sanar": "Sanar (%d PR)" % ReglasEcosistema.costo_sanar(),
+		"sanar": "Sanar%s(%d PR)" % [salto, ReglasEcosistema.costo_sanar()],
 	}
 	for clave in _botones_herramienta:
 		(_botones_herramienta[clave] as Button).text = textos.get(clave, clave)
+
+
+## Reubica la barra superior, las herramientas y los avisos según la orientación.
+func _reacomodar() -> void:
+	var vertical := Pantalla.vertical
+	# Barra superior: en vertical, PR y salud bajan a una segunda fila.
+	var destino := _fila_estado if vertical else _fila_superior
+	for i in 3:
+		var nodo: Control = [_pr_label, _salud_label, _salud_barra][i]
+		if nodo.get_parent() != destino:
+			if nodo.get_parent():
+				nodo.get_parent().remove_child(nodo)
+			destino.add_child(nodo)
+			destino.move_child(nodo, i if vertical else 1 + i)
+	_fila_estado.visible = vertical
+	_salud_barra.size_flags_horizontal = Control.SIZE_EXPAND_FILL if vertical else Control.SIZE_FILL
+	_salud_barra.custom_minimum_size.x = 40 if vertical else 160   # en vertical llena lo que sobre de la fila
+	_boton_mapa.text = "" if vertical else "Mundos"
+
+	for clave in _botones_herramienta:
+		var boton: Button = _botones_herramienta[clave]
+		boton.custom_minimum_size = Vector2(0, 52) if vertical else Vector2(120, 40)
+		boton.size_flags_horizontal = Control.SIZE_EXPAND_FILL if vertical else Control.SIZE_FILL
+		if vertical:
+			boton.add_theme_font_size_override("font_size", 14)
+		else:
+			boton.remove_theme_font_size_override("font_size")
+	_actualizar_textos_herramientas()
+
+	# Avisos: a lo ancho de la pantalla en vertical, centrados y acotados en horizontal.
+	_aviso.anchor_left = 0.0 if vertical else 0.5
+	_aviso.anchor_right = 1.0 if vertical else 0.5
+	_aviso.offset_left = 16 if vertical else -360
+	_aviso.offset_right = -16 if vertical else 360
+	_aviso.offset_top = -230 if vertical else -190
+	_aviso.offset_bottom = -150 if vertical else -130
 
 
 func _construir_barra_plantas(id_bioma: int) -> void:
@@ -371,7 +417,7 @@ func _mostrar_siguiente_dialogo() -> void:
 	var texto := Label.new()
 	texto.text = datos[1]
 	texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	texto.custom_minimum_size.x = 540
+	texto.custom_minimum_size.x = 340 if Pantalla.vertical else 540
 	columna.add_child(texto)
 	var aceptar := Button.new()
 	aceptar.text = "OK"

@@ -8,12 +8,17 @@ extends Node2D
 
 const ZOOM_MIN := 0.4
 const ZOOM_MAX := 3.0
-## Espacio de pantalla que ocupan las barras del HUD (arriba y abajo).
+## Espacio de pantalla que ocupan las barras del HUD (arriba y abajo), en horizontal y en
+## vertical (en vertical la barra superior tiene dos filas y las herramientas son más altas).
 const MARGEN_HUD_SUPERIOR := 56.0
 const MARGEN_HUD_INFERIOR := 120.0
+const MARGEN_HUD_SUPERIOR_VERTICAL := 92.0
+const MARGEN_HUD_INFERIOR_VERTICAL := 140.0
 ## Al entrar, la cámara encuadra el claro y su entorno (radio en parcelas), no el mapa completo:
 ## el paisaje llena la pantalla y se puede alejar con la rueda o pellizcando.
+## En un teléfono vertical el encuadre es más estrecho para que las parcelas no queden diminutas.
 const RADIO_VISTA_INICIAL := 5
+const RADIO_VISTA_INICIAL_VERTICAL := 4
 
 var id_bioma: int = -1
 ## Si es true, el mapa se arma con GeneradorMapa (río, montañas, caseta…) en lugar del
@@ -94,16 +99,26 @@ func _buscar_tilemap() -> TileMapLayer:
 func _configurar_camara() -> void:
 	camara = Camera2D.new()
 	add_child(camara)
+	_encuadrar()
+	camara.make_current()
+	# Al girar el teléfono cambia el área visible: se vuelve a encuadrar el claro.
+	Pantalla.orientacion_cambiada.connect(func(_v: bool) -> void: _encuadrar.call_deferred())
+
+
+func _encuadrar() -> void:
+	var vertical := Pantalla.vertical
+	var arriba := MARGEN_HUD_SUPERIOR_VERTICAL if vertical else MARGEN_HUD_SUPERIOR
+	var abajo := MARGEN_HUD_INFERIOR_VERTICAL if vertical else MARGEN_HUD_INFERIOR
+	var radio := RADIO_VISTA_INICIAL_VERTICAL if vertical else RADIO_VISTA_INICIAL
 	var tilemap := terreno.tilemap
-	var tam := Vector2(tilemap.tile_set.tile_size) * (RADIO_VISTA_INICIAL * 2 + 1)
+	var tam := Vector2(tilemap.tile_set.tile_size) * (radio * 2 + 1)
 	var rect := Rect2(tilemap.to_global(tilemap.map_to_local(Vector2i.ZERO)) - tam * 0.5, tam)
 	var vista := get_viewport_rect().size
-	var alto_util := maxf(100.0, vista.y - MARGEN_HUD_SUPERIOR - MARGEN_HUD_INFERIOR)
+	var alto_util := maxf(100.0, vista.y - arriba - abajo)
 	var zoom := clampf(minf(vista.x / rect.size.x, alto_util / rect.size.y), ZOOM_MIN, ZOOM_MAX)
 	camara.zoom = Vector2(zoom, zoom)
 	# Desplazamos el encuadre para compensar que el HUD inferior es más alto que el superior.
-	camara.global_position = rect.get_center() + Vector2(0, (MARGEN_HUD_INFERIOR - MARGEN_HUD_SUPERIOR) * 0.5 / zoom)
-	camara.make_current()
+	camara.global_position = rect.get_center() + Vector2(0, (abajo - arriba) * 0.5 / zoom)
 
 
 ## Controles de cámara para mouse, trackpad y pantallas táctiles:

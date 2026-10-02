@@ -1,10 +1,12 @@
-extends HBoxContainer
+extends BoxContainer
 
 ## Escáner de Especies (puzzle de percepción visual con el Lente Ancestral).
 ## Una expedición tiene RONDAS rondas: en cada una, una especie del bioma se camufla en el
 ## paisaje; el retículo del escáner disipa el camuflaje cerca de ella. Al encontrarla, el
 ## jugador la identifica entre 4 opciones. Acertar da PR y la registra en la Biopedia.
 ## A la derecha: tarjetas de repetición espaciada y del puzzle acústico.
+## En vertical (teléfono) la columna lateral pasa debajo del visor y se omite la tarjeta del
+## puzzle acústico (tiene su propia pestaña en la Tableta).
 
 signal abrir_puzzle_acustico
 
@@ -25,6 +27,8 @@ var _siguiente: Button
 var _repaso_nombre: Label
 var _repaso_chips: HBoxContainer
 var _repaso_boton: Button
+var _lateral: VBoxContainer
+var _tarjeta_acustica: PanelContainer
 
 var _objetivo: EspecieData
 var _ronda := -1                       # -1 = sin expedición en curso
@@ -45,6 +49,17 @@ func _ready() -> void:
 	add_child(_crear_columna_escaner())
 	add_child(_crear_columna_lateral())
 	GameState.repasos_actualizados.connect(_refrescar_repaso)
+	Pantalla.orientacion_cambiada.connect(func(_v: bool) -> void: _reacomodar())
+	_reacomodar()
+
+
+func _reacomodar() -> void:
+	var v := Pantalla.vertical
+	vertical = v
+	_lateral.custom_minimum_size.x = 0 if v else 330
+	_tarjeta_acustica.visible = not v
+	_visor.custom_minimum_size = Vector2(0, 220) if v else Vector2(380, 200)
+	_progreso.custom_minimum_size.x = 130 if v else 190
 
 
 ## La Tableta llama esto al mostrar la pestaña: retoma la expedición o empieza una nueva.
@@ -59,6 +74,7 @@ func al_mostrar() -> void:
 func _crear_columna_escaner() -> Control:
 	var columna := VBoxContainer.new()
 	columna.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columna.size_flags_vertical = Control.SIZE_EXPAND_FILL   # en vertical, el visor usa el alto libre
 	columna.size_flags_stretch_ratio = 1.8
 	columna.add_theme_constant_override("separation", 8)
 
@@ -129,8 +145,8 @@ func _crear_columna_escaner() -> Control:
 
 func _crear_columna_lateral() -> Control:
 	var columna := VBoxContainer.new()
-	columna.custom_minimum_size.x = 330
 	columna.add_theme_constant_override("separation", 10)
+	_lateral = columna
 
 	var panel_opciones := PanelContainer.new()
 	panel_opciones.add_theme_stylebox_override("panel", TemaFaunetra.caja(Color.WHITE, TemaFaunetra.BORDE, 14, 2, 10))
@@ -180,6 +196,7 @@ func _crear_columna_lateral() -> Control:
 	fila.add_child(onda)
 	caja_acustico.add_child(fila)
 	columna.add_child(acustico)
+	_tarjeta_acustica = acustico
 	return columna
 
 

@@ -52,11 +52,15 @@ func _construir_interfaz() -> void:
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for lado in ["left", "right"]:
-		margin.add_theme_constant_override("margin_" + lado, 60)
-	for lado in ["top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + lado, 30)
 	add_child(margin)
+	# En vertical (teléfono) los márgenes se angostan para aprovechar el ancho.
+	var ajustar_margenes := func(vertical: bool) -> void:
+		for lado in ["left", "right"]:
+			margin.add_theme_constant_override("margin_" + lado, 8 if vertical else 60)
+		for lado in ["top", "bottom"]:
+			margin.add_theme_constant_override("margin_" + lado, 12 if vertical else 30)
+	ajustar_margenes.call(Pantalla.vertical)
+	Pantalla.orientacion_cambiada.connect(ajustar_margenes)
 
 	var panel := PanelContainer.new()
 	margin.add_child(panel)
@@ -72,6 +76,7 @@ func _construir_interfaz() -> void:
 
 	_encabezado_label = Label.new()
 	_encabezado_label.modulate = Color(0.8, 0.9, 1.0)
+	_encabezado_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	raiz.add_child(_encabezado_label)
 
 	_scroll = ScrollContainer.new()

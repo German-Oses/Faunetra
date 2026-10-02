@@ -18,6 +18,9 @@ var _registros: Label
 
 func _ready() -> void:
 	add_theme_constant_override("separation", 12)
+	Pantalla.orientacion_cambiada.connect(func(_v: bool) -> void:
+		if is_visible_in_tree():
+			refrescar())
 
 	var cabecera := HBoxContainer.new()
 	var avatar := TextureRect.new()
@@ -88,8 +91,10 @@ func _ready() -> void:
 func _crear_seccion_investigacion() -> Control:
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", TemaFaunetra.caja(Color.WHITE, TemaFaunetra.BORDE, 12, 2, 10))
-	var fila := HBoxContainer.new()
-	fila.add_theme_constant_override("separation", 10)
+	# Se reparte en varias filas si no cabe (teléfono en vertical).
+	var fila := HFlowContainer.new()
+	fila.add_theme_constant_override("h_separation", 10)
+	fila.add_theme_constant_override("v_separation", 8)
 	panel.add_child(fila)
 	var etiqueta := Label.new()
 	etiqueta.text = "Código de participante:"
@@ -143,6 +148,8 @@ func _actualizar_confirmar() -> void:
 
 
 func refrescar() -> void:
+	var vertical := Pantalla.vertical
+	_resumen.columns = 2 if vertical else 4
 	_nueva_partida.visible = false
 	_selector.seleccionar(GameState.modo)
 	_actualizar_confirmar()
@@ -190,11 +197,14 @@ func refrescar() -> void:
 		fila.add_child(icono)
 		var nombre := Label.new()
 		nombre.text = GameState.nombre_bioma(id)
-		nombre.custom_minimum_size.x = 240
+		nombre.size_flags_horizontal = Control.SIZE_EXPAND_FILL if vertical else Control.SIZE_FILL
+		nombre.custom_minimum_size.x = 0 if vertical else 240
+		nombre.clip_text = true
+		nombre.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		fila.add_child(nombre)
 		var barra := ProgressBar.new()
 		barra.value = GameState.salud(id)
-		barra.custom_minimum_size = Vector2(220, 16)
+		barra.custom_minimum_size = Vector2(70 if vertical else 220, 16)
 		barra.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		fila.add_child(barra)
 		var pr := Label.new()
