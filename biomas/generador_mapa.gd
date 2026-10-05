@@ -25,8 +25,9 @@ const RADIO_EXTERIOR := RADIO_MAPA + 8
 const DESNIVEL_AGUA := 8
 ## Biomas con agua dulce tranquila donde crecen nenúfares.
 const BIOMAS_CON_NENUFARES: Array[int] = [1, 3, 4]
-## Árboles nativos del paisaje, dos por bioma (arbol_<bioma>_a/b.png, 64x96, generados con
-## herramientas/aseprite/arboles_paisaje.lua). La variante "a" es la más común.
+## Árboles nativos del paisaje, dos por bioma (arbol_<bioma>_a/b.png, 128x192 a la misma escala de
+## píxel que las baldosas, generados con herramientas/aseprite/arboles_detallados.lua).
+## La variante "a" es la más común.
 const ARBOLES_PAISAJE := {
 	1: ["arbol_1_a", "arbol_1_b"],  # Zona Central: quillay y espino
 	2: ["arbol_2_a", "arbol_2_b"],  # Norte Árido: cardón adulto y joven
@@ -256,7 +257,7 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 
 	# Borde del mundo: bosquecitos del árbol típico del bioma, agrupados con ruido y con
 	# claros entre ellos, más rocas sueltas. Nunca dentro de la zona jugable.
-	var densidad := {1: 0.5, 2: 0.2, 3: 0.75, 4: 0.55, 5: 0.45}
+	var densidad := {1: 0.5, 2: 0.12, 3: 0.75, 4: 0.55, 5: 0.45}
 	for c in tipos:
 		if absi(c.x) <= RADIO_JUGABLE and absi(c.y) <= RADIO_JUGABLE:
 			continue
@@ -269,6 +270,9 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 		if r < lerpf(0.03, densidad.get(id_bioma, 0.5), bosque):
 			var especies: Array = ARBOLES_PAISAJE.get(id_bioma, ARBOLES_PAISAJE[3])
 			var nombre: String = especies[0] if rng_exterior.randf() < PROPORCION_VARIANTE_A else especies[1]
+			# Un árbol alto tapa más filas detrás de él: el margen depende de lo que mide su dibujo.
+			if _taparia_el_refugio(c, ceili(_alto_visible(nombre) / 32.0)):
+				continue
 			var arbol := _sprite(contenedor, tilemap, nombre, c,
 				Vector2(rng_exterior.randi_range(-8, 8), rng_exterior.randi_range(2, 10)))
 			arbol.flip_h = rng_exterior.randf() < 0.5
@@ -282,11 +286,11 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 	return decoraciones
 
 
-## Un árbol grande tapa las parcelas que quedan detrás de él (hasta dos filas hacia arriba en pantalla):
-## no se ponen donde ocultarían la zona jugable.
-static func _taparia_el_refugio(c: Vector2i) -> bool:
-	for dy in 3:
-		for dx in 3:
+## Un adorno alto tapa las parcelas que quedan detrás de él (`filas` hacia arriba en pantalla, cada
+## una de 32 px): no se pone donde ocultaría la zona jugable.
+static func _taparia_el_refugio(c: Vector2i, filas := 3) -> bool:
+	for dy in filas:
+		for dx in filas:
 			if absi(c.x - dx) <= RADIO_JUGABLE and absi(c.y - dy) <= RADIO_JUGABLE:
 				return true
 	return false
@@ -332,6 +336,14 @@ static func _sprite(contenedor: Node2D, tilemap: TileMapLayer, nombre: String, c
 
 static var _textura_sombra: Texture2D
 static var _ancho_visible: Dictionary = {}  # ruta de textura -> ancho de la parte dibujada (px)
+static var _altos_visibles: Dictionary = {}  # nombre de decoración -> alto de la parte dibujada (px)
+
+
+static func _alto_visible(nombre: String) -> int:
+	if not _altos_visibles.has(nombre):
+		var tex: Texture2D = load(RUTA_DECORACION % nombre)
+		_altos_visibles[nombre] = tex.get_image().get_used_rect().size.y
+	return _altos_visibles[nombre]
 
 ## Sombra ovalada bajo una decoración, corrida hacia la derecha (la luz viene de arriba a la izquierda).
 static func _sombra(s: Sprite2D) -> void:
