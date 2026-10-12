@@ -74,7 +74,8 @@ const CASETA := Vector2i(2, -1)
 
 ## Genera el mapa sobre `tilemap` y coloca las decoraciones en `contenedor`.
 ## Devuelve {"zona": Array[Vector2i], "tipos": {Vector2i: String}, "decoraciones": {Vector2i: Node2D},
-## "alturas": {Vector2i: int}}.
+## "alturas": {Vector2i: int}, "capas": Array[TileMapLayer] (niveles de terraza),
+## "paisaje": Array[{celda, sprite, tipo}] (árboles y plantas de agua del exterior, ver PaisajeVivo)}.
 static func generar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 104729 * id_bioma + VERSION
@@ -135,8 +136,10 @@ static func generar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D) ->
 			var relleno := ROCA if h >= _roca_desde(id_bioma) else base
 			(capas[k - 1] as TileMapLayer).set_cell(c, 0, cima if k == h else relleno)
 
-	var decoraciones := _decorar(id_bioma, tilemap, contenedor, tipos, alturas, rng, rng_exterior)
-	return {"zona": zona, "tipos": tipos, "decoraciones": decoraciones, "alturas": alturas}
+	var paisaje: Array[Dictionary] = []
+	var decoraciones := _decorar(id_bioma, tilemap, contenedor, tipos, alturas, rng, rng_exterior, paisaje)
+	return {"zona": zona, "tipos": tipos, "decoraciones": decoraciones, "alturas": alturas,
+		"capas": capas, "paisaje": paisaje}
 
 
 ## Nivel de cada celda. Sube con la distancia hacia los bordes traseros (con ruido, para que las
@@ -181,17 +184,23 @@ static func _crear_tileset(id_bioma: int) -> TileSet:
 	ts.tile_shape = TileSet.TILE_SHAPE_ISOMETRIC
 	ts.tile_layout = TileSet.TILE_LAYOUT_DIAMOND_DOWN
 	ts.tile_size = Vector2i(64, 32)
+	ts.add_source(crear_fuente(load("res://Assets/tilesets/mapa_%d.png" % id_bioma)), 0)
+	return ts
+
+
+## Fuente de baldosas con la distribución de columnas de mapa_<id>.png. PaisajeVivo la usa
+## también para las variantes degradadas del tileset (mismas coordenadas, otra textura).
+static func crear_fuente(textura: Texture2D) -> TileSetAtlasSource:
 	var fuente := TileSetAtlasSource.new()
-	fuente.texture = load("res://Assets/tilesets/mapa_%d.png" % id_bioma)
+	fuente.texture = textura
 	fuente.texture_region_size = Vector2i(64, 48)
-	ts.add_source(fuente, 0)
 	for coords in [SUELO[0], SUELO[1], SUELO[2], SENDERO, AGUA, ESPECIAL, ROCA, NIEVE]:
 		fuente.create_tile(coords)
 		fuente.get_tile_data(coords, 0).texture_origin = Vector2i(0, -8 - (DESNIVEL_AGUA if coords == AGUA else 0))
 	fuente.set_tile_animation_frames_count(AGUA, 2)
 	fuente.set_tile_animation_frame_duration(AGUA, 0, 0.7)
 	fuente.set_tile_animation_frame_duration(AGUA, 1, 0.7)
-	return ts
+	return fuente
 
 
 ## Ondulación de baja frecuencia: formas grandes que cambian cada 10-20 parcelas.
@@ -275,7 +284,8 @@ static func _sendero(tipos: Dictionary) -> void:
 
 
 static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, tipos: Dictionary,
-		alturas: Dictionary, rng: RandomNumberGenerator, rng_exterior: RandomNumberGenerator) -> Dictionary:
+		alturas: Dictionary, rng: RandomNumberGenerator, rng_exterior: RandomNumberGenerator,
+		paisaje: Array[Dictionary]) -> Dictionary:
 	var decoraciones: Dictionary = {}
 	var ocupadas: Dictionary = {}
 
@@ -364,12 +374,13 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 				Vector2(rng_exterior.randi_range(-8, 8), rng_exterior.randi_range(2, 10)) + subir)
 			arbol.flip_h = rng_exterior.randf() < 0.5
 			_sombra(arbol)
+			paisaje.append({"celda": c, "sprite": arbol, "tipo": "arbol"})
 		elif r > 0.97:
 			_sombra(_sprite(contenedor, tilemap, "roca_%d" % id_bioma, c, Vector2(0, 6) + subir))
 		elif id_bioma == 3 and r > 0.94:
 			_sombra(_sprite(contenedor, tilemap, "tronco", c, Vector2(0, 6) + subir))
 
-	_plantas_de_agua(id_bioma, tilemap, contenedor, tipos, alturas, rng_exterior)
+	_plantas_de_agua(id_bioma, tilemap, contenedor, tipos, alturas, rng_exterior, paisaje)
 	return decoraciones
 
 
@@ -386,7 +397,7 @@ static func _taparia_el_refugio(c: Vector2i, filas := 3) -> bool:
 ## Nenúfares en el agua dulce y juncos en las orillas, fuera de la zona jugable
 ## (dentro quedarían por encima de la Niebla del Olvido).
 static func _plantas_de_agua(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, tipos: Dictionary,
-		alturas: Dictionary, rng: RandomNumberGenerator) -> void:
+		alturas: Dictionary, rng: RandomNumberGenerator, paisaje: Array[Dictionary]) -> void:
 	if id_bioma == 5:
 		return
 	var vecinas: Array[Vector2i] = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
@@ -402,10 +413,13 @@ static func _plantas_de_agua(id_bioma: int, tilemap: TileMapLayer, contenedor: N
 		var r := rng.randf()
 		var desfase := Vector2(rng.randi_range(-12, 12), DESNIVEL_AGUA + rng.randi_range(-3, 4))
 		if orilla and r < 0.3:
-			_sprite(contenedor, tilemap, "juncos", c, desfase).flip_h = rng.randf() < 0.5
+			var juncos := _sprite(contenedor, tilemap, "juncos", c, desfase)
+			juncos.flip_h = rng.randf() < 0.5
+			paisaje.append({"celda": c, "sprite": juncos, "tipo": "agua"})
 		elif id_bioma in BIOMAS_CON_NENUFARES and r > 0.86:
 			var hoja := _sprite(contenedor, tilemap, "nenufar", c, desfase + Vector2(0, 4))
 			hoja.z_index = -1
+			paisaje.append({"celda": c, "sprite": hoja, "tipo": "agua"})
 
 
 ## Coloca una decoración apoyada sobre la parcela (su base inferior en el centro de la celda).
@@ -448,11 +462,19 @@ static func _sombra(s: Sprite2D) -> void:
 	sombra.texture = _textura_sombra
 	sombra.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	sombra.show_behind_parent = true
-	# La sombra es hija del sprite (hereda su escala) y se ajusta al ancho de lo dibujado, no del lienzo:
-	# un cardón angosto no lleva la sombra de un árbol frondoso.
+	sombra.name = "Sombra"
+	sombra.position = Vector2(4, -3)
+	s.add_child(sombra)
+	ajustar_sombra(s)
+
+
+## La sombra es hija del sprite (hereda su escala) y se ajusta al ancho de lo dibujado, no del lienzo:
+## un cardón angosto no lleva la sombra de un árbol frondoso. Se vuelve a llamar al cambiar la textura.
+static func ajustar_sombra(s: Sprite2D) -> void:
+	var sombra := s.get_node_or_null("Sombra") as Sprite2D
+	if sombra == null:
+		return
 	var ruta := s.texture.resource_path
 	if not _ancho_visible.has(ruta):
 		_ancho_visible[ruta] = s.texture.get_image().get_used_rect().size.x
 	sombra.scale = Vector2(maxf(12.0, _ancho_visible[ruta] * 0.9) / 28.0, 1.0)
-	sombra.position = Vector2(4, -3)
-	s.add_child(sombra)

@@ -56,6 +56,11 @@ func _ready() -> void:
 	terreno.name = "TerrenoRefugio"
 	add_child(terreno)
 	terreno.configurar(id_bioma, tilemap, contenedor_especies, mapa)
+	if generar_mapa:
+		var paisaje := PaisajeVivo.new()
+		paisaje.name = "PaisajeVivo"
+		add_child(paisaje)
+		paisaje.configurar(id_bioma, tilemap, mapa)
 	_configurar_camara()
 	EventBus.bioma_cargado.emit(id_bioma)
 
