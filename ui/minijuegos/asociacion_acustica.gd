@@ -30,7 +30,10 @@ func _ready() -> void:
 	_escuchar = Button.new()
 	_escuchar.text = "Escuchar paisaje sonoro"
 	_escuchar.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	_escuchar.pressed.connect(func() -> void: _reproductor.play())
+	_escuchar.pressed.connect(func() -> void:
+		if _reproductor.stream:
+			Sonidos.atenuar_ambiente(_reproductor.stream.get_length())
+			_reproductor.play())
 	add_child(_escuchar)
 
 	var scroll := ScrollContainer.new()
@@ -69,6 +72,7 @@ func nueva_ronda() -> void:
 	_escuchar.disabled = false
 	_objetivo = fauna.pick_random()
 	_reproductor.stream = _objetivo.audio_canto if _objetivo.audio_canto else SintetizadorFauna.generar(_objetivo)
+	Sonidos.atenuar_ambiente(_reproductor.stream.get_length())
 	_reproductor.play()
 	_inicio_ms = Time.get_ticks_msec()
 	_instrucciones.text = "Escucha con atención y elige la ficha de la especie que produce este sonido. (+%d PR)" % RECOMPENSA_PR
@@ -114,6 +118,7 @@ func _on_ficha(elegida: EspecieData, boton: Button) -> void:
 	GameState.registrar({"tipo": "sonido", "id_especie": _objetivo.id_especie, "especie": _objetivo.nombre_comun,
 		"correcta": elegida == _objetivo, "tiempo_s": snappedf((Time.get_ticks_msec() - _inicio_ms) / 1000.0, 0.1),
 		"pr": RECOMPENSA_PR if elegida == _objetivo else 0, "detalle": "eligio=%s" % elegida.nombre_comun})
+	Sonidos.reproducir("correcta" if elegida == _objetivo else "incorrecta")
 	if elegida == _objetivo:
 		boton.modulate = Color(0.55, 1.0, 0.6)
 		GameState.agregar_pr(RECOMPENSA_PR)

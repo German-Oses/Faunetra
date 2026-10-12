@@ -33,6 +33,8 @@ func _ready() -> void:
 	_volumen.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_volumen.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_volumen.value_changed.connect(_on_volumen)
+	# Al soltar el control se oye un clic para comprobar el nuevo volumen.
+	_volumen.drag_ended.connect(func(_cambio: bool) -> void: Sonidos.reproducir("clic"))
 	fila_volumen.add_child(_volumen)
 	_volumen_texto = Label.new()
 	fila_volumen.add_child(_volumen_texto)

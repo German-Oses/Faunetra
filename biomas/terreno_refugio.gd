@@ -285,7 +285,7 @@ func _usar_herramienta(celda: Vector2i) -> bool:
 
 func _disipar(celda: Vector2i) -> void:
 	if not celdas[celda]["n"]:
-		_avisar("Esta parcela ya está libre de la Niebla del Olvido.")
+		_rechazar("Esta parcela ya está libre de la Niebla del Olvido.")
 		return
 	var costo := ReglasEcosistema.costo_niebla()
 	if not _pagar(costo):
@@ -303,10 +303,10 @@ func _disipar(celda: Vector2i) -> void:
 func _limpiar(celda: Vector2i) -> void:
 	var c: Dictionary = celdas[celda]
 	if c["n"]:
-		_avisar("Primero disipa la niebla para ver qué hay en esta parcela.")
+		_rechazar("Primero disipa la niebla para ver qué hay en esta parcela.")
 		return
 	if str(c["b"]) == "":
-		_avisar("No hay nada que limpiar aquí.")
+		_rechazar("No hay nada que limpiar aquí.")
 		return
 	var info := ReglasEcosistema.bloqueador(id_bioma, str(c["b"]))
 	var costo := ReglasEcosistema.costo_limpiar(info)
@@ -321,19 +321,19 @@ func _plantar(celda: Vector2i) -> void:
 	var c: Dictionary = celdas[celda]
 	var data := GameState.especie_para_plantar
 	if data == null or data.id_bioma != id_bioma:
-		_avisar("Elige una especie nativa en la barra de plantación.")
+		_rechazar("Elige una especie nativa en la barra de plantación.")
 		return
 	if c["n"]:
-		_avisar("No puedes plantar bajo la Niebla del Olvido.")
+		_rechazar("No puedes plantar bajo la Niebla del Olvido.")
 		return
 	if not es_plantable(celda):
-		_avisar("Aquí no se puede plantar: %s." % _descripcion_tipo(celda))
+		_rechazar("Aquí no se puede plantar: %s." % _descripcion_tipo(celda))
 		return
 	if str(c["b"]) != "":
-		_avisar("Limpia primero: %s." % ReglasEcosistema.bloqueador(id_bioma, str(c["b"])).get("nombre", "bloqueador"))
+		_rechazar("Limpia primero: %s." % ReglasEcosistema.bloqueador(id_bioma, str(c["b"])).get("nombre", "bloqueador"))
 		return
 	if int(c["e"]) > 0:
-		_avisar("Esta parcela ya tiene una planta.")
+		_rechazar("Esta parcela ya tiene una planta.")
 		return
 	var costo := ReglasEcosistema.costo_plantar(data)
 	if not _pagar(costo):
@@ -356,7 +356,7 @@ func _plantar(celda: Vector2i) -> void:
 func _sanar(celda: Vector2i) -> void:
 	var c: Dictionary = celdas[celda]
 	if c["n"] or int(c["e"]) <= 0 or not c["m"]:
-		_avisar("Aquí no hay plantas marchitas que sanar.")
+		_rechazar("Aquí no hay plantas marchitas que sanar.")
 		return
 	var costo := ReglasEcosistema.costo_sanar()
 	if not _pagar(costo):
@@ -412,7 +412,7 @@ func _descripcion_tipo(celda: Vector2i) -> String:
 func _pagar(costo: int) -> bool:
 	if GameState.gastar_pr(costo, id_bioma):
 		return true
-	_avisar("Necesitas %d PR y tienes %d. Gana Esencia Vital en la Tableta: trivias y minijuegos." % [costo, GameState.obtener_pr(id_bioma)])
+	_rechazar("Necesitas %d PR y tienes %d. Gana Esencia Vital en la Tableta: trivias y minijuegos." % [costo, GameState.obtener_pr(id_bioma)])
 	return false
 
 
@@ -425,6 +425,11 @@ func _tras_cambio(texto: String) -> void:
 
 func _avisar(texto: String) -> void:
 	EventBus.mensaje.emit(texto)
+
+
+func _rechazar(texto: String) -> void:
+	EventBus.accion_rechazada.emit()
+	_avisar(texto)
 
 
 func accion_valida(celda: Vector2i) -> bool:
@@ -569,6 +574,7 @@ func _evaluar_fauna(salud: float) -> void:
 			continue
 		presentes.append(animal.id_especie)
 		_aparecer_fauna(animal)
+		EventBus.fauna_llego.emit(animal)
 		GameState.marcar_cambios()
 		var nueva := GameState.descubrir_especie(animal)
 		_avisar("¡%s llegó a tu refugio!%s" % [animal.nombre_comun, " Nueva entrada en la Biopedia." if nueva else ""])

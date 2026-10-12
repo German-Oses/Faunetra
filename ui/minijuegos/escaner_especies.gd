@@ -315,6 +315,7 @@ func _limpiar_opciones() -> void:
 
 
 func _on_encontrado() -> void:
+	Sonidos.reproducir("encontrado")
 	_instruccion_titulo.text = "¡Especie localizada!"
 	_instruccion_texto.text = "Ahora identifícala entre las opciones."
 	_resultado.text = ""
@@ -324,6 +325,7 @@ func _on_encontrado() -> void:
 
 
 func _on_fallo_visor() -> void:
+	Sonidos.reproducir("error")
 	_resultado.text = "Nada por aquí… acerca el escáner y observa con atención."
 
 
@@ -336,6 +338,7 @@ func _on_opcion(elegida: EspecieData, boton: Button) -> void:
 		btn.disabled = true
 		if btn.get_meta("especie") == _objetivo:
 			btn.add_theme_stylebox_override("disabled", TemaFaunetra.caja(TemaFaunetra.VERDE_CLARO, TemaFaunetra.VERDE, 12, 3, 6))
+	Sonidos.reproducir("correcta" if elegida == _objetivo else "incorrecta")
 	if elegida == _objetivo:
 		_resultados[_ronda] = 1
 		_pr_ganados += RECOMPENSA_PR
@@ -380,6 +383,7 @@ func _reproducir_pista() -> void:
 	if _objetivo == null or EspecieLoader.es_flora(_objetivo):
 		return
 	_reproductor.stream = _objetivo.audio_canto if _objetivo.audio_canto else SintetizadorFauna.generar(_objetivo)
+	Sonidos.atenuar_ambiente(_reproductor.stream.get_length())
 	_reproductor.play()
 
 
