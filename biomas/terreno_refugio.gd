@@ -18,7 +18,6 @@ const MAX_BLOQUEADORES := 18
 const BLOQUEADORES_EN_CLARO := 2
 const INTERVALO_EVALUACION := 1.0
 
-const COLOR_NIEBLA := Color(0.84, 0.86, 0.93, 0.92)
 const COLOR_AURA := Color(0.35, 0.65, 1.0, 0.28)
 const COLOR_MARCHITA := Color(0.45, 0.3, 0.1, 0.4)
 const COLOR_VALIDO := Color(0.45, 1.0, 0.55)
@@ -51,6 +50,8 @@ var _centro := Vector2i.ZERO
 var _zona: Array[Vector2i] = []       # Parcelas jugables del refugio
 var _tipos: Dictionary = {}           # Vector2i -> tipo de parcela del GeneradorMapa ("suelo", "agua"...)
 var _decoraciones: Dictionary = {}    # Vector2i -> Node2D decorativo dentro del refugio
+var _niebla: NieblaOlvido
+var _cursor: Node2D                    # contorno de la parcela bajo el puntero, sobre la niebla
 
 
 ## `mapa` es el resultado de GeneradorMapa.generar(); si viene vacío se usa el TileMapLayer tal cual.
@@ -77,6 +78,17 @@ func configurar(p_id_bioma: int, p_tilemap: TileMapLayer, p_contenedor: Node2D, 
 
 	for celda in celdas:
 		_sincronizar_planta(celda)
+	# La niebla va bajo las especies y decoraciones (z 2 del contenedor), para no tapar la caseta
+	# ni el puente que sobresalen hacia atrás; el cursor sí va encima de todo.
+	_niebla = NieblaOlvido.new()
+	_niebla.name = "NieblaOlvido"
+	add_child(_niebla)
+	_niebla.configurar(self)
+	_cursor = Node2D.new()
+	_cursor.name = "Cursor"
+	_cursor.z_index = 3
+	add_child(_cursor)
+	_cursor.draw.connect(_dibujar_cursor)
 	_recalcular_auras()
 	for id in estado["fauna"]:
 		var animal := EspecieLoader.por_id(int(id))
@@ -296,6 +308,7 @@ func _disipar(celda: Vector2i) -> void:
 			celdas[otra]["n"] = false
 			_sincronizar_planta(otra)
 			despejadas += 1
+	_niebla.refrescar(celda)
 	EventBus.accion_terreno.emit("disipar")
 	_tras_cambio("La Niebla del Olvido se disipa en %d parcelas (−%d PR)." % [despejadas, costo])
 
@@ -750,22 +763,25 @@ func _draw() -> void:
 		var c: Dictionary = celdas[celda]
 		var p := tilemap.map_to_local(celda)
 		if c["n"]:
-			var ondulacion := 0.05 * sin(_tiempo * 1.3 + p.x * 0.05 + p.y * 0.08)
-			_dibujar_rombo(p, tam * 1.04, Color(COLOR_NIEBLA, COLOR_NIEBLA.a + ondulacion))
-			continue
+			continue   # la dibuja NieblaOlvido
 		if str(c["b"]) != "":
 			_dibujar_bloqueador(p, ReglasEcosistema.bloqueador(id_bioma, str(c["b"])), celda)
 		elif _auras.has(celda):
 			_dibujar_rombo(p, tam * 0.9, COLOR_AURA)
 		if int(c["e"]) > 0 and c["m"]:
 			_dibujar_rombo(p, tam * 0.8, COLOR_MARCHITA)
+	if _cursor:
+		_cursor.queue_redraw()
 
-	if _hay_hover:
-		var p := tilemap.map_to_local(_celda_hover)
-		var color := COLOR_VALIDO if accion_valida(_celda_hover) else COLOR_INVALIDO
-		var puntos := _rombo(p, tam)
-		puntos.append(puntos[0])
-		draw_polyline(puntos, color, 2.0)
+
+func _dibujar_cursor() -> void:
+	if not _hay_hover:
+		return
+	var p := tilemap.map_to_local(_celda_hover)
+	var color := COLOR_VALIDO if accion_valida(_celda_hover) else COLOR_INVALIDO
+	var puntos := _rombo(p, Vector2(tilemap.tile_set.tile_size))
+	puntos.append(puntos[0])
+	_cursor.draw_polyline(puntos, color, 2.0)
 
 
 func _rombo(centro: Vector2, tam: Vector2) -> PackedVector2Array:
