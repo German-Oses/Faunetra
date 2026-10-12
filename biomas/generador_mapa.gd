@@ -11,6 +11,11 @@ extends RefCounted
 ## Más allá del mapa base se extiende un anillo de paisaje (RADIO_EXTERIOR) con bosquecitos
 ## agrupados, para que el mundo llene la pantalla cuando la cámara está cerca. El agua se dibuja
 ## un escalón más abajo que el suelo, así las orillas muestran el canto de tierra.
+## Hacia los dos bordes traseros el paisaje sube en terrazas (la cordillera): cada nivel es otro
+## TileMapLayer desplazado 16 px hacia arriba (lo que mide el costado de una baldosa) y cada
+## columna apila una baldosa por nivel, así los acantilados no dejan huecos. La altura nunca
+## baja al ir hacia atrás, de modo que ninguna terraza tapa lo que tiene detrás y basta dibujar
+## las capas en orden. El refugio y su entorno quedan planos (nivel 0).
 ##
 ## Usa coordenadas DIAMOND_DOWN: la celda (x, y) se dibuja en ((x - y) * 32, (x + y) * 16),
 ## así que "atrás" (arriba en pantalla) es x + y pequeño y "adelante" es x + y grande.
@@ -37,11 +42,26 @@ const ARBOLES_PAISAJE := {
 }
 const PROPORCION_VARIANTE_A := 0.6
 
+## Terrazas de la cordillera.
+const TERRAZA_DESDE := RADIO_JUGABLE + 3   ## más allá de esta distancia hacia atrás, el suelo sube
+const ALTURA_MAXIMA := 5
+const ALTO_NIVEL := 16                     ## px por nivel: lo que mide el costado de una baldosa
+const ROCA_DESDE := 3                      ## desde este nivel las terrazas son de roca desnuda
+## Las islas son colinas volcánicas bajas y verdes, no una cordillera: sin roca ni nieve.
+const ALTURA_MAXIMA_ISLAS := 3
+
+static func _roca_desde(id_bioma: int) -> int:
+	return ALTURA_MAXIMA + 1 if id_bioma == 5 else ROCA_DESDE
+## Nivel desde el que hay nieve en las cumbres (las islas no tienen).
+const NIEVE_DESDE := {1: 5, 2: 5, 3: 5, 4: 5}
+
 # Columnas del tileset Assets/tilesets/mapa_<id>.png (cada baldosa mide 64x48).
 const SUELO: Array[Vector2i] = [Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0)]
 const SENDERO := Vector2i(3, 0)
 const AGUA := Vector2i(4, 0)           # animada: cuadros en las columnas 4 y 5
 const ESPECIAL := Vector2i(6, 0)
+const ROCA := Vector2i(7, 0)           # generadas con herramientas/aseprite/terrazas.lua
+const NIEVE := Vector2i(8, 0)
 
 ## Tipos de parcela. Solo "suelo" y "especial" admiten plantas y bloqueadores.
 const PLANTABLES: Array[String] = ["suelo", "especial"]
@@ -53,7 +73,8 @@ const CASETA := Vector2i(2, -1)
 
 
 ## Genera el mapa sobre `tilemap` y coloca las decoraciones en `contenedor`.
-## Devuelve {"zona": Array[Vector2i], "tipos": {Vector2i: String}, "decoraciones": {Vector2i: Node2D}}.
+## Devuelve {"zona": Array[Vector2i], "tipos": {Vector2i: String}, "decoraciones": {Vector2i: Node2D},
+## "alturas": {Vector2i: int}}.
 static func generar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 104729 * id_bioma + VERSION
@@ -85,22 +106,74 @@ static func generar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D) ->
 		var c := Vector2i(-1, y)
 		exterior[c] = "puente" if exterior.get(c) == "agua" else "sendero"
 	tipos.merge(exterior)
+	var alturas := _alturas(id_bioma, tipos)
 
-	# Baldosas
+	# Baldosas: el nivel 0 en el TileMapLayer del bioma y, encima, una baldosa por nivel.
+	var capas := _capas_de_altura(tilemap)
 	for c in tipos:
+		var base := Vector2i.ZERO
 		match tipos[c]:
 			"agua":
-				tilemap.set_cell(c, 0, AGUA)
+				base = AGUA
 			"sendero", "puente", "caseta":
-				tilemap.set_cell(c, 0, SENDERO)
+				base = SENDERO
 			"especial":
-				tilemap.set_cell(c, 0, ESPECIAL)
+				base = ESPECIAL
 			_:
 				var r := (rng_exterior if exterior.has(c) else rng).randf()
-				tilemap.set_cell(c, 0, SUELO[0] if r < 0.7 else (SUELO[1] if r < 0.88 else SUELO[2]))
+				base = SUELO[0] if r < 0.7 else (SUELO[1] if r < 0.88 else SUELO[2])
+		tilemap.set_cell(c, 0, base)
+		var h: int = alturas[c]
+		if base == AGUA or h == 0:
+			continue   # el agua se queda abajo: los ríos cortan las terrazas como quebradas
+		var cima := base
+		if h >= NIEVE_DESDE.get(id_bioma, ALTURA_MAXIMA + 1):
+			cima = NIEVE
+		elif h >= _roca_desde(id_bioma):
+			cima = ROCA
+		for k in range(1, h + 1):
+			var relleno := ROCA if h >= _roca_desde(id_bioma) else base
+			(capas[k - 1] as TileMapLayer).set_cell(c, 0, cima if k == h else relleno)
 
-	var decoraciones := _decorar(id_bioma, tilemap, contenedor, tipos, rng, rng_exterior)
-	return {"zona": zona, "tipos": tipos, "decoraciones": decoraciones}
+	var decoraciones := _decorar(id_bioma, tilemap, contenedor, tipos, alturas, rng, rng_exterior)
+	return {"zona": zona, "tipos": tipos, "decoraciones": decoraciones, "alturas": alturas}
+
+
+## Nivel de cada celda. Sube con la distancia hacia los bordes traseros (con ruido, para que las
+## terrazas sean irregulares) y nunca baja al ir hacia atrás: las celdas se recorren de adelante
+## hacia atrás y cada una toma al menos la altura de sus vecinas de adelante.
+static func _alturas(id_bioma: int, tipos: Dictionary) -> Dictionary:
+	var alturas: Dictionary = {}
+	var celdas := tipos.keys()
+	celdas.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x + a.y > b.x + b.y)
+	for c: Vector2i in celdas:
+		var profundidad := maxi(-c.x, -c.y) - TERRAZA_DESDE
+		var h := 0
+		if profundidad > 0:
+			# Ruido suave (crestas y entrantes grandes) más uno fino (bordes dentados): así las
+			# terrazas no son anillos paralelos.
+			var relieve := _ruido_suave(c.x, c.y, 5 * id_bioma) * 5.0 + _ruido(c.x, c.y, 7 * id_bioma) * 0.8
+			var tope := ALTURA_MAXIMA_ISLAS if id_bioma == 5 else ALTURA_MAXIMA
+			h = clampi(floori((profundidad + relieve) / 2.6), 0, tope)
+		h = maxi(h, maxi(alturas.get(c + Vector2i(1, 0), 0), alturas.get(c + Vector2i(0, 1), 0)))
+		alturas[c] = h
+	return alturas
+
+
+## Un TileMapLayer por nivel, hermano del del bioma y dibujado después de él en orden de altura.
+static func _capas_de_altura(tilemap: TileMapLayer) -> Array[TileMapLayer]:
+	var capas: Array[TileMapLayer] = []
+	var padre := tilemap.get_parent()
+	for k in range(1, ALTURA_MAXIMA + 1):
+		var capa := TileMapLayer.new()
+		capa.name = "Nivel%d" % k
+		capa.tile_set = tilemap.tile_set
+		capa.texture_filter = tilemap.texture_filter
+		capa.position = tilemap.position + Vector2(0, -ALTO_NIVEL * k)
+		padre.add_child(capa)
+		padre.move_child(capa, tilemap.get_index() + k)
+		capas.append(capa)
+	return capas
 
 
 static func _crear_tileset(id_bioma: int) -> TileSet:
@@ -112,13 +185,18 @@ static func _crear_tileset(id_bioma: int) -> TileSet:
 	fuente.texture = load("res://Assets/tilesets/mapa_%d.png" % id_bioma)
 	fuente.texture_region_size = Vector2i(64, 48)
 	ts.add_source(fuente, 0)
-	for coords in [SUELO[0], SUELO[1], SUELO[2], SENDERO, AGUA, ESPECIAL]:
+	for coords in [SUELO[0], SUELO[1], SUELO[2], SENDERO, AGUA, ESPECIAL, ROCA, NIEVE]:
 		fuente.create_tile(coords)
 		fuente.get_tile_data(coords, 0).texture_origin = Vector2i(0, -8 - (DESNIVEL_AGUA if coords == AGUA else 0))
 	fuente.set_tile_animation_frames_count(AGUA, 2)
 	fuente.set_tile_animation_frame_duration(AGUA, 0, 0.7)
 	fuente.set_tile_animation_frame_duration(AGUA, 1, 0.7)
 	return ts
+
+
+## Ondulación de baja frecuencia: formas grandes que cambian cada 10-20 parcelas.
+static func _ruido_suave(x: int, y: int, semilla: int) -> float:
+	return sin(x * 0.27 + semilla) * 0.6 + sin(y * 0.21 + semilla * 2.1) * 0.6 + sin((x - y) * 0.17 + semilla * 0.7) * 0.5
 
 
 static func _ruido(x: int, y: int, semilla: int) -> float:
@@ -197,7 +275,7 @@ static func _sendero(tipos: Dictionary) -> void:
 
 
 static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, tipos: Dictionary,
-		rng: RandomNumberGenerator, rng_exterior: RandomNumberGenerator) -> Dictionary:
+		alturas: Dictionary, rng: RandomNumberGenerator, rng_exterior: RandomNumberGenerator) -> Dictionary:
 	var decoraciones: Dictionary = {}
 	var ocupadas: Dictionary = {}
 
@@ -218,8 +296,10 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 		puestos = [Vector2i(-fondo, -fondo), Vector2i(-fondo, 6), Vector2i(6, -fondo)]
 	for c in puestos:
 		var cerca := absi(c.x + c.y) < 14
-		_sprite(contenedor, tilemap, "montana_%d" % id_bioma, c, Vector2(rng_exterior.randf_range(-20, 20), 40),
+		var montana := _sprite(contenedor, tilemap, "montana_%d" % id_bioma, c, Vector2(rng_exterior.randf_range(-20, 20), 40),
 			rng_exterior.randf_range(2.4, 2.9) if cerca else rng_exterior.randf_range(1.9, 2.3))
+		# Montañas lejanas: detrás de las terrazas (el contenedor va sobre el terreno, z 2).
+		montana.z_index = -3
 
 	# Caseta del guardaparque y cartel del sendero
 	decoraciones[CASETA] = _sprite(contenedor, tilemap, "caseta", CASETA, Vector2(0, 10))
@@ -265,8 +345,15 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 			continue
 		if _taparia_el_refugio(c):
 			continue
+		var h: int = alturas.get(c, 0)
+		var subir := Vector2(0, -ALTO_NIVEL * h)   # los adornos se apoyan sobre su terraza
 		var bosque := smoothstep(-0.3, 0.7, _ruido(c.x, c.y, 11 * id_bioma + 3))
 		var r := rng_exterior.randf()
+		if h >= _roca_desde(id_bioma):
+			# roca desnuda y nieve: sin árboles, alguna roca suelta
+			if r > 0.9:
+				_sombra(_sprite(contenedor, tilemap, "roca_%d" % id_bioma, c, Vector2(0, 6) + subir))
+			continue
 		if r < lerpf(0.03, densidad.get(id_bioma, 0.5), bosque):
 			var especies: Array = ARBOLES_PAISAJE.get(id_bioma, ARBOLES_PAISAJE[3])
 			var nombre: String = especies[0] if rng_exterior.randf() < PROPORCION_VARIANTE_A else especies[1]
@@ -274,15 +361,15 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 			if _taparia_el_refugio(c, ceili(_alto_visible(nombre) / 32.0)):
 				continue
 			var arbol := _sprite(contenedor, tilemap, nombre, c,
-				Vector2(rng_exterior.randi_range(-8, 8), rng_exterior.randi_range(2, 10)))
+				Vector2(rng_exterior.randi_range(-8, 8), rng_exterior.randi_range(2, 10)) + subir)
 			arbol.flip_h = rng_exterior.randf() < 0.5
 			_sombra(arbol)
 		elif r > 0.97:
-			_sombra(_sprite(contenedor, tilemap, "roca_%d" % id_bioma, c, Vector2(0, 6)))
+			_sombra(_sprite(contenedor, tilemap, "roca_%d" % id_bioma, c, Vector2(0, 6) + subir))
 		elif id_bioma == 3 and r > 0.94:
-			_sombra(_sprite(contenedor, tilemap, "tronco", c, Vector2(0, 6)))
+			_sombra(_sprite(contenedor, tilemap, "tronco", c, Vector2(0, 6) + subir))
 
-	_plantas_de_agua(id_bioma, tilemap, contenedor, tipos, rng_exterior)
+	_plantas_de_agua(id_bioma, tilemap, contenedor, tipos, alturas, rng_exterior)
 	return decoraciones
 
 
@@ -299,13 +386,15 @@ static func _taparia_el_refugio(c: Vector2i, filas := 3) -> bool:
 ## Nenúfares en el agua dulce y juncos en las orillas, fuera de la zona jugable
 ## (dentro quedarían por encima de la Niebla del Olvido).
 static func _plantas_de_agua(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, tipos: Dictionary,
-		rng: RandomNumberGenerator) -> void:
+		alturas: Dictionary, rng: RandomNumberGenerator) -> void:
 	if id_bioma == 5:
 		return
 	var vecinas: Array[Vector2i] = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 	for c in tipos:
 		if tipos[c] != "agua" or (absi(c.x) <= RADIO_JUGABLE and absi(c.y) <= RADIO_JUGABLE):
 			continue
+		if alturas.get(c, 0) > 0:
+			continue   # agua en una quebrada: las terrazas de adelante la tapan y el adorno quedaría encima
 		var orilla := false
 		for v in vecinas:
 			if tipos.get(c + v, "agua") != "agua":
