@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cebv5bs7kssc3"
-path="res://.godot/imported/pitao_luma_brote.png-95c154326138b38a928939a50e81ebb1.ctex"
+uid="uid://dvdpql1ew0qey"
+path="res://.godot/imported/aji_de_zorra_joven.png-0307f3ba25eb04c9d52fcf3efcc304a7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Plantas/etapas/pitao_luma_brote.png"
-dest_files=["res://.godot/imported/pitao_luma_brote.png-95c154326138b38a928939a50e81ebb1.ctex"]
+source_file="res://Assets/Plantas/etapas/aji_de_zorra_joven.png"
+dest_files=["res://.godot/imported/aji_de_zorra_joven.png-0307f3ba25eb04c9d52fcf3efcc304a7.ctex"]
 
 [params]
 

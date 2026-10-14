@@ -2,13 +2,13 @@
 
 importer="aseprite_wizard.plugin.spriteframes"
 type="SpriteFrames"
-uid="uid://dqwstitxhma1x"
-path="res://.godot/imported/pitao_luma.aseprite-1fdd53eb8dfa54b3bed5794bd47e5d97.res"
+uid="uid://drgnlidbw6v6k"
+path="res://.godot/imported/pitao.aseprite-8d733d86881ffdce3c24a6d75cc9ec21.res"
 
 [deps]
 
-source_file="res://Assets/Plantas/pitao_luma.aseprite"
-dest_files=["res://.godot/imported/pitao_luma.aseprite-1fdd53eb8dfa54b3bed5794bd47e5d97.res"]
+source_file="res://Assets/Plantas/pitao.aseprite"
+dest_files=["res://.godot/imported/pitao.aseprite-8d733d86881ffdce3c24a6d75cc9ec21.res"]
 
 [params]
 

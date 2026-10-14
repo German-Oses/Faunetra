@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="PackedScene" uid="uid://bpduxc71ddndd" path="res://entities/especies/especie.tscn" id="1_molde"]
-[ext_resource type="SpriteFrames" uid="uid://dqwstitxhma1x" path="res://Assets/Plantas/pitao_luma.aseprite" id="2_anim"]
+[ext_resource type="SpriteFrames" uid="uid://drgnlidbw6v6k" path="res://Assets/Plantas/pitao.aseprite" id="2_anim"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pitao"]
 radius = 40.0

@@ -1,11 +1,14 @@
--- Etapas tempranas de crecimiento de cada planta (ver entities/especies/especie.gd):
---   brote (recién plantada) y plántula. Las etapas "joven" y "adulta" usan el sprite de la especie.
+-- Etapas de crecimiento de cada planta (ver entities/especies/especie.gd):
+--   brote (recién plantada), plántula y joven. La adulta es el sprite de la especie.
+-- La joven es la especie reducida al ESCALA_JOVEN, redibujada a la misma densidad de píxel que el
+-- resto del arte: cada píxel toma el color más repetido de su zona del original y se rehace el
+-- contorno, así no queda como el adulto achicado con píxeles más finos.
 -- Cada especie se dibuja según su forma de crecimiento (árbol, palmera, arbusto, hierba, helecho,
 -- cactus, hongo o líquen) con los colores tomados de su propio sprite, para que el jugador la
 -- reconozca desde chica. 32x32, base en la fila 31, luz arriba-izquierda, como lib_faunetra.lua.
 -- Uso (desde la carpeta del proyecto):
 --   aseprite -b --script herramientas/aseprite/plantas_etapas.lua
--- Genera Assets/Plantas/etapas/<especie>_brote.png y <especie>_plantula.png, y la hoja
+-- Genera Assets/Plantas/etapas/<especie>_brote.png, _plantula.png y _joven.png, y la hoja
 -- herramientas/aseprite/previas/plantas_etapas.png.
 
 local floor, abs, sin, cos, pi, sqrt, max, min = math.floor, math.abs, math.sin, math.cos, math.pi, math.sqrt, math.max, math.min
@@ -23,7 +26,7 @@ local FORMAS = {
   helecho_pelicula = "helecho", hongo_subterraneo = "hongo", lenga = "arbol", liquen_de_la_estepa = "liquen",
   liquen_de_roca = "liquen", liquen_insular_gigante = "liquen", luma_de_juan_fernandez = "arbol",
   maihuen = "cactus", orquidea_zona_central = "hierba", palma_chilena = "palmera", palma_de_rapa_nui = "palmera",
-  palo_gordo = "columnar", peperomia = "arbusto", pitao_luma = "arbol", quenoa_de_altura = "arbol",
+  palo_gordo = "columnar", peperomia = "arbusto", pitao = "arbol", luma = "arbol", quenoa_de_altura = "arbol",
   quila = "hierba", sandillon = "cactus", seta_del_roble_maule = "hongo", teresa = "hierba",
   tintero_del_desierto = "hongo", toromiro = "arbol",
 }
@@ -269,6 +272,63 @@ local function contorno(m, color)
   for k, c in pairs(agregar) do m[k] = c end
 end
 
+-- ── Joven ────────────────────────────────────────────────────────────────────────────────
+local ESCALA_JOVEN = 0.62
+
+local function joven(ruta_especie, color_contorno, ruta)
+  local spr = app.open(ruta_especie)
+  local img = Image(spr.spec)
+  img:drawSprite(spr, 1)
+  spr:close()
+  local W, H = img.width, img.height
+  -- caja de lo dibujado
+  local x0, y0, x1, y1 = W, H, -1, -1
+  for y = 0, H - 1 do for x = 0, W - 1 do
+    if pc.rgbaA(img:getPixel(x, y)) > 0 then
+      x0, y0, x1, y1 = min(x0, x), min(y0, y), max(x1, x), max(y1, y)
+    end
+  end end
+  local ancho, alto = x1 - x0 + 1, y1 - y0 + 1
+  local nw, nh = max(1, floor(ancho * ESCALA_JOVEN + 0.5)), max(1, floor(alto * ESCALA_JOVEN + 0.5))
+  -- apoyada en el mismo pie y centrada como la adulta
+  local ox = floor(x0 + (ancho - nw) / 2 + 0.5)
+  local oy = y1 - nh + 1
+  local salida = Image(W, H, ColorMode.RGB)
+  local paso = 1 / ESCALA_JOVEN
+  for ty = 0, nh - 1 do for tx = 0, nw - 1 do
+    -- zona del original que cubre este píxel: gana el color más repetido (o vacío si predomina)
+    local sx0, sy0 = x0 + floor(tx * paso), y0 + floor(ty * paso)
+    -- sin salirse de lo dibujado: fuera del lienzo Aseprite devuelve blanco opaco
+    local sx1, sy1 = min(x1, x0 + floor((tx + 1) * paso - 0.001)), min(y1, y0 + floor((ty + 1) * paso - 0.001))
+    local cuenta, vacios, total = {}, 0, 0
+    for sy = sy0, sy1 do for sx = sx0, sx1 do
+      total = total + 1
+      local c = img:getPixel(sx, sy)
+      if pc.rgbaA(c) == 0 then vacios = vacios + 1
+      elseif lum(c) > lum(color_contorno) + 0.02 then cuenta[c] = (cuenta[c] or 0) + 1   -- el contorno se rehace
+      end
+    end end
+    local mejor, n = nil, 0
+    for c, k in pairs(cuenta) do if k > n then mejor, n = c, k end end
+    if mejor and vacios * 2 <= total + 1 then salida:drawPixel(ox + tx, oy + ty, mejor) end
+  end end
+  -- contorno de un píxel con el tono más oscuro de la especie
+  local agregar = {}
+  for y = 0, H - 1 do for x = 0, W - 1 do
+    if pc.rgbaA(salida:getPixel(x, y)) == 0 then
+      for _, d in ipairs({{0, 1}, {1, 0}, {-1, 0}, {0, -1}}) do
+        local xx, yy = x + d[1], y + d[2]
+        if xx >= 0 and yy >= 0 and xx < W and yy < H and pc.rgbaA(salida:getPixel(xx, yy)) > 0 then
+          agregar[#agregar + 1] = {x, y}; break
+        end
+      end
+    end
+  end end
+  for _, p in ipairs(agregar) do salida:drawPixel(p[1], p[2], color_contorno) end
+  salida:saveAs(ruta)
+  return salida
+end
+
 local function guardar(m, color, ruta)
   contorno(m, color)
   local img = Image(T, T, ColorMode.RGB)
@@ -281,7 +341,7 @@ app.fs.makeAllDirectories(DESTINO)
 local nombres = {}
 for nombre in pairs(FORMAS) do nombres[#nombres + 1] = nombre end
 table.sort(nombres)
-local hoja = Image(#nombres * 2 * 34 + 4, 38, ColorMode.RGB)
+local hoja = Image(#nombres * 3 * 34 + 4, 38, ColorMode.RGB)
 hoja:clear(pc.rgba(214, 206, 186, 255))
 for i, nombre in ipairs(nombres) do
   local forma = FORMAS[nombre]
@@ -291,8 +351,11 @@ for i, nombre in ipairs(nombres) do
   PLANTULA[forma](pl, p)
   local ib = guardar(b, p.contorno, DESTINO .. nombre .. "_brote.png")
   local ip = guardar(pl, p.contorno, DESTINO .. nombre .. "_plantula.png")
-  hoja:drawImage(ib, Point(4 + (i - 1) * 68, 3))
-  hoja:drawImage(ip, Point(4 + (i - 1) * 68 + 32, 3))
+  local ij = joven(ORIGEN .. nombre .. ".aseprite", p.contorno, DESTINO .. nombre .. "_joven.png")
+  if ij.width > 32 then ij:resize(32, 32) end
+  hoja:drawImage(ib, Point(4 + (i - 1) * 102, 3))
+  hoja:drawImage(ip, Point(4 + (i - 1) * 102 + 32, 3))
+  hoja:drawImage(ij, Point(4 + (i - 1) * 102 + 64, 3))
 end
 app.fs.makeAllDirectories(PREV)
 hoja:resize(hoja.width * 3, hoja.height * 3)
