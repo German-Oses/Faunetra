@@ -38,6 +38,15 @@ func _ready() -> void:
 	_tabs.add_child(_sonido)
 
 	GameState.repasos_actualizados.connect(_on_repasos_actualizados)
+	Pantalla.orientacion_cambiada.connect(_titular_pestanas)
+	_titular_pestanas(Pantalla.vertical)
+
+
+## En vertical (480 px lógicos) los nombres largos se acortan para que las cinco pestañas
+## quepan sin flechas de desplazamiento.
+func _titular_pestanas(vertical: bool) -> void:
+	_tabs.set_tab_title(Pestana.LENTE, "Escáner" if vertical else "Escáner de Especies")
+	_tabs.set_tab_title(Pestana.SONIDO, "Sonidos" if vertical else "Paisaje Sonoro")
 
 
 func abrir(pestana: Pestana = Pestana.BIOPEDIA) -> void:
@@ -61,7 +70,7 @@ func _on_tab_changed(indice: int) -> void:
 		Pestana.LENTE:
 			_escaner.al_mostrar()
 		Pestana.SONIDO:
-			_sonido.nueva_ronda()
+			_sonido.al_mostrar()
 
 
 func _on_repasos_actualizados() -> void:
@@ -122,7 +131,7 @@ func _construir_repasos() -> Control:
 	caja.name = "Repasos"
 	var texto := Label.new()
 	texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	texto.text = "Para que lo aprendido perdure, cada especie descubierta se valida a las 24 horas, a los 3 días y a los 7 días de su primer avistamiento. Si fallas, no pierdes nada: el repaso vuelve en tu próxima sesión."
+	texto.text = "Para que lo aprendido perdure, cada especie descubierta tiene un repaso rápido a los pocos minutos y luego se valida a las 24 horas, a los 3 días y a los 7 días de su primer avistamiento. Si fallas, no pierdes nada: el repaso vuelve más adelante."
 	caja.add_child(texto)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -147,7 +156,10 @@ func _refrescar_repasos() -> void:
 			continue
 		var fila := HBoxContainer.new()
 		var etiqueta := Label.new()
-		etiqueta.text = "%s — validación %d/%d" % [data.nombre_comun, GameState.etapa_validacion(id) + 1, GameState.INTERVALOS_REPASO_DIAS.size()]
+		if GameState.es_repaso_rapido(id):
+			etiqueta.text = "%s — repaso rápido" % data.nombre_comun
+		else:
+			etiqueta.text = "%s — validación %d/%d" % [data.nombre_comun, GameState.etapa_validacion(id) + 1, GameState.INTERVALOS_REPASO_DIAS.size()]
 		etiqueta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		fila.add_child(etiqueta)
 		var boton := Button.new()

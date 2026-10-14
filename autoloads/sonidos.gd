@@ -25,6 +25,9 @@ var _ambiente: AudioStreamPlayer
 var _ambientes: Dictionary = {}  # id_bioma -> AudioStreamWAV
 var _bioma_sonando := -1
 var _tween_ambiente: Tween
+## Tarea del WorkerThreadPool que genera un ambiente (-1 si no hay ninguna en curso).
+## Hay que esperarla siempre: una tarea sin esperar hace caer el juego al cerrarlo.
+var _tarea_ambiente := -1
 
 
 func _ready() -> void:
@@ -40,7 +43,7 @@ func _ready() -> void:
 
 	get_tree().node_added.connect(_on_nodo_agregado)
 	EventBus.accion_terreno.connect(reproducir)
-	EventBus.accion_rechazada.connect(func() -> void: reproducir("error"))
+	EventBus.accion_rechazada.connect(func(_motivo: String) -> void: reproducir("error"))
 	EventBus.fauna_llego.connect(func(_data: EspecieData) -> void: reproducir("fauna"))
 	EventBus.bioma_cargado.connect(iniciar_ambiente)
 	GameState.bioma_desbloqueado.connect(func(_id: int) -> void: reproducir("desbloquear"))
@@ -79,16 +82,43 @@ func iniciar_ambiente(id_bioma: int) -> void:
 	if _ambientes.has(id_bioma):
 		_cambiar_ambiente(_ambientes[id_bioma])
 		return
-	# Generar 12 s de ambiente toma un momento: lo hacemos fuera del hilo principal.
-	WorkerThreadPool.add_task(func() -> void:
+	_generar_ambiente_pendiente()
+
+
+## Generar 12 s de ambiente toma un momento: lo hacemos fuera del hilo principal, de a una tarea.
+## Si ya hay una en curso, al terminar se genera el del bioma que esté sonando entonces.
+## (En la web sin hilos la tarea se ejecuta en el momento y esperarla no bloquea.)
+func _generar_ambiente_pendiente() -> void:
+	if _tarea_ambiente >= 0 or _bioma_sonando < 0 or _ambientes.has(_bioma_sonando):
+		return
+	var id_bioma := _bioma_sonando
+	_tarea_ambiente = WorkerThreadPool.add_task(func() -> void:
 		var wav := _crear_ambiente(id_bioma)
 		_listo_ambiente.call_deferred(id_bioma, wav))
 
 
+func _esperar_tarea_ambiente() -> void:
+	if _tarea_ambiente >= 0:
+		WorkerThreadPool.wait_for_task_completion(_tarea_ambiente)
+		_tarea_ambiente = -1
+
+
+func _exit_tree() -> void:
+	_esperar_tarea_ambiente()
+	# Soltar el ambiente en curso evita que su reproducción quede huérfana al cerrar.
+	if _ambiente:
+		_ambiente.stop()
+		_ambiente.stream = null
+
+
 func _listo_ambiente(id_bioma: int, wav: AudioStreamWAV) -> void:
+	# La tarea ya terminó su trabajo (esto es lo último que hace): esperarla es inmediato.
+	_esperar_tarea_ambiente()
 	_ambientes[id_bioma] = wav
 	if id_bioma == _bioma_sonando:
 		_cambiar_ambiente(wav)
+	else:
+		_generar_ambiente_pendiente()
 
 
 func _cambiar_ambiente(wav: AudioStreamWAV) -> void:

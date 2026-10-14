@@ -28,8 +28,13 @@ var insignias_desbloqueadas: Array[String] = []
 ## Modelo del estudiante del ITS: "flora"/"fauna" -> {"aciertos": int, "errores": int}
 var desempeno_por_categoria: Dictionary = {}
 
-## Trivias ya mostradas en esta sesión, para no repetirlas mientras queden otras.
+## Trivias ya respondidas en esta sesión, para no repetirlas mientras queden otras.
+## Solo se marcan al responder: cerrar sin responder no permite saltarse una pregunta.
 var _mostradas: Dictionary = {}
+## Opciones incorrectas del banco agrupadas por su primera palabra ("porque", "para", "es"...),
+## para completar con un distractor del mismo estilo las trivias que tengan menos opciones de las
+## que pide el modo (Científico usa 4).
+var _distractores_banco: Dictionary = {}
 
 
 func _ready() -> void:
@@ -39,6 +44,7 @@ func _ready() -> void:
 
 func cargar_banco_trivias() -> void:
 	trivias_cargadas.clear()
+	_distractores_banco.clear()
 	if not FileAccess.file_exists(RUTA_BANCO_JSON):
 		print_debug("[TriviaManager] No se encontró el archivo del banco de trivias: ", RUTA_BANCO_JSON)
 		return
@@ -82,7 +88,14 @@ func cargar_banco_trivias() -> void:
 			op.es_correcta = op_json.get("es_correcta", false)
 			op.retroalimentacion_narrativa = op_json.get("retroalimentacion_narrativa", "")
 			ops_list.append(op)
+			if not op.es_correcta and op.texto.strip_edges() != "":
+				var clave := _primera_palabra(op.texto)
+				if not _distractores_banco.has(clave):
+					_distractores_banco[clave] = []
+				_distractores_banco[clave].append({"op": op, "id_especie": trivia.id_especie})
 
+		# En el JSON la opción correcta suele venir primero; el orden real se baraja
+		# cada vez que la trivia se muestra (ver _preparar_para_mostrar).
 		trivia.opciones = ops_list
 		trivias_cargadas.append(trivia)
 
@@ -112,7 +125,7 @@ func obtener_trivia_adaptativa(id_especie: int = 0, id_bioma: int = 0) -> Trivia
 		elegida = candidatas.pick_random()
 
 	if elegida:
-		_mostradas[elegida.id_trivia] = true
+		elegida = _preparar_para_mostrar(elegida)
 		trivia_iniciada.emit(elegida)
 	return elegida
 
@@ -128,8 +141,96 @@ func trivia_para_repaso(id_especie: int) -> TriviaData:
 	if elegida == null and not del_banco.is_empty():
 		elegida = del_banco.pick_random()
 	if elegida:
+		elegida = _preparar_para_mostrar(elegida)
 		trivia_iniciada.emit(elegida)
 	return elegida
+
+
+## Copia de la trivia lista para mostrarse: ajusta la cantidad de opciones al modo de juego
+## (una correcta + "distractores") y baraja su orden en cada presentación, para que la
+## respuesta no se pueda memorizar por posición. El banco original no se modifica.
+func _preparar_para_mostrar(base: TriviaData) -> TriviaData:
+	var t: TriviaData = base.duplicate()
+	var objetivo := int(GameState.ajuste("distractores")) + 1
+	var correctas: Array[TriviaOption] = []
+	var incorrectas: Array[TriviaOption] = []
+	for op in base.opciones:
+		if op.es_correcta:
+			correctas.append(op)
+		else:
+			incorrectas.append(op)
+	incorrectas.shuffle()
+	var opciones: Array[TriviaOption] = []
+	opciones.append_array(correctas)
+	# Si el banco trae más opciones de las que pide el modo, se recortan distractores.
+	for op in incorrectas:
+		if opciones.size() >= objetivo:
+			break
+		opciones.append(op)
+	# Si trae menos (p. ej. Científico pide 4 y el banco tiene 3), se completa con
+	# distractores de otras trivias del banco del mismo estilo de respuesta.
+	if opciones.size() < objetivo and correctas.size() == 1 and not base.id_trivia.begins_with("gen_"):
+		for extra in _distractores_extra(base, opciones, objetivo - opciones.size()):
+			opciones.append(extra)
+	opciones.shuffle()
+	t.opciones = opciones
+	return t
+
+
+## Distractores adicionales para una trivia del banco. Se toman solo opciones que el banco ya
+## marca como incorrectas y que empiezan igual que alguna de sus opciones (mismo estilo:
+## "Porque…", "Para…", "Es…"). Primero las de la misma especie (son afirmaciones falsas sobre
+## ella); luego las de otras especies que no la mencionen, para no crear otra opción correcta.
+func _distractores_extra(base: TriviaData, actuales: Array[TriviaOption], cantidad: int) -> Array[TriviaOption]:
+	var correcta: TriviaOption = null
+	var textos: Array[String] = []
+	for op in actuales:
+		textos.append(op.texto)
+		if op.es_correcta:
+			correcta = op
+	var resultado: Array[TriviaOption] = []
+	if correcta == null:
+		return resultado
+	var nombres: Array[String] = []
+	for parte in base.nombre_especie.split("/"):
+		if parte.strip_edges().length() >= 3:
+			nombres.append(parte.strip_edges().to_lower())
+	var claves: Array[String] = []
+	for op in base.opciones:
+		var clave := _primera_palabra(op.texto)
+		if not claves.has(clave):
+			claves.append(clave)
+	var candidatos: Array = []
+	for clave in claves:
+		candidatos.append_array(_distractores_banco.get(clave, []))
+	var misma: Array[TriviaOption] = []
+	var otras: Array[TriviaOption] = []
+	for item in candidatos:
+		var op: TriviaOption = item["op"]
+		if base.opciones.has(op) or textos.has(op.texto):
+			continue
+		if int(item["id_especie"]) == base.id_especie:
+			misma.append(op)
+		elif not nombres.any(func(n: String) -> bool: return op.texto.to_lower().contains(n)):
+			# La retroalimentación original habla de otra pregunta: se reemplaza por una neutra.
+			var copia := TriviaOption.new()
+			copia.texto = op.texto
+			copia.retroalimentacion_narrativa = "Esa opción no responde a esta pregunta. La respuesta correcta era: «%s»" % correcta.texto
+			otras.append(copia)
+	misma.shuffle()
+	otras.shuffle()
+	misma.append_array(otras)
+	for op in misma:
+		if resultado.size() >= cantidad:
+			break
+		resultado.append(op)
+	return resultado
+
+
+func _primera_palabra(texto: String) -> String:
+	var limpio := texto.strip_edges().to_lower()
+	var corte := limpio.find(" ")
+	return limpio if corte < 0 else limpio.left(corte)
 
 
 ## Nivel que conviene ofrecer: el del DDA, salvo que el tutor detecte dificultades.
@@ -158,6 +259,9 @@ func responder_trivia(trivia: TriviaData, opcion: TriviaOption, es_repaso: bool 
 	var apoyo := necesita_apoyo(trivia.id_especie)
 	var nivel_antes := int(nivel_actual_jugador)
 	total_trivias_respondidas += 1
+	# Recién al responder la trivia cuenta como vista (cerrar sin responder la deja disponible).
+	if not es_repaso:
+		_mostradas[trivia.id_trivia] = true
 	var es_correcta := opcion.es_correcta
 	var pr := 0
 	var xp := 0
@@ -184,21 +288,24 @@ func responder_trivia(trivia: TriviaData, opcion: TriviaOption, es_repaso: bool 
 		reg["errores"] = int(reg.get("errores", 0)) + 1
 	desempeno_por_categoria[categoria] = reg
 
+	var rapido := es_repaso and GameState.es_repaso_rapido(trivia.id_especie)
 	if es_repaso:
 		GameState.registrar_repaso(trivia.id_especie, es_correcta)
 	GameState.registrar({
-		"tipo": "repaso" if es_repaso else "trivia",
+		"tipo": ("repaso_rapido" if rapido else "repaso") if es_repaso else "trivia",
 		"id_bioma": trivia.id_bioma, "id_especie": trivia.id_especie, "especie": trivia.nombre_especie,
 		"id_trivia": trivia.id_trivia, "dificultad": NOMBRES_DIFICULTAD[trivia.dificultad],
 		"modo": meta.get("modo", ""), "correcta": es_correcta, "tiempo_s": snappedf(float(meta.get("tiempo_s", 0.0)), 0.1),
 		"uso_pista": bool(meta.get("uso_pista", false)), "apoyo_tutor": apoyo,
 		"nivel_dda": NOMBRES_DIFICULTAD[nivel_antes], "pr": pr,
+		# Apoyos visibles al responder: separan aciertos asistidos de la recuperación autónoma.
+		"ficha_visible": bool(meta.get("ficha_visible", false)), "imagen_apoyo": bool(meta.get("imagen_apoyo", false)),
 	})
 
 	_ajustar_dificultad_adaptativa()
 	GameState.marcar_cambios()
 	respuesta_evaluada.emit(es_correcta, opcion.retroalimentacion_narrativa, xp)
-	return {"correcta": es_correcta, "pr": pr, "xp": xp, "descubierta": descubierta}
+	return {"correcta": es_correcta, "pr": pr, "xp": xp, "descubierta": descubierta, "rapido": rapido}
 
 
 ## PR de un acierto. En el modo Científico, pedir la pista reduce la recompensa

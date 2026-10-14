@@ -275,7 +275,7 @@ func _preparar_ronda() -> void:
 	_inicio_ronda_ms = Time.get_ticks_msec()
 	_visor.preparar(_objetivo, GameState.bioma_actual_id)
 	_instruccion_titulo.text = "Identifica la especie oculta · Ronda %d de %d" % [_ronda + 1, RONDAS]
-	_instruccion_texto.text = "Observa bien el entorno y mueve el escáner: cerca de la especie, el camuflaje se disipa. Haz clic sobre ella."
+	_instruccion_texto.text = "Observa bien el entorno y mueve el escáner: cerca de la especie, el camuflaje se disipa. Tócala para seleccionarla."
 	_boton_sonido.disabled = EspecieLoader.es_flora(_objetivo)
 	_boton_sonido.tooltip_text = "Las plantas no emiten sonidos." if _boton_sonido.disabled else "Escucha una pista sonora."
 	_crear_opciones()

@@ -19,6 +19,9 @@ const BLOQUEADORES_EN_CLARO := 2
 const INTERVALO_EVALUACION := 1.0
 
 const COLOR_AURA := Color(0.35, 0.65, 1.0, 0.28)
+## Parcelas donde la planta elegida tendría una sinergia con sus vecinas (pista al plantar).
+const COLOR_SUGERENCIA := Color(0.55, 1.0, 0.45, 0.32)
+const COLOR_SUGERENCIA_BORDE := Color(0.85, 1.0, 0.7, 0.9)
 const COLOR_MARCHITA := Color(0.45, 0.3, 0.1, 0.4)
 const COLOR_VALIDO := Color(0.45, 1.0, 0.55)
 const COLOR_INVALIDO := Color(1.0, 0.45, 0.35)
@@ -51,6 +54,7 @@ var _zona: Array[Vector2i] = []       # Parcelas jugables del refugio
 var _tipos: Dictionary = {}           # Vector2i -> tipo de parcela del GeneradorMapa ("suelo", "agua"...)
 var _decoraciones: Dictionary = {}    # Vector2i -> Node2D decorativo dentro del refugio
 var _niebla: NieblaOlvido
+var _sugeridas: Dictionary = {}       # Vector2i -> true: buen lugar para la planta elegida
 var _cursor: Node2D                    # contorno de la parcela bajo el puntero, sobre la niebla
 
 
@@ -74,6 +78,16 @@ func configurar(p_id_bioma: int, p_tilemap: TileMapLayer, p_contenedor: Node2D, 
 		_generar_estado_inicial()
 	_indexar_celdas()
 	estado["fauna_total"] = EspecieLoader.fauna_del_bioma(id_bioma).size()
+	# Animales que el jugador ya identificó en este refugio. Las partidas anteriores a la
+	# identificación dan por identificados a los que ya estaban en la Biopedia.
+	if not estado.has("fauna_identificada"):
+		var previas: Array = []
+		for id in estado["fauna"]:
+			if GameState.esta_descubierta(int(id)):
+				previas.append(int(id))
+		estado["fauna_identificada"] = previas
+	EventBus.fauna_identificada.connect(_on_fauna_identificada)
+	GameState.herramienta_cambiada.connect(func(_h: String) -> void: _recalcular_sugerencias())
 	_aplicar_niebla_pendiente()
 
 	for celda in celdas:
@@ -218,6 +232,10 @@ func _indexar_celdas() -> void:
 		if not datos_celdas.has(clave):
 			# El mapa creció desde la última partida: las parcelas nuevas empiezan con niebla.
 			datos_celdas[clave] = {"n": true, "b": "", "e": 0, "c": 0.0, "m": false}
+		# La caseta, el sendero y el puente nunca llevan niebla (repara guardados que la tenían).
+		if tipo(celda) in GeneradorMapa.SIN_NIEBLA and datos_celdas[clave].get("n", false):
+			datos_celdas[clave]["n"] = false
+			GameState.marcar_cambios()
 		celdas[celda] = datos_celdas[clave]
 
 
@@ -232,7 +250,8 @@ func _aplicar_niebla_pendiente() -> void:
 		var mas_lejana := Vector2i.ZERO
 		var distancia_max := -1.0
 		for celda in celdas:
-			if celdas[celda]["n"]:
+			# La caseta, el sendero y el puente nunca se cubren de niebla.
+			if celdas[celda]["n"] or tipo(celda) in GeneradorMapa.SIN_NIEBLA:
 				continue
 			var d := _distancia(celda, _centro)
 			if d > distancia_max:
@@ -441,7 +460,7 @@ func _avisar(texto: String) -> void:
 
 
 func _rechazar(texto: String) -> void:
-	EventBus.accion_rechazada.emit()
+	EventBus.accion_rechazada.emit(texto)
 	_avisar(texto)
 
 
@@ -556,8 +575,33 @@ func _instanciar(data: EspecieData, celda: Vector2i, desfase: Vector2) -> especi
 # --- Salud y fauna ---------------------------------------------------------------------------
 
 func _evaluar() -> void:
+	_recalcular_sugerencias()
 	var salud := GameState.actualizar_salud(id_bioma)
 	_evaluar_fauna(salud)
+
+
+## Con «Plantar» y una especie elegida: parcelas libres donde recibiría o daría una sinergia
+## explícita a una vecina sana. Se recalcula al cambiar de planta y en cada evaluación.
+func _recalcular_sugerencias() -> void:
+	_sugeridas.clear()
+	var elegida := GameState.especie_para_plantar
+	if GameState.herramienta_activa != "plantar" or elegida == null or elegida.id_bioma != id_bioma:
+		return
+	for celda in celdas:
+		var c: Dictionary = celdas[celda]
+		if c["n"] or str(c["b"]) != "" or int(c["e"]) > 0 or not es_plantable(celda):
+			continue
+		for vecina in tilemap.get_surrounding_cells(celda):
+			var cv: Dictionary = celdas.get(vecina, {})
+			if cv.is_empty() or int(cv["e"]) <= 0 or cv["n"] or cv["m"]:
+				continue
+			var otra := EspecieLoader.por_id(int(cv["e"]))
+			if otra == null:
+				continue
+			if bool(ReglasEcosistema.sinergia(otra, elegida).get("explicita", false)) \
+					or bool(ReglasEcosistema.sinergia(elegida, otra).get("explicita", false)):
+				_sugeridas[celda] = true
+				break
 
 
 func _evaluar_fauna(salud: float) -> void:
@@ -574,6 +618,9 @@ func _evaluar_fauna(salud: float) -> void:
 	var presentes: Array = estado["fauna"]
 	for animal in EspecieLoader.fauna_del_bioma(id_bioma):
 		if presentes.has(animal.id_especie):
+			# Presente pero sin nodo (no había dónde ponerlo): se reintenta en cada evaluación.
+			if not _nodos_fauna.has(animal.id_especie):
+				_aparecer_fauna(animal)
 			continue
 		var req := ReglasEcosistema.requisitos_fauna(animal)
 		if salud < float(req["min_salud"]) or total_sanas < int(req["min_sanas"]):
@@ -585,19 +632,47 @@ func _evaluar_fauna(salud: float) -> void:
 				break
 		if not cumple:
 			continue
+		# Solo llega si hay una parcela despejada donde ponerlo; si no, se reintenta más tarde.
+		if not _aparecer_fauna(animal):
+			continue
 		presentes.append(animal.id_especie)
-		_aparecer_fauna(animal)
 		EventBus.fauna_llego.emit(animal)
 		GameState.marcar_cambios()
-		var nueva := GameState.descubrir_especie(animal)
-		_avisar("¡%s llegó a tu refugio!%s" % [animal.nombre_comun, " Nueva entrada en la Biopedia." if nueva else ""])
+		if identificada(animal.id_especie):
+			_avisar("¡%s volvió a tu refugio!" % animal.nombre_comun)
+		else:
+			_avisar("¡Llegó un visitante a tu refugio! Tócalo para identificarlo y registrarlo en la Biopedia.")
 		# La fauna cuenta para la salud: recalculamos para el siguiente animal.
 		salud = GameState.actualizar_salud(id_bioma)
+	EventBus.refugio_evaluado.emit(id_bioma, sanas, salud)
 
 
-func _aparecer_fauna(animal: EspecieData) -> void:
-	if _nodos_fauna.has(animal.id_especie):
+func identificada(id_especie: int) -> bool:
+	return (estado.get("fauna_identificada", []) as Array).has(id_especie)
+
+
+func _on_fauna_identificada(data: EspecieData) -> void:
+	if data.id_bioma != id_bioma or identificada(data.id_especie):
 		return
+	(estado["fauna_identificada"] as Array).append(data.id_especie)
+	GameState.marcar_cambios()
+	var nodo: especie = _nodos_fauna.get(data.id_especie)
+	if nodo:
+		nodo.marcar_sin_identificar(false)
+
+
+## Devuelve true si el animal quedó en el refugio (false si no hay parcela donde ponerlo).
+func _aparecer_fauna(animal: EspecieData) -> bool:
+	if _nodos_fauna.has(animal.id_especie):
+		return true
+	_crear_nodo_fauna(animal)
+	var nodo: especie = _nodos_fauna.get(animal.id_especie)
+	if nodo and not identificada(animal.id_especie):
+		nodo.marcar_sin_identificar(true)
+	return nodo != null
+
+
+func _crear_nodo_fauna(animal: EspecieData) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = animal.id_especie * 104729 + id_bioma
 	if _es_nadador(animal):
@@ -764,6 +839,11 @@ func _draw() -> void:
 		var p := tilemap.map_to_local(celda)
 		if c["n"]:
 			continue   # la dibuja NieblaOlvido
+		if _sugeridas.has(celda):
+			var puntos := _rombo(p, tam * 0.86)
+			draw_colored_polygon(puntos, COLOR_SUGERENCIA)
+			puntos.append(puntos[0])
+			draw_polyline(puntos, COLOR_SUGERENCIA_BORDE, 1.5)
 		if str(c["b"]) != "":
 			_dibujar_bloqueador(p, ReglasEcosistema.bloqueador(id_bioma, str(c["b"])), celda)
 		elif _auras.has(celda):

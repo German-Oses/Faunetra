@@ -19,6 +19,20 @@ const FILTROS := [
 	{"id": 4, "texto": "Patagonia", "icono": "montana"},
 	{"id": 5, "texto": "Insular", "icono": "palmera"},
 ]
+## Color de la marca de rareza según el estado de conservación (más amenazada, más llamativa).
+const COLORES_ESTADO := {
+	"EX": Color("#3A3A3A"), "EW": Color("#5A4A6A"), "CR": Color("#B8322A"), "EN": Color("#D2702A"),
+	"VU": Color("#C9A227"), "NT": Color("#7FA04A"), "LC": Color("#4E8A5A"),
+}
+## Dónde ver cada bioma en terreno (áreas protegidas representativas; ver «Sal a buscarla»).
+const LUGARES_BIOMA := {
+	1: "Parque Nacional La Campana, Reserva Nacional Río Clarillo y el Santuario de la Naturaleza Yerba Loca.",
+	2: "Parque Nacional Lauca y Reserva Nacional Las Vicuñas en el altiplano; Parque Nacional Pan de Azúcar en la costa.",
+	3: "Parque Nacional Alerce Andino, Parque Nacional Nahuelbuta, Parque Nacional Chiloé y la Reserva Costera Valdiviana.",
+	4: "Parque Nacional Torres del Paine, Parque Nacional Patagonia y la Reserva Nacional Magallanes.",
+	5: "Parque Nacional Archipiélago Juan Fernández y Parque Nacional Rapa Nui.",
+}
+const URL_INATURALIST := "https://www.inaturalist.org/observations?place_id=7182&taxon_name=%s"   # 7182 = Chile
 const COLORES_TIPO := {
 	"vertebrado": Color(0.55, 0.85, 0.5),
 	"ave": Color(0.55, 0.78, 0.95),
@@ -43,6 +57,7 @@ var _panel_detalle: PanelContainer
 var _volver: Button
 var _en_ficha := false   # en vertical: true mientras se ve la ficha en lugar de la lista
 var _placeholders: Dictionary = {}
+var _progreso: ProgressBar
 
 
 func _ready() -> void:
@@ -59,6 +74,11 @@ func _ready() -> void:
 	_lista = izquierda
 	izquierda.add_child(_crear_cabecera())
 	izquierda.add_child(_crear_filtros())
+	_progreso = ProgressBar.new()
+	_progreso.custom_minimum_size.y = 10
+	_progreso.show_percentage = false
+	_progreso.modulate = Color(0.75, 1.0, 0.75)
+	izquierda.add_child(_progreso)
 
 	_busqueda = LineEdit.new()
 	_busqueda.placeholder_text = "Buscar especie…"
@@ -229,6 +249,25 @@ func _crear_grilla() -> GridContainer:
 
 # --- Datos ---------------------------------------------------------------------------------
 
+## Cada filtro de bioma muestra su avance; con el bioma completo, lleva el sello (check).
+func _actualizar_filtros() -> void:
+	for b in _botones_filtro:
+		var id := int(b.get_meta("id_bioma"))
+		var f: Dictionary = FILTROS.filter(func(x: Dictionary) -> bool: return x["id"] == id)[0]
+		if id < 0:
+			continue
+		var total := 0
+		var conocidas := 0
+		for d in EspecieLoader.cargar_especies_del_bioma(id):
+			total += 1
+			if GameState.esta_descubierta(d.id_especie):
+				conocidas += 1
+		var completo := total > 0 and conocidas == total
+		b.text = "%s %d/%d" % [f["texto"], conocidas, total]
+		b.icon = TemaFaunetra.icono("check" if completo else f["icono"])
+		b.tooltip_text = "¡Sello de bioma completo!" if completo else ""
+
+
 func _seleccionar_filtro(id_bioma: int) -> void:
 	_filtro_bioma = id_bioma
 	for b in _botones_filtro:
@@ -276,6 +315,9 @@ func refrescar() -> void:
 		(_grilla_descubiertas if conocida else _grilla_ocultas).add_child(_crear_tarjeta(data, conocida))
 
 	_contador.text = "%d/%d descubiertas" % [conocidas, total]
+	_progreso.max_value = maxi(1, total)
+	_progreso.value = conocidas
+	_actualizar_filtros()
 	_titulo_ocultas.visible = not solo_descubiertas and _grilla_ocultas.get_child_count() > 0
 	_grilla_ocultas.visible = _titulo_ocultas.visible
 	if _seleccionada and visibles.has(_seleccionada):
@@ -330,6 +372,31 @@ func _crear_tarjeta(data: EspecieData, conocida: bool) -> Button:
 	nombre.add_theme_font_size_override("font_size", 12)
 	nombre.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	caja.add_child(nombre)
+
+	if conocida:
+		# Marca de rareza: el estado de conservación, con color según cuán amenazada está.
+		var rareza := Label.new()
+		rareza.text = data.estado_conservacion
+		rareza.add_theme_font_size_override("font_size", 10)
+		rareza.add_theme_color_override("font_color", Color.WHITE)
+		rareza.add_theme_stylebox_override("normal", TemaFaunetra.caja(COLORES_ESTADO.get(data.estado_conservacion, TemaFaunetra.VERDE), Color(0, 0, 0, 0), 6, 0, 3))
+		rareza.position = Vector2(6, 6)
+		rareza.tooltip_text = EspecieData.NOMBRES_ESTADO.get(data.estado_conservacion, "")
+		# PASS (no IGNORE): así recibe el hover para su tooltip y el clic sigue llegando a la tarjeta.
+		rareza.mouse_filter = Control.MOUSE_FILTER_PASS
+		boton.add_child(rareza)
+		if GameState.vio_en_la_vida_real(data.id_especie):
+			var vista := TextureRect.new()
+			vista.texture = TemaFaunetra.icono("persona")
+			vista.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			vista.custom_minimum_size = Vector2(20, 20)
+			vista.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+			vista.offset_left = -26
+			vista.offset_right = -6
+			vista.offset_top = -44
+			vista.offset_bottom = -24
+			vista.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			boton.add_child(vista)
 
 	var insignia := TextureRect.new()
 	insignia.texture = TemaFaunetra.icono("check" if conocida else "candado")
@@ -401,19 +468,80 @@ func _mostrar_detalle(data: EspecieData) -> void:
 		_detalle.add_child(_parrafo("Registro", "Primer avistamiento: %s · Validaciones: %d/%d" % [
 			fecha, GameState.etapa_validacion(data.id_especie), GameState.INTERVALOS_REPASO_DIAS.size()]))
 		_detalle.add_child(_relaciones(data))
+		_detalle.add_child(_sal_a_buscarla(data))
 	else:
 		var pista := ""
 		if flora:
-			pista = "Esta especie ya no existe en la naturaleza: conócela resolviendo su pista conceptual." if data.estado_conservacion == "EX" \
+			pista = "Esta especie está extinta, no queda ningún ejemplar vivo: conócela resolviendo su pista conceptual." if data.estado_conservacion == "EX" \
 				else "Plántala desde la barra de plantación de su bioma o resuelve su pista conceptual."
 		else:
-			pista = ReglasEcosistema.texto_requisitos(data)
+			pista = ReglasEcosistema.texto_requisitos(data) + " Cuando llegue al refugio, tócalo para identificarlo."
 		_detalle.add_child(_parrafo("Pista", pista))
 		var boton := Button.new()
 		boton.text = "Resolver pista conceptual"
 		boton.icon = TemaFaunetra.icono("lupa")
 		boton.pressed.connect(func() -> void: EventBus.solicitar_trivia.emit("especie", data.id_especie))
 		_detalle.add_child(boton)
+
+
+## «Sal a buscarla»: dónde verla en Chile, sus observaciones reales en iNaturalist y un botón
+## para registrar que el jugador la vio en la vida real (queda en el registro de investigación).
+func _sal_a_buscarla(data: EspecieData) -> Control:
+	var caja := VBoxContainer.new()
+	caja.add_theme_constant_override("separation", 6)
+	# Extinta (EX): no quedan ejemplares vivos en ninguna parte, así que no hay nada que salir a buscar
+	# ni avistamiento que registrar. Extinta en estado silvestre (EW): sobrevive solo en cultivo o cautiverio.
+	if data.estado_conservacion == "EX":
+		caja.add_child(_titulo_seccion("brujula", "Su historia"))
+		var historia := Label.new()
+		historia.text = "Esta especie está extinta: ya no quedan ejemplares vivos, ni en la naturaleza ni en viveros. " \
+			+ "La conocemos por sus restos (semillas, polen o troncos) y por la historia de su ecosistema. " \
+			+ "Recordarla nos ayuda a proteger a las especies que todavía podemos salvar."
+		historia.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		historia.add_theme_font_size_override("font_size", 13)
+		caja.add_child(historia)
+		return caja
+	caja.add_child(_titulo_seccion("brujula", "Sal a buscarla"))
+	var texto := ""
+	if data.estado_conservacion == "EW":
+		texto = "Ya no vive en estado silvestre: hoy sobrevive gracias a viveros y programas de conservación que buscan devolverla a su hábitat."
+	else:
+		texto = "Puedes encontrarla en áreas protegidas como: %s" % LUGARES_BIOMA.get(data.id_bioma, "")
+	texto += "
+Observa sin tocar ni sacar nada: una foto basta para registrarla."
+	var parrafo := Label.new()
+	parrafo.text = texto
+	parrafo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	parrafo.add_theme_font_size_override("font_size", 13)
+	caja.add_child(parrafo)
+
+	var botones := HFlowContainer.new()
+	botones.add_theme_constant_override("h_separation", 8)
+	botones.add_theme_constant_override("v_separation", 6)
+	caja.add_child(botones)
+	var observaciones := Button.new()
+	observaciones.text = "Ver observaciones reales"
+	observaciones.icon = TemaFaunetra.icono("lupa")
+	observaciones.tooltip_text = "Abre iNaturalist con los registros de %s en Chile." % data.nombre_cientifico
+	observaciones.pressed.connect(func() -> void:
+		GameState.registrar({"tipo": "inaturalist", "id_especie": data.id_especie, "especie": data.nombre_comun, "id_bioma": data.id_bioma})
+		OS.shell_open(URL_INATURALIST % data.nombre_cientifico.uri_encode()))
+	botones.add_child(observaciones)
+	if GameState.vio_en_la_vida_real(data.id_especie):
+		var vista := Label.new()
+		vista.text = "La viste en la vida real el %s." % _fecha(float(GameState.avistamientos_reales[str(data.id_especie)]))
+		vista.add_theme_color_override("font_color", TemaFaunetra.VERDE)
+		botones.add_child(vista)
+	else:
+		var marcar := Button.new()
+		marcar.text = "¡La vi en la vida real!"
+		marcar.icon = TemaFaunetra.icono("persona")
+		marcar.pressed.connect(func() -> void:
+			GameState.marcar_avistamiento_real(data)
+			Sonidos.reproducir("encontrado")
+			refrescar())
+		botones.add_child(marcar)
+	return caja
 
 
 func _fila_dato(icono: String, etiqueta: String, valor: String) -> HBoxContainer:

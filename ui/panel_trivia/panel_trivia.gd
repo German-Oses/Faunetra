@@ -203,6 +203,8 @@ func _mostrar_trivia(trivia: TriviaData) -> void:
 	var nivel: String = TriviaManager.NOMBRES_DIFICULTAD[trivia.dificultad]
 	var pr: int = TriviaManager.PR_POR_DIFICULTAD[trivia.dificultad]
 	match _modo:
+		Modo.REPASO when GameState.es_repaso_rapido(trivia.id_especie):
+			_encabezado_label.text = "Repaso rápido · Nivel %s · +%d PR" % [nivel, pr + TriviaManager.PR_BONO_REPASO]
 		Modo.REPASO:
 			var etapa := GameState.etapa_validacion(trivia.id_especie)
 			_encabezado_label.text = "Repaso de validación %d/%d · Nivel %s · +%d PR" % [
@@ -234,6 +236,8 @@ func _mostrar_trivia(trivia: TriviaData) -> void:
 		btn.text = op.texto
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		# Las opciones llegan barajadas: cada botón guarda si su opción es la correcta.
+		btn.set_meta("es_correcta", op.es_correcta)
 		btn.pressed.connect(_al_seleccionar_opcion.bind(op, btn))
 		opciones_container.add_child(btn)
 
@@ -275,16 +279,16 @@ func _al_seleccionar_opcion(opcion: TriviaOption, boton: Button) -> void:
 		return
 	_respondida = true
 
-	for i in opciones_container.get_child_count():
-		var btn := opciones_container.get_child(i) as Button
+	for btn: Button in opciones_container.get_children():
 		btn.disabled = true
-		if trivia_actual.opciones[i].es_correcta:
+		if btn.get_meta("es_correcta", false):
 			btn.modulate = COLOR_CORRECTA
 	if not opcion.es_correcta:
 		boton.modulate = COLOR_INCORRECTA
 
 	var meta := {"tiempo_s": (Time.get_ticks_msec() - _inicio_ms) / 1000.0, "uso_pista": _uso_pista,
-		"modo": ["especie", "bioma", "repaso"][_modo]}
+		"modo": ["especie", "bioma", "repaso"][_modo],
+		"ficha_visible": _ficha_label.visible, "imagen_apoyo": _imagen.visible}
 	var resultado := TriviaManager.responder_trivia(trivia_actual, opcion, _modo == Modo.REPASO, meta)
 	var texto := ""
 	if resultado["correcta"]:
@@ -293,7 +297,10 @@ func _al_seleccionar_opcion(opcion: TriviaOption, boton: Button) -> void:
 			GameState.nombre_bioma(GameState.bioma_actual_id), resultado["xp"]]
 		if resultado["descubierta"]:
 			texto += "\nNueva entrada en la Biopedia: %s." % trivia_actual.nombre_especie
-		if _modo == Modo.REPASO:
+		if _modo == Modo.REPASO and resultado.get("rapido", false):
+			# El repaso rápido no avanza etapas: solo confirma lo recién aprendido.
+			texto += "\nRepaso rápido superado. Su primera validación llegará en unos días."
+		elif _modo == Modo.REPASO:
 			var etapa := GameState.etapa_validacion(trivia_actual.id_especie)
 			if etapa >= GameState.INTERVALOS_REPASO_DIAS.size():
 				texto += "\nValidación completa: ¡conocimiento consolidado!"
@@ -304,7 +311,10 @@ func _al_seleccionar_opcion(opcion: TriviaOption, boton: Button) -> void:
 		texto = "RESPUESTA INCORRECTA\n\n%s\n\nSin castigo: no pierdes PR ni salud." % opcion.retroalimentacion_narrativa
 		if not trivia_actual.pista_narrativa.is_empty():
 			pista_label.visible = true
-		if _modo == Modo.REPASO:
+		if _modo == Modo.REPASO and resultado.get("rapido", false):
+			texto += "\nPodrás repetir este repaso rápido en unos %d minutos. Revisa la pista para prepararte." % roundi(
+				GameState.SEGUNDOS_REPASO_RAPIDO / 60.0)
+		elif _modo == Modo.REPASO:
 			texto += "\nEste repaso se reprogramó para tu próxima sesión. Revisa la pista para prepararte."
 	retroalimentacion_label.text = texto
 	retroalimentacion_panel.visible = true

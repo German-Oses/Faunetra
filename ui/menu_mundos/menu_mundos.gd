@@ -118,6 +118,8 @@ func _reacomodar() -> void:
 	_pagina_refugio_caja.vertical = vertical
 	_mapa.size_flags_stretch_ratio = 1.7 if vertical else 2.3
 	_especies_cercanas.columns = 5 if vertical else 3
+	# 5 fichas de 82 px: con 6 px de separación (434) no caben en los 432 px del panel en vertical.
+	_especies_cercanas.add_theme_constant_override("h_separation", 4 if vertical else 6)
 	for b in _botones_nav.values():
 		(b as Button).vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP if vertical else VERTICAL_ALIGNMENT_CENTER
 		(b as Button).add_theme_font_size_override("font_size", 13 if vertical else 16)

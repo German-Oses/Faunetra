@@ -41,6 +41,21 @@ const ARBOLES_PAISAJE := {
 	5: ["arbol_5_a", "arbol_5_b"],  # Islas (Juan Fernández): chonta y helecho arborescente
 }
 const PROPORCION_VARIANTE_A := 0.6
+## Vaivén con el viento de los árboles del paisaje, como el de las plantas del refugio: la copa se
+## mece y la base queda fija. El desplazamiento es proporcional al alto del dibujo (un tocón casi no
+## se mueve) y se redondea a píxeles enteros. Los cardones del Norte Árido no se mecen.
+const SHADER_VAIVEN := """
+shader_type canvas_item;
+uniform float amplitud = 0.011;   // fracción del alto del dibujo que se mueve la punta
+uniform float velocidad = 1.3;
+void vertex() {
+	float alto = 1.0 / TEXTURE_PIXEL_SIZE.y;
+	float fase = MODEL_MATRIX[3].x * 0.013 + MODEL_MATRIX[3].y * 0.021;
+	float viento = sin(TIME * velocidad + fase) + 0.35 * sin(TIME * velocidad * 2.3 + fase * 1.7);
+	VERTEX.x += floor(viento * amplitud * alto * pow(1.0 - UV.y, 1.5) + 0.5);
+}
+"""
+const BIOMAS_SIN_VAIVEN: Array[int] = [2]
 
 ## Terrazas de la cordillera.
 const TERRAZA_DESDE := RADIO_JUGABLE + 3   ## más allá de esta distancia hacia atrás, el suelo sube
@@ -373,6 +388,8 @@ static func _decorar(id_bioma: int, tilemap: TileMapLayer, contenedor: Node2D, t
 			var arbol := _sprite(contenedor, tilemap, nombre, c,
 				Vector2(rng_exterior.randi_range(-8, 8), rng_exterior.randi_range(2, 10)) + subir)
 			arbol.flip_h = rng_exterior.randf() < 0.5
+			if id_bioma not in BIOMAS_SIN_VAIVEN:
+				arbol.material = _material_vaiven()
 			_sombra(arbol)
 			paisaje.append({"celda": c, "sprite": arbol, "tipo": "arbol"})
 		elif r > 0.97:
@@ -438,6 +455,17 @@ static func _sprite(contenedor: Node2D, tilemap: TileMapLayer, nombre: String, c
 
 
 static var _textura_sombra: Texture2D
+static var _vaiven: ShaderMaterial
+
+
+## Material compartido por todos los árboles del paisaje (un solo shader para todo el bosque).
+static func _material_vaiven() -> ShaderMaterial:
+	if _vaiven == null:
+		var shader := Shader.new()
+		shader.code = SHADER_VAIVEN
+		_vaiven = ShaderMaterial.new()
+		_vaiven.shader = shader
+	return _vaiven
 static var _ancho_visible: Dictionary = {}  # ruta de textura -> ancho de la parte dibujada (px)
 static var _altos_visibles: Dictionary = {}  # nombre de decoración -> alto de la parte dibujada (px)
 

@@ -15,8 +15,11 @@ signal bioma_desbloqueado(id_bioma: int)
 signal herramienta_cambiada(herramienta: String)
 signal especie_descubierta(data: EspecieData)
 signal repasos_actualizados
+signal modo_cambiado(id_modo: String)
 
 const RUTA_GUARDADO := "user://faunetra_guardado.json"
+const RUTA_RESPALDO := "user://faunetra_guardado.json.bak"
+const VERSION_GUARDADO := 1
 ## Orden de desbloqueo. El prototipo comienza en el Bosque Templado (id 3), que tiene todas
 ## sus especies animadas; luego sigue de norte a sur y finalmente las islas.
 const ORDEN_BIOMAS: Array[int] = [3, 2, 1, 4, 5]
@@ -30,6 +33,10 @@ const NOMBRES_BIOMAS := {
 const SEGUNDOS_DIA := 86400
 const MAX_SEVERIDAD := 7
 const INTERVALOS_REPASO_DIAS: Array[int] = [1, 3, 7]
+## Repaso rápido en la misma sesión, unos minutos después del descubrimiento: el espaciado
+## funciona mejor si antes hubo alguna recuperación temprana. No cuenta como validación.
+const SEGUNDOS_REPASO_RAPIDO := 240.0
+const INTERVALO_REVISION_REPASOS := 10.0
 const SEGUNDOS_ENTRE_GUARDADOS := 3.0
 
 # Pesos del indicador de salud (suman 100).
@@ -108,20 +115,39 @@ var informe_degradacion: Array[String] = []
 var dias_inactivo: int = 0
 
 var _ultima_sesion: float = 0.0
+var _inicio_sesion_ms := 0
+var _revision_repasos := 0.0
+var _rapidos_avisados: Dictionary = {}   # id_especie -> true (ya se avisó en esta sesión)
+## Avistamientos en la vida real que el jugador marcó en la Biopedia: "id_especie" -> timestamp.
+var avistamientos_reales: Dictionary = {}
 var _cambios_pendientes := false
 var _tiempo_sin_guardar := 0.0
 
 
 func _ready() -> void:
+	_inicio_sesion_ms = Time.get_ticks_msec()
 	cargar()
 	sesion += 1
 	_aplicar_degradacion_por_inactividad(Time.get_unix_time_from_system())
 	aplicar_opciones()
 	registrar({"tipo": "inicio_sesion", "detalle": "dias_inactivo=%d" % dias_inactivo})
 	guardar()
+	# Acciones en el terreno, para medir el recorrido del jugador (p. ej. tiempo hasta la primera planta).
+	EventBus.accion_terreno.connect(func(accion: String) -> void:
+		var e := {"tipo": "accion", "detalle": accion}
+		if accion == "plantar" and especie_para_plantar:
+			e["id_especie"] = especie_para_plantar.id_especie
+			e["especie"] = especie_para_plantar.nombre_comun
+		registrar(e))
+	EventBus.accion_rechazada.connect(func(motivo: String) -> void:
+		registrar({"tipo": "accion_rechazada", "detalle": "%s: %s" % [herramienta_activa, motivo]}))
 
 
 func _process(delta: float) -> void:
+	_revision_repasos += delta
+	if _revision_repasos >= INTERVALO_REVISION_REPASOS:
+		_revision_repasos = 0.0
+		_avisar_repasos_rapidos()
 	if not _cambios_pendientes:
 		return
 	_tiempo_sin_guardar += delta
@@ -131,6 +157,7 @@ func _process(delta: float) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
+		registrar({"tipo": "fin_sesion"})
 		guardar()
 
 
@@ -172,21 +199,25 @@ func costo(base: int) -> int:
 
 
 ## Elección del modo al comenzar la partida. Los biomas aún intactos reciben los PR iniciales del nuevo modo.
+## En la primera elección el bioma inicial ya tiene algo de salud (el claro inicial sin niebla),
+## así que basta con que no se hayan gastado PR.
 func elegir_modo(id_modo: String) -> void:
 	if not MODOS.has(id_modo):
 		return
 	var pr_anterior := int(ajuste("pr_inicial"))
+	var primera_eleccion := not modo_elegido
 	modo = id_modo
 	modo_elegido = true
 	for clave in biomas:
 		var estado: Dictionary = biomas[clave]
-		if int(estado.get("pr", 0)) == pr_anterior and float(estado.get("salud", 0.0)) <= 0.0:
+		if int(estado.get("pr", 0)) == pr_anterior and (primera_eleccion or float(estado.get("salud", 0.0)) <= 0.0):
 			agregar_pr(int(ajuste("pr_inicial")) - pr_anterior, int(clave))
 	var trivia := get_node_or_null("/root/TriviaManager")
 	if trivia and trivia.total_trivias_respondidas == 0:
 		trivia.reiniciar()
 	registrar({"tipo": "eleccion_modo", "detalle": id_modo})
 	marcar_cambios()
+	modo_cambiado.emit(id_modo)
 
 
 func nombre_bioma(id_bioma: int) -> String:
@@ -320,6 +351,7 @@ func descubrir_especie(data: EspecieData) -> bool:
 		"etapa": 0,
 		"proxima": ahora + INTERVALOS_REPASO_DIAS[0] * SEGUNDOS_DIA,
 		"sesion_bloqueada": -1,
+		"rapido": ahora + SEGUNDOS_REPASO_RAPIDO,
 	}
 	marcar_cambios()
 	especie_descubierta.emit(data)
@@ -341,20 +373,56 @@ func repasos_pendientes() -> Array[int]:
 	var ahora := Time.get_unix_time_from_system()
 	for clave in validaciones:
 		var v: Dictionary = validaciones[clave]
+		if es_repaso_rapido(int(clave)):
+			resultado.append(int(clave))
+			continue
 		if int(v["etapa"]) >= INTERVALOS_REPASO_DIAS.size():
 			continue
 		if ahora >= float(v["proxima"]) and int(v.get("sesion_bloqueada", -1)) < sesion:
 			resultado.append(int(clave))
-	resultado.sort()
+	# Los repasos rápidos van primero: son los que más conviene hacer ahora.
+	resultado.sort_custom(func(a: int, b: int) -> bool:
+		if es_repaso_rapido(a) != es_repaso_rapido(b):
+			return es_repaso_rapido(a)
+		return a < b)
 	return resultado
 
 
+## true si a la especie le toca ahora su repaso rápido (el de minutos después de descubrirla).
+func es_repaso_rapido(id_especie: int) -> bool:
+	var rapido := float(validaciones.get(str(id_especie), {}).get("rapido", 0.0))
+	return rapido > 0.0 and Time.get_unix_time_from_system() >= rapido
+
+
+## Avisa en pantalla cuando vence un repaso rápido (una vez por especie y sesión).
+func _avisar_repasos_rapidos() -> void:
+	var nuevos: Array[String] = []
+	for clave in validaciones:
+		var id := int(clave)
+		if es_repaso_rapido(id) and not _rapidos_avisados.has(id):
+			_rapidos_avisados[id] = true
+			var data := EspecieLoader.por_id(id)
+			if data:
+				nuevos.append(data.nombre_comun)
+	if nuevos.is_empty():
+		return
+	repasos_actualizados.emit()
+	EventBus.mensaje.emit("Repaso rápido: ¿recuerdas a %s? Lo encuentras en la Tableta, pestaña «Repasos»." % " y ".join(PackedStringArray(nuevos)))
+
+
 ## Acierto: avanza la validación. Error: sin castigo, se reprograma para la próxima sesión.
+## El repaso rápido no avanza etapas: acertarlo lo cierra y fallarlo lo repite unos minutos después.
 func registrar_repaso(id_especie: int, correcta: bool) -> void:
 	var clave := str(id_especie)
 	if not validaciones.has(clave):
 		return
 	var v: Dictionary = validaciones[clave]
+	if es_repaso_rapido(id_especie):
+		v["rapido"] = 0.0 if correcta else Time.get_unix_time_from_system() + SEGUNDOS_REPASO_RAPIDO
+		_rapidos_avisados.erase(id_especie)
+		marcar_cambios()
+		repasos_actualizados.emit()
+		return
 	if correcta:
 		var etapa := int(v["etapa"]) + 1
 		v["etapa"] = etapa
@@ -367,6 +435,19 @@ func registrar_repaso(id_especie: int, correcta: bool) -> void:
 		v["sesion_bloqueada"] = sesion
 	marcar_cambios()
 	repasos_actualizados.emit()
+
+
+## «La vi en la vida real» (Biopedia): queda en el registro para la investigación.
+func marcar_avistamiento_real(data: EspecieData) -> void:
+	var clave := str(data.id_especie)
+	if avistamientos_reales.has(clave):
+		return
+	avistamientos_reales[clave] = Time.get_unix_time_from_system()
+	registrar({"tipo": "avistamiento_real", "id_especie": data.id_especie, "especie": data.nombre_comun, "id_bioma": data.id_bioma})
+
+
+func vio_en_la_vida_real(id_especie: int) -> bool:
+	return avistamientos_reales.has(str(id_especie))
 
 
 # --- Degradación por abandono ---------------------------------------------------------
@@ -422,7 +503,10 @@ func simular_inactividad(dias: int) -> void:
 	for clave in descubiertas:
 		descubiertas[clave] = float(descubiertas[clave]) - desplazamiento
 	for clave in validaciones:
-		validaciones[clave]["proxima"] = float(validaciones[clave]["proxima"]) - desplazamiento
+		var v: Dictionary = validaciones[clave]
+		v["proxima"] = float(v.get("proxima", 0.0)) - desplazamiento
+		if float(v.get("rapido", 0.0)) > 0.0:
+			v["rapido"] = float(v["rapido"]) - desplazamiento
 	var ahora := Time.get_unix_time_from_system()
 	_ultima_sesion = ahora - desplazamiento
 	sesion += 1
@@ -449,9 +533,9 @@ func aplicar_volumen() -> void:
 
 # --- Registro de aprendizaje (para la tesis) ------------------------------------------
 
-const COLUMNAS_REGISTRO: Array[String] = ["fecha_hora", "participante", "sesion", "modo_juego", "tipo", "id_bioma", "bioma",
+const COLUMNAS_REGISTRO: Array[String] = ["fecha_hora", "participante", "sesion", "t_sesion_s", "modo_juego", "tipo", "id_bioma", "bioma",
 	"id_especie", "especie", "id_trivia", "dificultad", "modo", "correcta", "tiempo_s", "uso_pista",
-	"apoyo_tutor", "nivel_dda", "pr", "detalle"]
+	"apoyo_tutor", "nivel_dda", "pr", "detalle", "ficha_visible", "imagen_apoyo"]
 
 
 ## Agrega un evento al registro. Se completan fecha, sesión, participante y bioma.
@@ -460,6 +544,8 @@ func registrar(evento: Dictionary) -> void:
 	e["fecha_hora"] = Time.get_datetime_string_from_system(false, true)
 	e["participante"] = codigo_participante
 	e["sesion"] = sesion
+	# Segundos desde que se abrió el juego: permite medir, por ejemplo, el tiempo hasta la primera planta.
+	e["t_sesion_s"] = snappedf((Time.get_ticks_msec() - _inicio_sesion_ms) / 1000.0, 0.1)
 	e["modo_juego"] = modo
 	if not e.has("id_bioma"):
 		e["id_bioma"] = bioma_actual_id
@@ -492,6 +578,8 @@ func reiniciar_partida(id_modo: String = "") -> void:
 	biomas = {}
 	descubiertas = {}
 	validaciones = {}
+	avistamientos_reales = {}
+	_rapidos_avisados.clear()
 	desbloqueados = [ORDEN_BIOMAS[0]]
 	ultimo_bioma = -1
 	bioma_actual_id = -1
@@ -501,6 +589,10 @@ func reiniciar_partida(id_modo: String = "") -> void:
 	primera_partida = true
 	tutorial_paso = 0
 	registro.clear()
+	# El reloj de sesión vuelve a cero: t_sesion_s no debe incluir el tiempo de la partida anterior.
+	# El código de participante se conserva a propósito (es la misma persona).
+	_inicio_sesion_ms = Time.get_ticks_msec()
+	registrar({"tipo": "nueva_partida"})
 	informe_degradacion.clear()
 	dias_inactivo = 0
 	var trivia := get_node_or_null("/root/TriviaManager")
@@ -521,7 +613,7 @@ func guardar() -> void:
 		datos_trivia = trivia.exportar()
 	_ultima_sesion = Time.get_unix_time_from_system()
 	var datos := {
-		"version": 1,
+		"version": VERSION_GUARDADO,
 		"ultima_sesion": _ultima_sesion,
 		"sesion": sesion,
 		"primera_partida": primera_partida,
@@ -536,14 +628,33 @@ func guardar() -> void:
 		"biomas": biomas,
 		"descubiertas": descubiertas,
 		"validaciones": validaciones,
+		"avistamientos_reales": avistamientos_reales,
 		"trivia": datos_trivia,
 	}
-	var archivo := FileAccess.open(RUTA_GUARDADO, FileAccess.WRITE)
+	# Escritura segura: primero un archivo temporal, se comprueba que se puede leer de vuelta y recién
+	# entonces reemplaza al principal; la versión anterior queda como respaldo (.bak). Si el juego se
+	# cierra a mitad de la escritura, la partida anterior sigue intacta.
+	var texto := JSON.stringify(datos)
+	var temporal := RUTA_GUARDADO + ".tmp"
+	var archivo := FileAccess.open(temporal, FileAccess.WRITE)
 	if archivo == null:
 		push_error("[GameState] No se pudo guardar la partida: %s" % error_string(FileAccess.get_open_error()))
 		return
-	archivo.store_string(JSON.stringify(datos))
+	archivo.store_string(texto)
 	archivo.close()
+	if FileAccess.get_file_as_string(temporal) != texto:
+		push_error("[GameState] El guardado no se escribió completo; se conserva la partida anterior.")
+		return
+	var principal := ProjectSettings.globalize_path(RUTA_GUARDADO)
+	var respaldo := ProjectSettings.globalize_path(RUTA_RESPALDO)
+	if FileAccess.file_exists(RUTA_GUARDADO):
+		if FileAccess.file_exists(RUTA_RESPALDO):
+			DirAccess.remove_absolute(respaldo)
+		DirAccess.rename_absolute(principal, respaldo)
+	var error := DirAccess.rename_absolute(ProjectSettings.globalize_path(temporal), principal)
+	if error != OK:
+		push_error("[GameState] No se pudo reemplazar el guardado: %s" % error_string(error))
+		return
 	_cambios_pendientes = false
 	_tiempo_sin_guardar = 0.0
 
@@ -558,15 +669,42 @@ func _migrar_guardado_antiguo() -> void:
 		DirAccess.copy_absolute(antiguo, ProjectSettings.globalize_path(RUTA_GUARDADO))
 
 
+## Lee y parsea un archivo de guardado; null si no existe o no es un diccionario JSON.
+func _leer_guardado(ruta: String) -> Variant:
+	if not FileAccess.file_exists(ruta):
+		return null
+	var datos = JSON.parse_string(FileAccess.get_file_as_string(ruta))
+	return datos if datos is Dictionary else null
+
+
+func _dic(datos: Dictionary, clave: String) -> Dictionary:
+	var v = datos.get(clave, {})
+	return v if v is Dictionary else {}
+
+
+func _lista(datos: Dictionary, clave: String) -> Array:
+	var v = datos.get(clave, [])
+	return v if v is Array else []
+
+
 func cargar() -> void:
 	desbloqueados = [ORDEN_BIOMAS[0]]
 	_migrar_guardado_antiguo()
-	if not FileAccess.file_exists(RUTA_GUARDADO):
+	if not FileAccess.file_exists(RUTA_GUARDADO) and not FileAccess.file_exists(RUTA_RESPALDO):
 		return
-	var datos = JSON.parse_string(FileAccess.get_file_as_string(RUTA_GUARDADO))
-	if not (datos is Dictionary):
-		push_warning("[GameState] Guardado ilegible, se inicia una partida nueva.")
-		return
+	var datos = _leer_guardado(RUTA_GUARDADO)
+	if datos == null:
+		datos = _leer_guardado(RUTA_RESPALDO)
+		if FileAccess.file_exists(RUTA_GUARDADO):
+			# No se sobrescribe a ciegas una partida que no se pudo leer: se aparta para revisarla.
+			DirAccess.rename_absolute(ProjectSettings.globalize_path(RUTA_GUARDADO),
+				ProjectSettings.globalize_path(RUTA_GUARDADO + ".ilegible"))
+		if datos == null:
+			push_warning("[GameState] Guardado ilegible y sin respaldo válido, se inicia una partida nueva.")
+			return
+		push_warning("[GameState] Guardado ilegible: se recuperó la partida desde el respaldo.")
+	if int(datos.get("version", 1)) > VERSION_GUARDADO:
+		push_warning("[GameState] El guardado viene de una versión más nueva del juego (%s)." % datos.get("version"))
 
 	_ultima_sesion = float(datos.get("ultima_sesion", 0.0))
 	sesion = int(datos.get("sesion", 0))
@@ -577,25 +715,48 @@ func cargar() -> void:
 		modo = MODO_POR_DEFECTO
 	# Las partidas anteriores a los modos siguen en Guardaparques sin volver a preguntar.
 	modo_elegido = bool(datos.get("modo_elegido", not primera_partida))
-	opciones.merge(datos.get("opciones", {}), true)
+	opciones.merge(_dic(datos, "opciones"), true)
 	codigo_participante = str(datos.get("codigo_participante", ""))
-	registro = datos.get("registro", [])
+	# Cada estructura se valida por tipo: un JSON válido pero con otra forma no debe romper la carga.
+	registro = _lista(datos, "registro")
 	ultimo_bioma = int(datos.get("ultimo_bioma", -1))
-	for id in datos.get("desbloqueados", []):
+	for id in _lista(datos, "desbloqueados"):
 		if not desbloqueados.has(int(id)):
 			desbloqueados.append(int(id))
-	biomas = datos.get("biomas", {})
-	descubiertas = datos.get("descubiertas", {})
-	validaciones = datos.get("validaciones", {})
-	datos_trivia = datos.get("trivia", {})
+	biomas = _dic(datos, "biomas")
+	descubiertas = _dic(datos, "descubiertas")
+	validaciones = _dic(datos, "validaciones")
+	avistamientos_reales = _dic(datos, "avistamientos_reales")
+	datos_trivia = _dic(datos, "trivia")
+	for clave in biomas.keys():
+		if not (biomas[clave] is Dictionary):
+			biomas.erase(clave)
+	for clave in validaciones.keys():
+		if not (validaciones[clave] is Dictionary):
+			validaciones.erase(clave)
+	registro = registro.filter(func(e) -> bool: return e is Dictionary)
 
 	# JSON guarda todos los números como float: normalizamos los que se usan como enteros.
+	# Guardados incompletos o de versiones anteriores: completamos las claves que faltan.
 	for clave in biomas:
 		var estado: Dictionary = biomas[clave]
+		if not (estado.get("celdas") is Dictionary):
+			estado["celdas"] = {}
+		if not (estado.get("fauna") is Array):
+			estado["fauna"] = []
+		estado["salud"] = float(estado.get("salud", 0.0))
+		estado["bloqueadores_iniciales"] = int(estado.get("bloqueadores_iniciales", 0))
+		estado["fauna_total"] = int(estado.get("fauna_total", 0))
+		estado["niebla_pendiente"] = int(estado.get("niebla_pendiente", 0))
 		var fauna: Array = []
 		for id in estado.get("fauna", []):
 			fauna.append(int(id))
 		estado["fauna"] = fauna
+		if estado.has("fauna_identificada"):
+			var identificadas: Array = []
+			for id in estado["fauna_identificada"]:
+				identificadas.append(int(id))
+			estado["fauna_identificada"] = identificadas
 		estado["pr"] = int(estado.get("pr", ajuste("pr_inicial")))
 		for k in estado.get("celdas", {}):
 			var c: Dictionary = estado["celdas"][k]
@@ -604,3 +765,5 @@ func cargar() -> void:
 		var v: Dictionary = validaciones[clave]
 		v["etapa"] = int(v.get("etapa", 0))
 		v["sesion_bloqueada"] = int(v.get("sesion_bloqueada", -1))
+		v["proxima"] = float(v.get("proxima", float(descubiertas.get(clave, 0.0)) + INTERVALOS_REPASO_DIAS[0] * SEGUNDOS_DIA))
+		v["rapido"] = float(v.get("rapido", 0.0))

@@ -49,6 +49,7 @@ var id_bioma := -1
 var _capas: Array[TileMapLayer] = []
 var _celdas: Array[Vector2i] = []
 var _umbral: Dictionary = {}      # Vector2i -> salud (%) desde la que la parcela está sana
+var _posicion: Dictionary = {}    # Vector2i -> Vector2(distancia normalizada, ruido) para recalcular _umbral
 var _estado: Dictionary = {}      # Vector2i -> Estado mostrado
 var _decoraciones: Dictionary = {}  # Vector2i -> Array[{sprite, tipo, textura, escala}]
 var _pendientes: Array[Vector2i] = []
@@ -68,15 +69,15 @@ func configurar(p_id_bioma: int, tilemap: TileMapLayer, mapa: Dictionary) -> voi
 
 	var r := GeneradorMapa.RADIO_JUGABLE
 	var alcance := float(GeneradorMapa.RADIO_EXTERIOR - r)
-	var meta := GameState.umbral_desbloqueo()
 	for c: Vector2i in mapa.get("tipos", {}):
 		var distancia := maxi(absi(c.x), absi(c.y)) - r
 		if distancia <= 0:
 			continue   # el refugio lo restaura el jugador parcela a parcela
 		var t := clampf(distancia / alcance, 0.0, 1.0)
 		var ruido := GeneradorMapa._ruido_suave(c.x, c.y, 17 * id_bioma) * 5.0 + GeneradorMapa._ruido(c.x, c.y, 3 * id_bioma) * 2.0
-		_umbral[c] = clampf(lerpf(UMBRAL_MINIMO, meta - 1.0, t) + ruido, UMBRAL_MINIMO, meta - 1.0)
+		_posicion[c] = Vector2(t, ruido)
 		_celdas.append(c)
+	_calcular_umbrales()
 	for item: Dictionary in mapa.get("paisaje", []):
 		var s: Sprite2D = item["sprite"]
 		var lista: Array = _decoraciones.get(item["celda"], [])
@@ -90,6 +91,25 @@ func configurar(p_id_bioma: int, tilemap: TileMapLayer, mapa: Dictionary) -> voi
 	for c in _celdas:
 		_aplicar(c, _estado_para(c, _salud), false)
 	GameState.salud_actualizada.connect(_on_salud)
+	GameState.modo_cambiado.connect(_on_modo_cambiado)
+
+
+## Umbral de cada parcela según la meta de desbloqueo del modo actual.
+func _calcular_umbrales() -> void:
+	var meta := GameState.umbral_desbloqueo()
+	for c in _celdas:
+		var p: Vector2 = _posicion[c]
+		_umbral[c] = clampf(lerpf(UMBRAL_MINIMO, meta - 1.0, p.x) + p.y, UMBRAL_MINIMO, meta - 1.0)
+
+
+## El modo se elige con el primer bioma ya cargado: la meta cambia y el paisaje se reajusta.
+func _on_modo_cambiado(_id_modo: String) -> void:
+	_calcular_umbrales()
+	_pendientes.clear()
+	_acumulado = 0.0
+	for c in _celdas:
+		_aplicar(c, _estado_para(c, _salud), false)
+	_actualizar_caseta(true)
 
 
 func _on_salud(p_id_bioma: int, salud: float) -> void:
@@ -150,6 +170,10 @@ func _aplicar_arbol(c: Vector2i, deco: Dictionary, estado: Estado, animar: bool)
 	var s: Sprite2D = deco["sprite"]
 	var base: Vector2 = deco["escala"]
 	var objetivo := base
+	# El vaivén con el viento (GeneradorMapa.SHADER_VAIVEN) es solo para árboles vivos.
+	if not deco.has("material"):
+		deco["material"] = s.material
+	s.material = null if estado == Estado.SECO else deco["material"]
 	if estado == Estado.SECO:
 		var seco := _sprite_seco(c)
 		s.visible = seco != ""

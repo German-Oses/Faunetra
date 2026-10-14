@@ -129,3 +129,42 @@ static func texto_requisitos(animal: EspecieData) -> String:
 	if float(req["min_salud"]) > 0.0:
 		texto += " y el bioma tenga al menos %d%% de salud" % int(req["min_salud"])
 	return texto + "."
+
+
+## Pista breve al elegir una planta para sembrar: con quién crece mejor, a quién potencia y qué
+## visitantes atrae. Los animales aún no descubiertos se cuentan sin nombrarlos.
+static func pista_planta(data: EspecieData) -> String:
+	var n := normalizar(data.nombre_comun)
+	var crece_con: Array[String] = []
+	var potencia: Array[String] = []
+	for s in datos().get("sinergias", []):
+		if normalizar(str(s["objetivo"])) == n:
+			crece_con.append(str(s["fuente"]))
+		elif normalizar(str(s["fuente"])) == n:
+			potencia.append(str(s["objetivo"]))
+	var atrae: Array[String] = []
+	var por_descubrir := 0
+	for animal in EspecieLoader.fauna_del_bioma(data.id_bioma):
+		if (requisitos_fauna(animal)["plantas"] as Array).has(data.nombre_comun):
+			if GameState.esta_descubierta(animal.id_especie):
+				atrae.append(animal.nombre_comun)
+			else:
+				por_descubrir += 1
+	var partes: Array[String] = []
+	if not crece_con.is_empty():
+		partes.append("crece mejor junto a " + _lista(crece_con))
+	if not potencia.is_empty():
+		partes.append("ayuda a crecer a " + _lista(potencia))
+	if por_descubrir > 0:
+		atrae.append("%d visitante%s por descubrir" % [por_descubrir, "" if por_descubrir == 1 else "s"])
+	if not atrae.is_empty():
+		partes.append("atrae a " + _lista(atrae))
+	if partes.is_empty():
+		return "%s: crece mejor junto a especies distintas (biodiversidad)." % data.nombre_comun
+	return "%s: %s." % [data.nombre_comun, " · ".join(PackedStringArray(partes))]
+
+
+static func _lista(nombres: Array[String]) -> String:
+	if nombres.size() <= 1:
+		return "".join(PackedStringArray(nombres))
+	return ", ".join(PackedStringArray(nombres.slice(0, -1))) + " y " + nombres[-1]
