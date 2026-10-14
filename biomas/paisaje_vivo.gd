@@ -11,6 +11,9 @@ extends Node
 ## - Las baldosas degradadas no son arte aparte: se derivan del tileset del bioma al cargar
 ##   (mismas coordenadas en otras dos fuentes del TileSet), así siguen cualquier cambio del arte.
 ## - La caseta del guardaparque marca el avance: abandonada, en reparación y restaurada (con humo).
+## - Desierto Florido (solo Norte Árido): desde FLORIDO_DESDE de la meta, la arena se cubre de flores
+##   nativas (pata de guanaco, suspiro, malvilla, añañuca, garra de león), también desde el refugio
+##   hacia afuera. Se retiran si la salud baja. La primera vez se explica el fenómeno.
 
 enum Estado { SECO, BROTANDO, SANO }
 
@@ -38,7 +41,17 @@ const SUELO_SECO := {
 const CASETA_REPARACION := 0.25
 const CASETA_RESTAURADA := 0.6
 ## Punta de la chimenea respecto del pie de la caseta (caseta.png, 64x64, anclada abajo al centro).
-const CHIMENEA := Vector2(10.5, -58.0)
+const CHIMENEA := Vector2(11.0, -41.3)
+
+## Desierto Florido: bioma, fracción de la meta desde la que florece y especies con su peso
+## (la pata de guanaco forma los mantos más extensos). Arte: herramientas/aseprite/desierto_florido.lua.
+const BIOMA_FLORIDO := 2
+const FLORIDO_DESDE := 0.9
+const FLORES := {"pata_de_guanaco": 5, "suspiro": 2, "malvilla": 2, "ananuca_roja": 1,
+	"ananuca_amarilla": 1, "garra_de_leon": 1}
+const RUTA_FLORES := "res://Assets/decoracion/flores_%s_%s.png"
+## Bajo este ruido la parcela queda como claro de arena (aprox. una de cada cuatro).
+const CLAROS_FLORIDO := -0.5
 
 const COLOR_AGUA_TURBIA := Color("#6B6450")
 ## Columnas del tileset que se degradan: suelo (0-2), agua (4-5) y suelo especial (6).
@@ -59,10 +72,18 @@ var _salud := 0.0
 var _caseta: Sprite2D
 var _etapa_caseta := ""
 var _humo: CPUParticles2D
+var _tilemap: TileMapLayer
+var _contenedor: Node2D
+var _alturas: Dictionary = {}
+var _umbral_flor: Dictionary = {}  # Vector2i -> salud (%) desde la que florece (solo arena del desierto)
+var _florido: Dictionary = {}      # Vector2i -> bool mostrado
+var _flores: Dictionary = {}       # Vector2i -> Array[Sprite2D] (se crean la primera vez que florece)
 
 
 func configurar(p_id_bioma: int, tilemap: TileMapLayer, mapa: Dictionary) -> void:
 	id_bioma = p_id_bioma
+	_tilemap = tilemap
+	_alturas = mapa.get("alturas", {})
 	_capas = [tilemap]
 	_capas.append_array(mapa.get("capas", []))
 	_agregar_fuentes(tilemap.tile_set)
@@ -77,6 +98,11 @@ func configurar(p_id_bioma: int, tilemap: TileMapLayer, mapa: Dictionary) -> voi
 		var ruido := GeneradorMapa._ruido_suave(c.x, c.y, 17 * id_bioma) * 5.0 + GeneradorMapa._ruido(c.x, c.y, 3 * id_bioma) * 2.0
 		_posicion[c] = Vector2(t, ruido)
 		_celdas.append(c)
+		# Florece sobre arena (el salar, el agua y la roca no), en mantos con claros entre medio.
+		if id_bioma == BIOMA_FLORIDO and mapa["tipos"][c] == "suelo" \
+				and _alturas.get(c, 0) < GeneradorMapa._roca_desde(id_bioma) \
+				and GeneradorMapa._ruido_suave(c.x, c.y, 91) * 0.3 + GeneradorMapa._ruido(c.x, c.y, 37) > CLAROS_FLORIDO:
+			_umbral_flor[c] = 0.0
 	_calcular_umbrales()
 	for item: Dictionary in mapa.get("paisaje", []):
 		var s: Sprite2D = item["sprite"]
@@ -85,11 +111,15 @@ func configurar(p_id_bioma: int, tilemap: TileMapLayer, mapa: Dictionary) -> voi
 		_decoraciones[item["celda"]] = lista
 
 	_caseta = mapa.get("decoraciones", {}).get(GeneradorMapa.CASETA)
+	_contenedor = _caseta.get_parent() if _caseta else tilemap.get_parent()
 	_salud = GameState.calcular_salud(id_bioma)
 	_actualizar_caseta(false)
 	# Al cargar, el paisaje aparece directamente en su estado (sin animar el avance).
 	for c in _celdas:
 		_aplicar(c, _estado_para(c, _salud), false)
+		_aplicar_flores(c, _florido_para(c, _salud), false)
+	if _florido.values().has(true):
+		_avisar_desierto_florido.call_deferred()   # partidas que ya estaban floridas al cargar
 	GameState.salud_actualizada.connect(_on_salud)
 	GameState.modo_cambiado.connect(_on_modo_cambiado)
 
@@ -100,6 +130,9 @@ func _calcular_umbrales() -> void:
 	for c in _celdas:
 		var p: Vector2 = _posicion[c]
 		_umbral[c] = clampf(lerpf(UMBRAL_MINIMO, meta - 1.0, p.x) + p.y, UMBRAL_MINIMO, meta - 1.0)
+		if _umbral_flor.has(c):
+			var desde := meta * FLORIDO_DESDE
+			_umbral_flor[c] = maxf(_umbral[c], clampf(lerpf(desde, meta - 0.5, p.x) + p.y * 0.3, desde, meta - 0.5))
 
 
 ## El modo se elige con el primer bioma ya cargado: la meta cambia y el paisaje se reajusta.
@@ -109,6 +142,7 @@ func _on_modo_cambiado(_id_modo: String) -> void:
 	_acumulado = 0.0
 	for c in _celdas:
 		_aplicar(c, _estado_para(c, _salud), false)
+		_aplicar_flores(c, _florido_para(c, _salud), false)
 	_actualizar_caseta(true)
 
 
@@ -119,7 +153,7 @@ func _on_salud(p_id_bioma: int, salud: float) -> void:
 	_salud = salud
 	_pendientes.clear()
 	for c in _celdas:
-		if _estado_para(c, salud) != _estado[c]:
+		if _estado_para(c, salud) != _estado[c] or _florido_para(c, salud) != _florido.get(c, false):
 			_pendientes.append(c)
 	# Lo verde avanza desde el refugio hacia afuera; la degradación, desde afuera hacia adentro.
 	_pendientes.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
@@ -136,6 +170,7 @@ func _process(delta: float) -> void:
 		_acumulado -= 1.0
 		var c: Vector2i = _pendientes.pop_back()
 		_aplicar(c, _estado_para(c, _salud), true)
+		_aplicar_flores(c, _florido_para(c, _salud), true)
 	if _pendientes.is_empty():
 		_acumulado = 0.0
 
@@ -147,6 +182,82 @@ func _estado_para(c: Vector2i, salud: float) -> Estado:
 	if salud >= u - MARGEN_BROTE:
 		return Estado.BROTANDO
 	return Estado.SECO
+
+
+func _florido_para(c: Vector2i, salud: float) -> bool:
+	return _umbral_flor.has(c) and salud >= _umbral_flor[c]
+
+
+## Flores de la parcela: uno o dos manchones de una especie, elegidos de forma fija por parcela.
+func _aplicar_flores(c: Vector2i, florece: bool, animar: bool) -> void:
+	if not _umbral_flor.has(c) or _florido.get(c, false) == florece:
+		return
+	_florido[c] = florece
+	if florece and not _flores.has(c):
+		_flores[c] = _crear_flores(c)
+	for s: Sprite2D in _flores.get(c, []):
+		if s.has_meta("tween"):
+			(s.get_meta("tween") as Tween).kill()
+		s.visible = true
+		if not animar:
+			s.visible = florece
+			s.scale = Vector2.ONE
+			continue
+		var tween := s.create_tween()
+		s.set_meta("tween", tween)
+		if florece:
+			s.scale = Vector2(0.2, 0.0)
+			tween.tween_property(s, "scale", Vector2.ONE, 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		else:
+			tween.tween_property(s, "scale", Vector2(0.2, 0.0), 0.35)
+			tween.tween_callback(s.hide)
+	if florece and animar:
+		_avisar_desierto_florido()
+
+
+func _crear_flores(c: Vector2i) -> Array[Sprite2D]:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(Vector3i(c.x, c.y, 7919))
+	var total := 0
+	for n in FLORES:
+		total += FLORES[n]
+	var lista: Array[Sprite2D] = []
+	var subir := Vector2(0, -GeneradorMapa.ALTO_NIVEL * int(_alturas.get(c, 0)))
+	for i in (2 if rng.randf() < 0.55 else 1):
+		var r := rng.randi_range(1, total)
+		var especie := ""
+		for n in FLORES:
+			r -= FLORES[n]
+			if r <= 0:
+				especie = n
+				break
+		var variante := "a" if rng.randf() < 0.5 else "b"
+		var s := Sprite2D.new()
+		s.name = "Flores_%s_%d_%d_%d" % [especie, c.x, c.y, i]
+		s.texture = load(RUTA_FLORES % [especie, variante])
+		s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		s.flip_h = rng.randf() < 0.5
+		s.z_index = -1   # a ras de suelo: los cardones y la fauna quedan por encima
+		_contenedor.add_child(s)
+		var desfase := Vector2(rng.randi_range(-10, 10), rng.randi_range(-4, 5)) + subir
+		s.global_position = _tilemap.to_global(_tilemap.map_to_local(c)) + desfase
+		lista.append(s)
+	return lista
+
+
+## La primera vez que florece el desierto se explica el fenómeno real (queda en el registro).
+func _avisar_desierto_florido() -> void:
+	var estado := GameState.estado_bioma(id_bioma)
+	if estado.get("florido_visto", false):
+		return
+	estado["florido_visto"] = true
+	GameState.marcar_cambios()
+	GameState.registrar({"tipo": "desierto_florido", "id_bioma": id_bioma, "detalle": "salud=%.1f" % _salud})
+	EventBus.dialogo.emit("¡Desierto Florido!",
+		"Tu refugio está casi restaurado y la arena se cubrió de flores. En la costa y los llanos de "
+		+ "Atacama, semillas y bulbos esperan años bajo el suelo; cuando llueve más de lo normal "
+		+ "(a menudo en años de El Niño) germinan todas juntas: pata de guanaco, suspiros, añañucas "
+		+ "y la escasa garra de león. Dura unas semanas y es uno de los fenómenos más famosos de Chile.")
 
 
 func _aplicar(c: Vector2i, estado: Estado, animar: bool) -> void:

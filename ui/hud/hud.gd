@@ -76,6 +76,7 @@ func _ready() -> void:
 
 	EventBus.bioma_cargado.connect(_on_bioma_cargado)
 	EventBus.mensaje.connect(mostrar_aviso)
+	EventBus.dialogo.connect(mostrar_dialogo)
 	GameState.pr_actualizado.connect(_on_pr_actualizado)
 	GameState.salud_actualizada.connect(_on_salud_actualizada)
 	GameState.herramienta_cambiada.connect(_on_herramienta_cambiada)
