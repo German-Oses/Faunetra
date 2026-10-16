@@ -109,15 +109,16 @@ func nueva_ronda() -> void:
 		_fichas.add_child(ficha)
 
 
-## El objetivo más dos distractores, priorizando grupos acústicos distintos para que sea deducible.
+## El objetivo más dos distractores, priorizando los que suenan distinto (otra firma sonora) para
+## que sea deducible: dos grupos diferentes pueden sonar igual, como crustáceos y caracoles de agua.
 func _elegir_opciones(fauna: Array[EspecieData]) -> Array[EspecieData]:
-	var categoria_objetivo := SintetizadorFauna.categoria(_objetivo)
+	var firma_objetivo := SintetizadorFauna.firma(_objetivo)
 	var distintas: Array[EspecieData] = []
 	var iguales: Array[EspecieData] = []
 	for d in fauna:
 		if d == _objetivo:
 			continue
-		if SintetizadorFauna.categoria(d) != categoria_objetivo or d.audio_canto:
+		if SintetizadorFauna.firma(d) != firma_objetivo or d.audio_canto:
 			distintas.append(d)
 		else:
 			iguales.append(d)
@@ -155,7 +156,7 @@ func _on_ficha(elegida: EspecieData, boton: Button) -> void:
 		_reconocidas[_objetivo.id_especie] = true
 		if pr > 0:
 			GameState.agregar_pr(pr)
-		var nueva := GameState.descubrir_especie(_objetivo)
+		var nueva: bool = GameState.descubrir_especie(_objetivo)
 		var premio := "+%d PR." % pr if pr > 0 else ("Práctica superada: la próxima ronda vuelve a dar PR." \
 			if _practicas_pendientes == 0 else "Bien: te falta %d acierto más para volver a ganar PR." % _practicas_pendientes)
 		_resultado.text = "¡Correcto! Era %s. %s %s%s" % [

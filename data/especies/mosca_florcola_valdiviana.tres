@@ -13,5 +13,6 @@ estado_conservacion = "VU"
 rol_ecologico = "Díptero imitador de avispas. Polinizador clave del dosel profundo del bosque lluvioso."
 umbral_desbloqueo = 0
 id_bioma = 3
+grupo = "insecto"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

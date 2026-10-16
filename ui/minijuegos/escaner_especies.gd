@@ -54,7 +54,7 @@ func _ready() -> void:
 
 
 func _reacomodar() -> void:
-	var v := Pantalla.vertical
+	var v: bool = Pantalla.vertical
 	vertical = v
 	_lateral.custom_minimum_size.x = 0 if v else 330
 	_tarjeta_acustica.visible = not v
@@ -277,7 +277,12 @@ func _preparar_ronda() -> void:
 	_instruccion_titulo.text = "Identifica la especie oculta · Ronda %d de %d" % [_ronda + 1, RONDAS]
 	_instruccion_texto.text = "Observa bien el entorno y mueve el escáner: cerca de la especie, el camuflaje se disipa. Tócala para seleccionarla."
 	_boton_sonido.disabled = EspecieLoader.es_flora(_objetivo)
-	_boton_sonido.tooltip_text = "Las plantas no emiten sonidos." if _boton_sonido.disabled else "Escucha una pista sonora."
+	if _boton_sonido.disabled:
+		_boton_sonido.tooltip_text = "Las plantas no emiten sonidos."
+	elif _objetivo.audio_canto:
+		_boton_sonido.tooltip_text = "Escucha su canto real."
+	else:
+		_boton_sonido.tooltip_text = "Escucha una pista sonora simulada de su grupo (no es una grabación real)."
 	_crear_opciones()
 	_siguiente.visible = false
 
@@ -343,7 +348,7 @@ func _on_opcion(elegida: EspecieData, boton: Button) -> void:
 		_resultados[_ronda] = 1
 		_pr_ganados += RECOMPENSA_PR
 		GameState.agregar_pr(RECOMPENSA_PR)
-		var nueva := GameState.descubrir_especie(_objetivo)
+		var nueva: bool = GameState.descubrir_especie(_objetivo)
 		_resultado.text = "¡Correcto! Es %s (%s). +%d PR.%s" % [_objetivo.nombre_comun, _objetivo.nombre_cientifico,
 			RECOMPENSA_PR, " Nueva entrada en la Biopedia." if nueva else ""]
 	else:
@@ -385,12 +390,15 @@ func _reproducir_pista() -> void:
 	_reproductor.stream = _objetivo.audio_canto if _objetivo.audio_canto else SintetizadorFauna.generar(_objetivo)
 	Sonidos.atenuar_ambiente(_reproductor.stream.get_length())
 	_reproductor.play()
+	# Igual que en el Paisaje Sonoro: sin grabación en la ficha, se dice que el sonido es simulado.
+	if not _objetivo.audio_canto:
+		EventBus.mensaje.emit("Pista sonora simulada: representa a su grupo, no es una grabación real.")
 
 
 # --- Repetición espaciada -----------------------------------------------------------------------
 
 func _especie_para_repaso() -> EspecieData:
-	var pendientes := GameState.repasos_pendientes()
+	var pendientes: Array[int] = GameState.repasos_pendientes()
 	if not pendientes.is_empty():
 		return EspecieLoader.por_id(pendientes[0])
 	if _ultima_identificada and GameState.esta_descubierta(_ultima_identificada.id_especie):
@@ -414,8 +422,8 @@ func _refrescar_repaso() -> void:
 		_repaso_nombre.text = "Descubre especies para programar sus repasos."
 		_repaso_boton.visible = false
 		return
-	var etapa := GameState.etapa_validacion(data.id_especie)
-	var pendiente := GameState.repasos_pendientes().has(data.id_especie)
+	var etapa: int = GameState.etapa_validacion(data.id_especie)
+	var pendiente: bool = GameState.repasos_pendientes().has(data.id_especie)
 	_repaso_nombre.text = data.nombre_comun
 	for i in ETIQUETAS_REPASO.size():
 		var chip := PanelContainer.new()

@@ -19,6 +19,10 @@ signal modo_cambiado(id_modo: String)
 
 const RUTA_GUARDADO := "user://faunetra_guardado.json"
 const RUTA_RESPALDO := "user://faunetra_guardado.json.bak"
+## Formato del guardado. Las partidas deben seguir funcionando al actualizar el juego: si el
+## formato cambia, se sube este número y cargar() migra los guardados anteriores al nuevo.
+## Un guardado de una versión MÁS NUEVA (p. ej. el navegador cargó una versión vieja desde su
+## caché) se abre en solo lectura: nunca se sobrescribe ni se renombra.
 const VERSION_GUARDADO := 1
 ## Orden de desbloqueo. El prototipo comienza en el Bosque Templado (id 3), que tiene todas
 ## sus especies animadas; luego sigue de norte a sur y finalmente las islas.
@@ -121,6 +125,8 @@ var _rapidos_avisados: Dictionary = {}   # id_especie -> true (ya se avisó en e
 ## Avistamientos en la vida real que el jugador marcó en la Biopedia: "id_especie" -> timestamp.
 var avistamientos_reales: Dictionary = {}
 var _cambios_pendientes := false
+## True si el guardado es de una versión más nueva del juego: no se escribe nada (ver VERSION_GUARDADO).
+var solo_lectura := false
 var _tiempo_sin_guardar := 0.0
 
 
@@ -573,6 +579,9 @@ func registro_csv() -> String:
 
 ## Borra todo el progreso y vuelve a cargar la escena principal desde cero con el modo indicado.
 func reiniciar_partida(id_modo: String = "") -> void:
+	if solo_lectura:
+		EventBus.mensaje.emit("Tu partida es de una versión más nueva del juego: ábrelo en su versión actual para reiniciarla.")
+		return
 	modo = id_modo if MODOS.has(id_modo) else modo
 	modo_elegido = MODOS.has(id_modo)
 	biomas = {}
@@ -608,8 +617,13 @@ func marcar_cambios() -> void:
 
 
 func guardar() -> void:
+	if solo_lectura:
+		return
+	# GameState se inicia (y guarda) antes que TriviaManager: hasta que este no termine su _ready
+	# (donde importa datos_trivia) exportarlo devolvería sus valores iniciales y borraría XP, nivel,
+	# rachas, insignias y desempeño de la partida. Mientras tanto se conserva lo que se cargó.
 	var trivia := get_node_or_null("/root/TriviaManager")
-	if trivia:
+	if trivia and trivia.is_node_ready():
 		datos_trivia = trivia.exportar()
 	_ultima_sesion = Time.get_unix_time_from_system()
 	var datos := {
@@ -677,6 +691,107 @@ func _leer_guardado(ruta: String) -> Variant:
 	return datos if datos is Dictionary else null
 
 
+## Revisa la forma del guardado ANTES de tocar el estado del juego. Devuelve "" si se puede cargar
+## o la descripción del primer problema. Regla: las claves que faltan se completan después con
+## valores por defecto; un tipo equivocado (null donde va una celda, texto donde va un número...)
+## invalida el archivo y se recurre al respaldo. Única excepción: eventos del registro que no son
+## diccionarios se descartan uno a uno, para no perder el resto de los datos de investigación.
+func _problema_en_guardado(datos: Dictionary) -> String:
+	for clave in ["opciones", "biomas", "descubiertas", "validaciones", "avistamientos_reales", "trivia"]:
+		if datos.has(clave) and not (datos[clave] is Dictionary):
+			return "«%s» no es un diccionario" % clave
+	for clave in ["registro", "desbloqueados"]:
+		if datos.has(clave) and not (datos[clave] is Array):
+			return "«%s» no es una lista" % clave
+	var p := _numeros(datos, ["version", "ultima_sesion", "sesion", "tutorial_paso", "ultimo_bioma"], "")
+	if p: return p
+	for id in datos.get("desbloqueados", []):
+		if not _es_numero(id):
+			return "un bioma desbloqueado no es un número"
+	for coleccion in ["descubiertas", "avistamientos_reales"]:
+		for clave in datos.get(coleccion, {}):
+			if not _es_numero(datos[coleccion][clave]):
+				return "«%s/%s» no es una fecha" % [coleccion, clave]
+	var biomas_g: Dictionary = datos.get("biomas", {})
+	for clave in biomas_g:
+		var estado = biomas_g[clave]
+		if not (estado is Dictionary):
+			return "el bioma %s no es un diccionario" % clave
+		p = _numeros(estado, ["pr", "salud", "bloqueadores_iniciales", "fauna_total", "niebla_pendiente", "version_mapa"], "bioma %s: " % clave)
+		if p: return p
+		for campo in ["fauna", "fauna_identificada"]:
+			if estado.has(campo):
+				if not (estado[campo] is Array):
+					return "bioma %s: «%s» no es una lista" % [clave, campo]
+				for id in estado[campo]:
+					if not _es_numero(id):
+						return "bioma %s: «%s» tiene un valor que no es número" % [clave, campo]
+		if estado.has("celdas"):
+			if not (estado["celdas"] is Dictionary):
+				return "bioma %s: «celdas» no es un diccionario" % clave
+			for k in estado["celdas"]:
+				var c = estado["celdas"][k]
+				if not (c is Dictionary):
+					return "bioma %s: la celda %s no es un diccionario" % [clave, k]
+				p = _numeros(c, ["e", "c"], "bioma %s, celda %s: " % [clave, k])
+				if p: return p
+				for campo in ["n", "m"]:
+					if c.has(campo) and not (c[campo] is bool or _es_numero(c[campo])):
+						return "bioma %s, celda %s: «%s» no es verdadero/falso" % [clave, k, campo]
+				if c.has("b") and not (c["b"] is String):
+					return "bioma %s, celda %s: «b» no es texto" % [clave, k]
+	var validaciones_g: Dictionary = datos.get("validaciones", {})
+	for clave in validaciones_g:
+		if not (validaciones_g[clave] is Dictionary):
+			return "la validación %s no es un diccionario" % clave
+		p = _numeros(validaciones_g[clave], ["etapa", "sesion_bloqueada", "proxima", "rapido"], "validación %s: " % clave)
+		if p: return p
+	var trivia_g: Dictionary = datos.get("trivia", {})
+	p = _numeros(trivia_g, ["nivel", "racha_aciertos", "racha_errores", "total", "xp"], "trivias: ")
+	if p: return p
+	if trivia_g.has("insignias"):
+		if not (trivia_g["insignias"] is Array):
+			return "trivias: «insignias» no es una lista"
+		for insignia in trivia_g["insignias"]:
+			if not (insignia is String):
+				return "trivias: una insignia no es texto"
+	if trivia_g.has("desempeno") and not (trivia_g["desempeno"] is Dictionary):
+		return "trivias: «desempeno» no es un diccionario"
+	return ""
+
+
+func _es_numero(v: Variant) -> bool:
+	return v is int or v is float
+
+
+## Primer campo presente de `campos` que no es número, o "" si todos lo son.
+func _numeros(dic: Dictionary, campos: Array, prefijo: String) -> String:
+	for campo in campos:
+		if dic.has(campo) and not _es_numero(dic[campo]):
+			return "%s«%s» no es un número" % [prefijo, campo]
+	return ""
+
+
+## Lee un guardado y comprueba su forma; null si no existe, no es JSON o tiene tipos equivocados.
+func _leer_valido(ruta: String) -> Variant:
+	var datos = _leer_guardado(ruta)
+	if datos == null:
+		return null
+	var problema := _problema_en_guardado(datos)
+	if problema:
+		push_warning("[GameState] %s no se puede cargar: %s." % [ruta.get_file(), problema])
+		return null
+	return datos
+
+
+## Aparta un guardado que no se pudo cargar (no se borra: queda para revisarlo).
+func _apartar(ruta: String) -> void:
+	var destino := ProjectSettings.globalize_path(ruta + ".ilegible")
+	if FileAccess.file_exists(ruta + ".ilegible"):
+		DirAccess.remove_absolute(destino)
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(ruta), destino)
+
+
 func _dic(datos: Dictionary, clave: String) -> Dictionary:
 	var v = datos.get(clave, {})
 	return v if v is Dictionary else {}
@@ -692,19 +807,23 @@ func cargar() -> void:
 	_migrar_guardado_antiguo()
 	if not FileAccess.file_exists(RUTA_GUARDADO) and not FileAccess.file_exists(RUTA_RESPALDO):
 		return
-	var datos = _leer_guardado(RUTA_GUARDADO)
+	# Guardado de una versión más nueva: se abre en solo lectura y no se toca ningún archivo.
+	var crudo = _leer_guardado(RUTA_GUARDADO)
+	if crudo != null and _es_numero(crudo.get("version", 1)) and int(crudo.get("version", 1)) > VERSION_GUARDADO:
+		solo_lectura = true
+		push_warning("[GameState] El guardado viene de una versión más nueva del juego (%s): no se guardarán cambios." % crudo.get("version"))
+		if _problema_en_guardado(crudo):
+			return   # su formato no se entiende: se juega sin cargarlo, y sin escribir encima
+	var datos = crudo if solo_lectura else _leer_valido(RUTA_GUARDADO)
 	if datos == null:
-		datos = _leer_guardado(RUTA_RESPALDO)
+		datos = _leer_valido(RUTA_RESPALDO)
 		if FileAccess.file_exists(RUTA_GUARDADO):
 			# No se sobrescribe a ciegas una partida que no se pudo leer: se aparta para revisarla.
-			DirAccess.rename_absolute(ProjectSettings.globalize_path(RUTA_GUARDADO),
-				ProjectSettings.globalize_path(RUTA_GUARDADO + ".ilegible"))
+			_apartar(RUTA_GUARDADO)
 		if datos == null:
 			push_warning("[GameState] Guardado ilegible y sin respaldo válido, se inicia una partida nueva.")
 			return
 		push_warning("[GameState] Guardado ilegible: se recuperó la partida desde el respaldo.")
-	if int(datos.get("version", 1)) > VERSION_GUARDADO:
-		push_warning("[GameState] El guardado viene de una versión más nueva del juego (%s)." % datos.get("version"))
 
 	_ultima_sesion = float(datos.get("ultima_sesion", 0.0))
 	sesion = int(datos.get("sesion", 0))

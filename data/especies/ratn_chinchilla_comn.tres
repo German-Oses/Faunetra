@@ -13,5 +13,6 @@ estado_conservacion = "LC"
 rol_ecologico = "Roedor cavador endémico de Chile central. Aireador de suelos arcillosos mediterráneos."
 umbral_desbloqueo = 0
 id_bioma = 1
+grupo = "mamifero"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

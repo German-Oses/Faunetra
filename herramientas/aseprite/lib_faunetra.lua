@@ -1,6 +1,9 @@
 -- Biblioteca de arquetipos pixel art de Faunetra (32x32, perfil mirando a la derecha, luz arriba-izquierda).
-RAIZ = "/Users/joshuavillavicencio/ProyectoTitulo/Assets/"
-PREV = RAIZ .. "../herramientas/aseprite/previas/"  -- tiras de vista previa
+-- Rutas relativas a la carpeta del proyecto (ejecutar desde ella, o definir PROYECTO antes de
+-- cargar esta biblioteca): así los scripts funcionan en cualquier computador.
+local _proyecto = PROYECTO or app.fs.currentPath
+RAIZ = RAIZ_ASSETS or (app.fs.joinPath(_proyecto, "Assets") .. "/")
+PREV = PREVIA_DIR or (app.fs.joinPath(_proyecto, "herramientas/aseprite/previas") .. "/")  -- tiras de vista previa
 app.fs.makeAllDirectories(PREV)
 floor,ceil,sin,cos,pi,abs,max,min,sqrt = math.floor,math.ceil,math.sin,math.cos,math.pi,math.abs,math.max,math.min,math.sqrt
 TAM = 32

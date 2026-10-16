@@ -13,5 +13,6 @@ estado_conservacion = "CR"
 rol_ecologico = "Coleóptero bupréstido. Indicador biológico de la recuperación de la flora arbustiva nativa."
 umbral_desbloqueo = 0
 id_bioma = 2
+grupo = "insecto"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

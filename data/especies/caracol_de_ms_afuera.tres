@@ -13,5 +13,6 @@ estado_conservacion = "CR"
 rol_ecologico = "Molusco crítico en peligro extremo de extinción por pérdida de hábitat boscoso en la isla exterior."
 umbral_desbloqueo = 0
 id_bioma = 5
+grupo = "caracol_terrestre"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

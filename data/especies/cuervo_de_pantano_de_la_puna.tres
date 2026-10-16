@@ -13,5 +13,6 @@ estado_conservacion = "NT"
 rol_ecologico = "Ave de humedales de altura. Busca invertebrados en el fango de bofedales y lagunas altiplánicas."
 umbral_desbloqueo = 0
 id_bioma = 2
+grupo = "ave"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

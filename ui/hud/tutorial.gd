@@ -99,7 +99,7 @@ func _ready() -> void:
 
 ## Notifica que ocurrió algo; si es lo que espera el paso actual, avanza.
 func avisar(evento: String) -> void:
-	var paso := GameState.tutorial_paso
+	var paso: int = GameState.tutorial_paso
 	if paso >= PASOS.size():
 		return
 	if PASOS[paso]["espera"] != evento:

@@ -67,6 +67,11 @@ func cargar_bioma(ruta_escena: String) -> void:
 
 func _mostrar_avisos_de_inicio() -> void:
 	hud.abrir_menu()
+	if GameState.solo_lectura:
+		hud.mostrar_dialogo("Tu partida es de una versión más nueva",
+			"Esta partida se guardó con una versión más reciente de Faunetra. Para no dañarla, esta "
+			+ "versión no guardará cambios. Cierra todas las pestañas del juego y vuelve a abrirlo "
+			+ "para cargar la versión actual y continuar donde quedaste.")
 	if GameState.primera_partida:
 		GameState.primera_partida = false
 		GameState.marcar_cambios()
@@ -82,7 +87,7 @@ func _mostrar_avisos_de_inicio() -> void:
 
 func _mostrar_informe_degradacion() -> void:
 	if GameState.informe_degradacion.is_empty():
-		var repasos := GameState.repasos_pendientes().size()
+		var repasos: int = GameState.repasos_pendientes().size()
 		if repasos > 0:
 			EventBus.mensaje.emit("Tienes %d repasos de validación pendientes en la Tableta." % repasos)
 		return

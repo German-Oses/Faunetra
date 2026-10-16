@@ -13,5 +13,6 @@ estado_conservacion = "VU"
 rol_ecologico = "Reptil endémico de la zona central. Controla insectos entre rocas y troncos caídos."
 umbral_desbloqueo = 0
 id_bioma = 1
+grupo = "reptil"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

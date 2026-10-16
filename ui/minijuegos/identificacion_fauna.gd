@@ -192,7 +192,7 @@ func _on_opcion(elegida: EspecieData, boton: Button) -> void:
 		(b as Button).disabled = true
 	boton.add_theme_stylebox_override("disabled", TemaFaunetra.caja(TemaFaunetra.VERDE_CLARO, TemaFaunetra.VERDE, 12, 3, 6))
 	GameState.agregar_pr(pr, _data.id_bioma)
-	var nueva := GameState.descubrir_especie(_data)
+	var nueva: bool = GameState.descubrir_especie(_data)
 	EventBus.fauna_identificada.emit(_data)
 	_pista.visible = false
 	_resultado.visible = true

@@ -13,5 +13,6 @@ estado_conservacion = "NT"
 rol_ecologico = "Carroñero tope. Limpia el ecosistema consumiendo animales muertos y evita la propagación de enfermedades."
 umbral_desbloqueo = 0
 id_bioma = 1
+grupo = "ave"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

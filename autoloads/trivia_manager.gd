@@ -288,7 +288,7 @@ func responder_trivia(trivia: TriviaData, opcion: TriviaOption, es_repaso: bool 
 		reg["errores"] = int(reg.get("errores", 0)) + 1
 	desempeno_por_categoria[categoria] = reg
 
-	var rapido := es_repaso and GameState.es_repaso_rapido(trivia.id_especie)
+	var rapido: bool = es_repaso and GameState.es_repaso_rapido(trivia.id_especie)
 	if es_repaso:
 		GameState.registrar_repaso(trivia.id_especie, es_correcta)
 	GameState.registrar({
@@ -376,7 +376,7 @@ func generar_trivia(data: EspecieData, nivel: TriviaData.Dificultad) -> TriviaDa
 	var correcta := ""
 	var distractores: Array[String] = []
 	var cantidad := int(GameState.ajuste("distractores"))
-	var bioma := GameState.nombre_bioma(data.id_bioma)
+	var bioma: String = GameState.nombre_bioma(data.id_bioma)
 	match nivel:
 		TriviaData.Dificultad.FACIL:
 			t.titulo_narrativo = "Reconocimiento en terreno"
@@ -483,13 +483,22 @@ func exportar() -> Dictionary:
 	}
 
 
+## GameState ya valida la forma del guardado; aquí, además, cada campo se lee con su tipo y un
+## valor por defecto, para que un dato extraño nunca deje al gestor a medio importar.
 func importar(datos: Dictionary) -> void:
 	if datos.is_empty():
 		return
-	nivel_actual_jugador = clampi(int(datos.get("nivel", 0)), 0, TriviaData.Dificultad.DIFICIL) as TriviaData.Dificultad
-	racha_aciertos = int(datos.get("racha_aciertos", 0))
-	racha_errores = int(datos.get("racha_errores", 0))
-	total_trivias_respondidas = int(datos.get("total", 0))
-	xp_acumulada = int(datos.get("xp", 0))
-	insignias_desbloqueadas.assign(datos.get("insignias", []))
-	desempeno_por_categoria = datos.get("desempeno", {})
+	nivel_actual_jugador = clampi(_entero(datos, "nivel"), 0, TriviaData.Dificultad.DIFICIL) as TriviaData.Dificultad
+	racha_aciertos = maxi(0, _entero(datos, "racha_aciertos"))
+	racha_errores = maxi(0, _entero(datos, "racha_errores"))
+	total_trivias_respondidas = maxi(0, _entero(datos, "total"))
+	xp_acumulada = maxi(0, _entero(datos, "xp"))
+	var insignias = datos.get("insignias", [])
+	insignias_desbloqueadas.assign((insignias as Array).filter(func(i) -> bool: return i is String) if insignias is Array else [])
+	var desempeno = datos.get("desempeno", {})
+	desempeno_por_categoria = desempeno if desempeno is Dictionary else {}
+
+
+func _entero(datos: Dictionary, clave: String) -> int:
+	var v = datos.get(clave, 0)
+	return int(v) if (v is int or v is float) else 0

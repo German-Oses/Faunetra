@@ -24,3 +24,11 @@ const NOMBRES_ESTADO := {
 ## Escena propia (heredada de especie.tscn) para especies animadas. Si está vacía se usa el molde genérico con la textura.
 @export var escena: PackedScene
 @export var audio_canto: AudioStream
+## Grupo biológico de la fauna, asignado por taxonomía (no se deduce del nombre ni del rol, que
+## mencionan presas y otras especies). Define la firma del sonido simulado y qué animales se
+## parecen entre sí en los minijuegos. Vacío en flora y hongos. Valores en GRUPOS.
+@export var grupo: String = ""
+
+## Grupos biológicos válidos de la fauna (ver `grupo`).
+const GRUPOS: Array[String] = ["ave", "mamifero", "mamifero_marino", "anfibio", "reptil", "reptil_marino",
+	"insecto", "aracnido", "crustaceo", "caracol_acuatico", "caracol_terrestre"]

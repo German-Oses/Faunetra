@@ -206,7 +206,7 @@ func _mostrar_trivia(trivia: TriviaData) -> void:
 		Modo.REPASO when GameState.es_repaso_rapido(trivia.id_especie):
 			_encabezado_label.text = "Repaso rápido · Nivel %s · +%d PR" % [nivel, pr + TriviaManager.PR_BONO_REPASO]
 		Modo.REPASO:
-			var etapa := GameState.etapa_validacion(trivia.id_especie)
+			var etapa: int = GameState.etapa_validacion(trivia.id_especie)
 			_encabezado_label.text = "Repaso de validación %d/%d · Nivel %s · +%d PR" % [
 				etapa + 1, GameState.INTERVALOS_REPASO_DIAS.size(), nivel, pr + TriviaManager.PR_BONO_REPASO]
 		_:
@@ -289,7 +289,7 @@ func _al_seleccionar_opcion(opcion: TriviaOption, boton: Button) -> void:
 	var meta := {"tiempo_s": (Time.get_ticks_msec() - _inicio_ms) / 1000.0, "uso_pista": _uso_pista,
 		"modo": ["especie", "bioma", "repaso"][_modo],
 		"ficha_visible": _ficha_label.visible, "imagen_apoyo": _imagen.visible}
-	var resultado := TriviaManager.responder_trivia(trivia_actual, opcion, _modo == Modo.REPASO, meta)
+	var resultado: Dictionary = TriviaManager.responder_trivia(trivia_actual, opcion, _modo == Modo.REPASO, meta)
 	var texto := ""
 	if resultado["correcta"]:
 		texto = "¡RESPUESTA CORRECTA!\n\n%s\n\n+%d PR para %s · +%d XP Biodiversidad" % [
@@ -301,7 +301,7 @@ func _al_seleccionar_opcion(opcion: TriviaOption, boton: Button) -> void:
 			# El repaso rápido no avanza etapas: solo confirma lo recién aprendido.
 			texto += "\nRepaso rápido superado. Su primera validación llegará en unos días."
 		elif _modo == Modo.REPASO:
-			var etapa := GameState.etapa_validacion(trivia_actual.id_especie)
+			var etapa: int = GameState.etapa_validacion(trivia_actual.id_especie)
 			if etapa >= GameState.INTERVALOS_REPASO_DIAS.size():
 				texto += "\nValidación completa: ¡conocimiento consolidado!"
 			else:

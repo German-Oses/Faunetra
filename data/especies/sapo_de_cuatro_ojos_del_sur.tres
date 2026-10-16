@@ -13,5 +13,6 @@ estado_conservacion = "NT"
 rol_ecologico = "Anfibio muy resistente al frío. Pasa el invierno bajo rocas y se defiende mostrando glándulas con forma de ojos."
 umbral_desbloqueo = 0
 id_bioma = 4
+grupo = "anfibio"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

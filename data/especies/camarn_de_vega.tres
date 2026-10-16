@@ -13,5 +13,6 @@ estado_conservacion = "LC"
 rol_ecologico = "Excavador de napas freáticas. Crea 'chimeneas' que airean y enriquecan los suelos de vegas húmedas."
 umbral_desbloqueo = 0
 id_bioma = 3
+grupo = "crustaceo"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

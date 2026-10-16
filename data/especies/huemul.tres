@@ -13,5 +13,6 @@ estado_conservacion = "EN"
 rol_ecologico = "Ciervo heráldico especialista de laderas andinas empinadas. Especie cúspide de restauración."
 umbral_desbloqueo = 0
 id_bioma = 4
+grupo = "mamifero"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

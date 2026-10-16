@@ -121,7 +121,7 @@ func _configurar_camara() -> void:
 
 
 func _encuadrar() -> void:
-	var vertical := Pantalla.vertical
+	var vertical: bool = Pantalla.vertical
 	var arriba := MARGEN_HUD_SUPERIOR_VERTICAL if vertical else MARGEN_HUD_SUPERIOR
 	var abajo := MARGEN_HUD_INFERIOR_VERTICAL if vertical else MARGEN_HUD_INFERIOR
 	var radio := RADIO_VISTA_INICIAL_VERTICAL if vertical else RADIO_VISTA_INICIAL

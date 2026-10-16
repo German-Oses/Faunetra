@@ -13,5 +13,6 @@ estado_conservacion = "CR"
 rol_ecologico = "Herbívoro especialista de roqueríos. Aparece al restaurar grietas rocosas estables."
 umbral_desbloqueo = 0
 id_bioma = 2
+grupo = "mamifero"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

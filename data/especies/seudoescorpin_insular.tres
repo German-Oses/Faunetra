@@ -13,5 +13,6 @@ estado_conservacion = "CR"
 rol_ecologico = "Microdepredador endémico de la isla San Ambrosio (islas Desventuradas). Controla ácaros y pequeños insectos entre rocas y vegetación."
 umbral_desbloqueo = 0
 id_bioma = 5
+grupo = "aracnido"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

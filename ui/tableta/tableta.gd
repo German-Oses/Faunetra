@@ -146,7 +146,7 @@ func _refrescar_repasos() -> void:
 	for hijo in _lista_repasos.get_children():
 		hijo.queue_free()
 
-	var pendientes := GameState.repasos_pendientes()
+	var pendientes: Array[int] = GameState.repasos_pendientes()
 	_agregar_titulo("Repasos disponibles (%d)" % pendientes.size())
 	if pendientes.is_empty():
 		_agregar_texto("No tienes repasos pendientes ahora mismo.")
@@ -172,7 +172,7 @@ func _refrescar_repasos() -> void:
 	var hay_proximas := false
 	for clave in GameState.validaciones:
 		var id := int(clave)
-		var etapa := GameState.etapa_validacion(id)
+		var etapa: int = GameState.etapa_validacion(id)
 		var data := EspecieLoader.por_id(id)
 		if data == null or pendientes.has(id):
 			continue

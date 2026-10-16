@@ -125,8 +125,8 @@ func _on_participante(texto: String) -> void:
 
 ## En la web descarga el archivo; en PC lo guarda en la carpeta de datos del juego y la abre.
 func _exportar_csv() -> void:
-	var csv := GameState.registro_csv()
-	var sufijo := GameState.codigo_participante if GameState.codigo_participante != "" else "anonimo"
+	var csv: String = GameState.registro_csv()
+	var sufijo: String = GameState.codigo_participante if GameState.codigo_participante != "" else "anonimo"
 	var nombre := "faunetra_registro_%s_%s.csv" % [sufijo, Time.get_date_string_from_system()]
 	if OS.has_feature("web"):
 		JavaScriptBridge.download_buffer(csv.to_utf8_buffer(), nombre, "text/csv")
@@ -148,7 +148,7 @@ func _actualizar_confirmar() -> void:
 
 
 func refrescar() -> void:
-	var vertical := Pantalla.vertical
+	var vertical: bool = Pantalla.vertical
 	_resumen.columns = 2 if vertical else 4
 	_nueva_partida.visible = false
 	_selector.seleccionar(GameState.modo)
@@ -158,7 +158,7 @@ func refrescar() -> void:
 	_registros.text = "%d eventos registrados" % GameState.registro.size()
 	for hijo in _resumen.get_children():
 		hijo.queue_free()
-	var xp := TriviaManager.xp_acumulada
+	var xp: int = TriviaManager.xp_acumulada
 	var completas := 0
 	for clave in GameState.validaciones:
 		if GameState.etapa_validacion(int(clave)) >= GameState.INTERVALOS_REPASO_DIAS.size():
@@ -212,7 +212,7 @@ func refrescar() -> void:
 		fila.add_child(pr)
 		_biomas.add_child(fila)
 
-	var insignias := TriviaManager.insignias_desbloqueadas
+	var insignias: Array[String] = TriviaManager.insignias_desbloqueadas
 	_insignias.text = "Insignias: " + (", ".join(PackedStringArray(insignias.map(_nombre_insignia))) if not insignias.is_empty() else "aún ninguna. Responde trivias narrativas para ganarlas.")
 
 

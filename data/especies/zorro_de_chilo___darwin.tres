@@ -13,5 +13,6 @@ estado_conservacion = "EN"
 rol_ecologico = "Carnívoro endémico crítico. Se atrae manteniendo el bioma libre de perturbaciones antropogénicas."
 umbral_desbloqueo = 0
 id_bioma = 3
+grupo = "mamifero"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

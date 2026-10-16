@@ -2,41 +2,56 @@ class_name SintetizadorFauna
 extends RefCounted
 
 ## Genera paisajes sonoros procedurales para especies sin grabación (audio_canto vacío).
-## Cada grupo tiene una firma acústica reconocible (aves agudas y moduladas, anfibios con
-## croares pulsados, insectos que zumban...) y cada especie varía tono y ritmo según su id,
-## de modo que el jugador pueda deducir la ficha correcta a partir de lo que escucha.
+## El grupo biológico viene explícito en cada ficha (EspecieData.grupo, asignado por taxonomía);
+## antes se deducía buscando palabras en el nombre y el rol, y fallaba: «cordillerana» contiene
+## «rana», el rol del gato montés menciona aves... Cada grupo tiene una firma acústica (aves agudas
+## y moduladas, anfibios con croares pulsados, insectos que zumban...) y cada especie varía tono y
+## ritmo según su id. Los animales que no vocalizan (caracoles, crustáceos, arañas, reptiles) se
+## representan con el sonido de su ambiente, y la explicación lo dice.
 
 const MUESTREO := 22050
 const DURACION := 3.0
 
+## Qué se escucha de cada grupo (explicación que ve el jugador después de responder).
 const DESCRIPCIONES := {
 	"ave": "Cantos agudos y modulados: las aves usan silbidos y trinos para marcar territorio y comunicarse a distancia.",
-	"anfibio": "Croares graves y pulsados, típicos de anfibios que llaman desde zonas húmedas.",
-	"insecto": "Zumbido continuo producido por el batir rápido de alas.",
-	"acuatico": "Burbujeo y chapoteos: sonidos de un ambiente acuático o costero.",
-	"reptil": "Crujidos secos de hojarasca y roca: reptiles que se desplazan sobre el suelo.",
-	"invertebrado": "Leves chasquidos y roces: pequeños invertebrados moviéndose entre el sustrato.",
 	"mamifero": "Resoplidos graves y pasos entre la vegetación, propios de mamíferos.",
+	"mamifero_marino": "Silbidos y chasquidos bajo el agua: los delfines se comunican y se orientan con sonidos agudos.",
+	"anfibio": "Croares graves y pulsados, típicos de anfibios que llaman desde zonas húmedas.",
+	"reptil": "Los reptiles casi no vocalizan: se oyen sus pasos y roces sobre la hojarasca y la roca.",
+	"reptil_marino": "La serpiente marina no vocaliza: se oye el oleaje del mar abierto donde vive.",
+	"insecto": "Zumbido del batir rápido de alas, típico de moscas y escarabajos en vuelo.",
+	"aracnido": "Arañas y seudoescorpiones no emiten cantos: se oyen leves roces entre la hojarasca y el suelo.",
+	"crustaceo": "Pancoras y camarones no vocalizan: se oye el agua del río, la poza o la costa donde viven.",
+	"caracol_acuatico": "Los caracoles no emiten sonidos: se oye el agua de la vertiente donde viven.",
+	"caracol_terrestre": "Los caracoles no emiten sonidos: se oye el roce de la hojarasca húmeda del bosque.",
+}
+## Firma sonora de cada grupo. Grupos distintos pueden sonar igual (crustáceos y caracoles de
+## agua dulce suenan a agua): para elegir alternativas que se distingan al oído se compara la firma.
+const FIRMAS := {
+	"ave": "cantos", "mamifero": "resoplidos", "mamifero_marino": "silbidos_marinos", "anfibio": "croares",
+	"reptil": "crujidos", "reptil_marino": "oleaje", "insecto": "zumbido", "aracnido": "roces",
+	"crustaceo": "agua", "caracol_acuatico": "agua", "caracol_terrestre": "roces",
 }
 
 static var _cache: Dictionary = {}
+static var _sin_grupo_avisado: Dictionary = {}
 
 
+## Grupo biológico de la ficha (ver EspecieData.grupo).
 static func categoria(data: EspecieData) -> String:
-	var texto := ReglasEcosistema.normalizar(data.nombre_comun + " " + data.rol_ecologico)
-	if data.tipo == "ave" or _contiene(texto, ["ave ", "aves ", "loro", "condor", "flamenco", "fardela", "cometocino", "choroy", "cuervo", "huairavillo", "picaflor", "pajaro"]):
-		return "ave"
-	if _contiene(texto, ["rana", "sapo", "anfibio"]):
-		return "anfibio"
-	if _contiene(texto, ["delfin", "marin", "camaron", "pancora", "acuatic"]):
-		return "acuatico"
-	if _contiene(texto, ["lagartija", "gecko", "corredor", "serpiente", "reptil"]):
-		return "reptil"
-	if _contiene(texto, ["mosca", "abeja", "insecto", "polinizador"]):
-		return "insecto"
-	if data.tipo == "invertebrado":
-		return "invertebrado"
-	return "mamifero"
+	if data.grupo in EspecieData.GRUPOS:
+		return data.grupo
+	# Ficha de fauna sin grupo: se avisa una vez y se usa un valor neutro según el tipo.
+	if not _sin_grupo_avisado.has(data.id_especie):
+		_sin_grupo_avisado[data.id_especie] = true
+		push_warning("[SintetizadorFauna] %s no tiene un grupo válido en su ficha (grupo = \"%s\")." % [data.nombre_comun, data.grupo])
+	return "ave" if data.tipo == "ave" else "mamifero"
+
+
+## Firma sonora de la ficha: dos especies con la misma firma suenan parecido.
+static func firma(data: EspecieData) -> String:
+	return FIRMAS.get(categoria(data), "resoplidos")
 
 
 static func descripcion(data: EspecieData) -> String:
@@ -50,17 +65,24 @@ static func generar(data: EspecieData) -> AudioStreamWAV:
 	rng.seed = data.id_especie * 92821 + 7
 	var muestras := PackedFloat32Array()
 	muestras.resize(int(MUESTREO * DURACION))
-	match categoria(data):
-		"ave":
+	match firma(data):
+		"cantos":
 			_cantos(muestras, rng)
-		"anfibio":
+		"croares":
 			_croares(muestras, rng)
-		"insecto":
+		"zumbido":
 			_zumbido(muestras, rng)
-		"acuatico":
+		"agua":
 			_burbujas(muestras, rng)
-		"reptil", "invertebrado":
+		"oleaje":
+			_oleaje(muestras, rng, 1.0)
+		"silbidos_marinos":
+			_oleaje(muestras, rng, 0.5)
+			_silbidos(muestras, rng)
+		"crujidos":
 			_crujidos(muestras, rng)
+		"roces":
+			_roces(muestras, rng)
 		_:
 			_resoplidos(muestras, rng)
 	# Viento de fondo muy suave para que suene a paisaje y no a tono de laboratorio.
@@ -69,13 +91,6 @@ static func generar(data: EspecieData) -> AudioStreamWAV:
 	var wav := _a_wav(muestras)
 	_cache[data.id_especie] = wav
 	return wav
-
-
-static func _contiene(texto: String, palabras: Array) -> bool:
-	for p in palabras:
-		if texto.contains(p):
-			return true
-	return false
 
 
 static func _cantos(m: PackedFloat32Array, rng: RandomNumberGenerator) -> void:
@@ -133,6 +148,46 @@ static func _burbujas(m: PackedFloat32Array, rng: RandomNumberGenerator) -> void
 	for i in m.size():
 		previo = lerpf(previo, rng.randf_range(-1.0, 1.0), 0.02)
 		m[i] += previo * (0.5 + 0.5 * sin(TAU * 0.3 * float(i) / MUESTREO)) * 0.8
+
+
+## Mar abierto: ruido filtrado con oleaje lento.
+static func _oleaje(m: PackedFloat32Array, rng: RandomNumberGenerator, volumen: float) -> void:
+	var previo := 0.0
+	var ola := rng.randf_range(0.15, 0.3)
+	for i in m.size():
+		previo = lerpf(previo, rng.randf_range(-1.0, 1.0), 0.012)
+		m[i] += previo * (0.4 + 0.6 * pow(0.5 + 0.5 * sin(TAU * ola * float(i) / MUESTREO), 2.0)) * volumen
+
+
+## Delfines: silbidos agudos que suben y bajan, con trenes de chasquidos.
+static func _silbidos(m: PackedFloat32Array, rng: RandomNumberGenerator) -> void:
+	var t := 0.2
+	while t < DURACION - 0.6:
+		var f0 := rng.randf_range(4500.0, 7000.0)
+		_barrido(m, t, rng.randf_range(0.25, 0.45), f0, f0 * rng.randf_range(0.6, 1.4), 0.4)
+		t += rng.randf_range(0.5, 0.8)
+		for _c in rng.randi_range(6, 12):
+			var inicio := int(t * MUESTREO)
+			for i in int(0.003 * MUESTREO):
+				if inicio + i < m.size():
+					m[inicio + i] += rng.randf_range(-1.0, 1.0) * 0.5
+			t += 0.03
+		t += rng.randf_range(0.1, 0.3)
+
+
+## Animales que no vocalizan sobre hojarasca: roces suaves y espaciados.
+static func _roces(m: PackedFloat32Array, rng: RandomNumberGenerator) -> void:
+	var t := 0.1
+	while t < DURACION:
+		var inicio := int(t * MUESTREO)
+		var largo := int(rng.randf_range(0.02, 0.06) * MUESTREO)
+		var ruido := 0.0
+		for i in largo:
+			if inicio + i >= m.size():
+				break
+			ruido = lerpf(ruido, rng.randf_range(-1.0, 1.0), 0.3)
+			m[inicio + i] += ruido * sin(PI * i / largo) * 0.35
+		t += rng.randf_range(0.12, 0.4)
 
 
 static func _crujidos(m: PackedFloat32Array, rng: RandomNumberGenerator) -> void:

@@ -13,5 +13,6 @@ estado_conservacion = "LC"
 rol_ecologico = "Crustáceo marino de fondos costeros. Limpia detritos orgánicos en estuarios y canales australes."
 umbral_desbloqueo = 0
 id_bioma = 4
+grupo = "crustaceo"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

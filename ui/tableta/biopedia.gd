@@ -133,7 +133,7 @@ func _ready() -> void:
 
 ## En horizontal se ven lista y ficha a la vez; en vertical, una u otra.
 func _reacomodar() -> void:
-	var vertical := Pantalla.vertical
+	var vertical: bool = Pantalla.vertical
 	_ajustar_columnas()
 	_lista.visible = not vertical or not _en_ficha
 	_panel_detalle.visible = not vertical or _en_ficha
@@ -302,7 +302,7 @@ func refrescar() -> void:
 		if _filtro_bioma >= 0 and data.id_bioma != _filtro_bioma:
 			continue
 		total += 1
-		var conocida := GameState.esta_descubierta(data.id_especie)
+		var conocida: bool = GameState.esta_descubierta(data.id_especie)
 		if conocida:
 			conocidas += 1
 		elif solo_descubiertas:
@@ -426,7 +426,7 @@ func _mostrar_detalle(data: EspecieData) -> void:
 		for tarjeta in g.get_children():
 			(tarjeta as Button).set_pressed_no_signal(int(tarjeta.get_meta("id_especie", -1)) == data.id_especie)
 	_limpiar_detalle()
-	var conocida := GameState.esta_descubierta(data.id_especie)
+	var conocida: bool = GameState.esta_descubierta(data.id_especie)
 	var flora := EspecieLoader.es_flora(data)
 
 	var cabecera := HBoxContainer.new()

@@ -311,7 +311,7 @@ func _actualizar_textos_herramientas() -> void:
 
 ## Reubica la barra superior, las herramientas y los avisos según la orientación.
 func _reacomodar() -> void:
-	var vertical := Pantalla.vertical
+	var vertical: bool = Pantalla.vertical
 	# Barra superior: en vertical, PR y salud bajan a una segunda fila.
 	var destino := _fila_estado if vertical else _fila_superior
 	for i in 3:
@@ -397,8 +397,8 @@ func _ficha_planta(data: EspecieData) -> String:
 
 
 func _actualizar_info_planta() -> void:
-	var data := GameState.especie_para_plantar
-	var mostrar := GameState.herramienta_activa == "plantar" and data != null \
+	var data: EspecieData = GameState.especie_para_plantar
+	var mostrar: bool = GameState.herramienta_activa == "plantar" and data != null \
 		and data.id_bioma == GameState.bioma_actual_id
 	_info_planta.visible = mostrar
 	if mostrar:
@@ -447,7 +447,7 @@ func _on_especie_descubierta(data: EspecieData) -> void:
 
 
 func _actualizar_boton_tableta() -> void:
-	var pendientes := GameState.repasos_pendientes().size()
+	var pendientes: int = GameState.repasos_pendientes().size()
 	_boton_tableta.text = "Tableta (%d repasos)" % pendientes if pendientes > 0 else "Tableta"
 
 

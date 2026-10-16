@@ -351,7 +351,7 @@ func _limpiar(celda: Vector2i) -> void:
 
 func _plantar(celda: Vector2i) -> void:
 	var c: Dictionary = celdas[celda]
-	var data := GameState.especie_para_plantar
+	var data: EspecieData = GameState.especie_para_plantar
 	if data == null or data.id_bioma != id_bioma:
 		_rechazar("Elige una especie nativa en la barra de plantación.")
 		return
@@ -576,7 +576,7 @@ func _instanciar(data: EspecieData, celda: Vector2i, desfase: Vector2) -> especi
 
 func _evaluar() -> void:
 	_recalcular_sugerencias()
-	var salud := GameState.actualizar_salud(id_bioma)
+	var salud: float = GameState.actualizar_salud(id_bioma)
 	_evaluar_fauna(salud)
 
 
@@ -584,7 +584,7 @@ func _evaluar() -> void:
 ## explícita a una vecina sana. Se recalcula al cambiar de planta y en cada evaluación.
 func _recalcular_sugerencias() -> void:
 	_sugeridas.clear()
-	var elegida := GameState.especie_para_plantar
+	var elegida: EspecieData = GameState.especie_para_plantar
 	if GameState.herramienta_activa != "plantar" or elegida == null or elegida.id_bioma != id_bioma:
 		return
 	for celda in celdas:

@@ -96,7 +96,7 @@ func _cercania(animal: EspecieData, sanas: Dictionary, salud: float) -> float:
 
 
 func _fila(animal: EspecieData, sanas: Dictionary, salud: float) -> Control:
-	var conocida := GameState.esta_descubierta(animal.id_especie)
+	var conocida: bool = GameState.esta_descubierta(animal.id_especie)
 	var fila := HBoxContainer.new()
 	fila.add_theme_constant_override("separation", 8)
 	var icono := TextureRect.new()

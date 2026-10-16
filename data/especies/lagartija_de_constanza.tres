@@ -13,5 +13,6 @@ estado_conservacion = "LC"
 rol_ecologico = "Insectívoro diurno. Controla microfauna invertebrada bajo piedras sanadas."
 umbral_desbloqueo = 0
 id_bioma = 2
+grupo = "reptil"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

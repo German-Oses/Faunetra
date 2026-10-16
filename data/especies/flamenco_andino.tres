@@ -13,5 +13,6 @@ estado_conservacion = "VU"
 rol_ecologico = "Filtrador clave de lagunas salinas. Depende de aguas limpias y ricas en microalgas."
 umbral_desbloqueo = 0
 id_bioma = 2
+grupo = "ave"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

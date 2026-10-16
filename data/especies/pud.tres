@@ -12,5 +12,6 @@ tipo = "vertebrado"
 estado_conservacion = "VU"
 rol_ecologico = "Ciervo enano de sotobosque denso. Requiere niveles altos de cobertura arbustiva para ocultarse."
 id_bioma = 3
+grupo = "mamifero"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

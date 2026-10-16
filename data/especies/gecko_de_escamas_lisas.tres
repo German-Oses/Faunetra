@@ -13,5 +13,6 @@ estado_conservacion = "LC"
 rol_ecologico = "Pequeño reptil nocturno que en Chile solo vive en Rapa Nui, probablemente llegado con los primeros navegantes polinésicos. Consume mosquitos y otros insectos."
 umbral_desbloqueo = 0
 id_bioma = 5
+grupo = "reptil"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"

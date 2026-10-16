@@ -126,12 +126,12 @@ func configurar(p_id_bioma: int, tilemap: TileMapLayer, mapa: Dictionary) -> voi
 
 ## Umbral de cada parcela según la meta de desbloqueo del modo actual.
 func _calcular_umbrales() -> void:
-	var meta := GameState.umbral_desbloqueo()
+	var meta: float = GameState.umbral_desbloqueo()
 	for c in _celdas:
 		var p: Vector2 = _posicion[c]
 		_umbral[c] = clampf(lerpf(UMBRAL_MINIMO, meta - 1.0, p.x) + p.y, UMBRAL_MINIMO, meta - 1.0)
 		if _umbral_flor.has(c):
-			var desde := meta * FLORIDO_DESDE
+			var desde: float = meta * FLORIDO_DESDE
 			_umbral_flor[c] = maxf(_umbral[c], clampf(lerpf(desde, meta - 0.5, p.x) + p.y * 0.3, desde, meta - 0.5))
 
 
@@ -247,7 +247,7 @@ func _crear_flores(c: Vector2i) -> Array[Sprite2D]:
 
 ## La primera vez que florece el desierto se explica el fenómeno real (queda en el registro).
 func _avisar_desierto_florido() -> void:
-	var estado := GameState.estado_bioma(id_bioma)
+	var estado: Dictionary = GameState.estado_bioma(id_bioma)
 	if estado.get("florido_visto", false):
 		return
 	estado["florido_visto"] = true
@@ -333,7 +333,7 @@ func _cambiar_textura(s: Sprite2D, textura: Texture2D) -> void:
 func _actualizar_caseta(animar: bool) -> void:
 	if _caseta == null:
 		return
-	var avance := _salud / GameState.umbral_desbloqueo()
+	var avance: float = _salud / GameState.umbral_desbloqueo()
 	var etapa := "caseta_abandonada"
 	if avance >= CASETA_RESTAURADA:
 		etapa = "caseta_restaurada"

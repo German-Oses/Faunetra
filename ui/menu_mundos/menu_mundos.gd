@@ -102,7 +102,7 @@ func _ready() -> void:
 
 ## Reorganiza cabecera, página del mapa y navegación según la orientación.
 func _reacomodar() -> void:
-	var vertical := Pantalla.vertical
+	var vertical: bool = Pantalla.vertical
 	# Cabecera: en vertical, la salud y los PR bajan a una segunda fila.
 	for tarjeta in [_tarjeta_salud, _tarjeta_pr]:
 		var destino := _cabecera_fila2 if vertical else _cabecera_fila1
@@ -353,7 +353,7 @@ func _ubicar_islas() -> void:
 	if _mapa == null:
 		return
 	var area := _mapa.size
-	var vertical := Pantalla.vertical
+	var vertical: bool = Pantalla.vertical
 	var posiciones: Dictionary = POSICION_ISLAS_VERTICAL if vertical else POSICION_ISLAS
 	# En vertical las islas se apilan: la escala la limita sobre todo el alto disponible.
 	var referencia := Vector2(330, 640) if vertical else Vector2(640, 470)
@@ -377,8 +377,8 @@ func _refrescar_mapa() -> void:
 	for id in _islas:
 		_pintar_isla(id)
 	var id := _seleccionado
-	var estado := GameState.estado_bioma(id)
-	var salud := GameState.salud(id)
+	var estado: Dictionary = GameState.estado_bioma(id)
+	var salud: float = GameState.salud(id)
 	_barra_salud.value = salud
 	_texto_salud.text = "Restauración: %s  %d%%" % [GameState.nombre_bioma(id), int(salud)]
 	_texto_pr.text = "Puntos de restauración\n%d PR" % int(estado.get("pr", 0))
@@ -408,7 +408,7 @@ func _refrescar_mapa() -> void:
 func _pintar_isla(id: int) -> void:
 	var isla: Dictionary = _islas[id]
 	var boton: TextureButton = isla["boton"]
-	var desbloqueado := GameState.esta_desbloqueado(id)
+	var desbloqueado: bool = GameState.esta_desbloqueado(id)
 	boton.self_modulate = Color.WHITE if desbloqueado else Color(0.55, 0.58, 0.6)
 	var seleccionado := id == _seleccionado
 	var burbuja: PanelContainer = isla["burbuja"]
@@ -457,7 +457,7 @@ func _refrescar_especies_cercanas(id: int) -> void:
 	var especies := EspecieLoader.fauna_del_bioma(id)
 	especies.sort_custom(_descubiertas_primero)
 	for d in especies.slice(0, 9):
-		var conocida := GameState.esta_descubierta(d.id_especie)
+		var conocida: bool = GameState.esta_descubierta(d.id_especie)
 		var b := Button.new()
 		b.custom_minimum_size = Vector2(82, 84)
 		b.icon = EspecieLoader.textura_de(d)

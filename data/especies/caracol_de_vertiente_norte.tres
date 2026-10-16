@@ -13,5 +13,6 @@ estado_conservacion = "CR"
 rol_ecologico = "Molusco dulceacuícola microscópico. Habita exclusivamente vertientes purificadas sin basura."
 umbral_desbloqueo = 0
 id_bioma = 2
+grupo = "caracol_acuatico"
 escena = ExtResource("2_escena")
 metadata/_custom_type_script = "uid://hj44annjt7bk"
