@@ -1,0 +1,81 @@
+id_especie,nombre_comun,nombre_cientifico,tipo,grupo_fauna,id_bioma,estado_en_el_juego,estado_verificado,autoridad,ambito,fuente,url,fecha_consulta,nombre_cientifico_aceptado,presencia_en_bioma_verificada,revisado_por,fecha_revision,observaciones,estado_revision
+1,Chinchilla cordillerana,Chinchilla chinchilla,vertebrado,mamifero,2,CR,,,,,,,,,,,,pendiente
+2,Vicuña,Vicugna vicugna,vertebrado,mamifero,2,VU,,,,,,,,,,,,pendiente
+3,Flamenco andino,Phoenicoparrus andinus,vertebrado,ave,2,VU,,,,,,,,,,,,pendiente
+4,Queñoa de altura,Polylepis tarapacana,planta,,2,VU,,,,,,,,,,,,pendiente
+5,Sandillón de los Andes,Eriosyce rodentiophila,planta,,2,VU,,,,,,,,,,,,pendiente
+6,Lagartija de Constanza,Liolaemus constanzae,vertebrado,reptil,2,LC,,,,,,,,,,,,pendiente
+7,Corredor de Tarapacá,Microlophus tarapacensis,vertebrado,reptil,2,LC,,,,,,,,,,,,pendiente
+8,Cuervo de pantano de la puna,Plegadis ridgwayi,vertebrado,ave,2,NT,,,,,,,,,,,,pendiente
+9,Cactus de la costa norte,Haageocereus australis,planta,,2,VU,,,,,,,,,,,,pendiente
+10,Ají de zorra,Malesherbia auristipulata,planta,,2,CR,,,,,,,,,,,,pendiente
+11,Tintero del desierto,Montagnea arenaria,hongo,,2,LC,,,,,,,,,,,,pendiente
+12,Balita de Barriga,Ectinogonia barrigai,invertebrado,insecto,2,CR,,,,,,,,,,,,pendiente
+13,Caracol de vertiente norte,Heleobia transitoria,invertebrado,caracol_acuatico,2,CR,,,,,,,,,,,,pendiente
+14,Ratón chinchilla ceniciente,Abrocoma cinerea,vertebrado,mamifero,2,LC,,,,,,,,,,,,pendiente
+15,Guanaco norteño,Lama guanicoe,vertebrado,mamifero,2,VU,,,,,,,,,,,,pendiente
+16,Chayotillo del norte,Sicyos bryoniifolius,planta,,2,LC,,,,,,,,,,,,pendiente
+17,Palma chilena,Jubaea chilensis,planta,,1,EN,,,,,,,,,,,,pendiente
+18,Monito del monte,Dromiciops gliroides,vertebrado,mamifero,3,NT,,,,,,,,,,,,pendiente
+19,Chinchilla costina,Chinchilla lanigera,vertebrado,mamifero,1,EN,,,,,,,,,,,,pendiente
+20,Cóndor andino,Vultur gryphus,vertebrado,ave,1,NT,,,,,,,,,,,,pendiente
+21,Zorro culpeo,Lycalopex culpaeus,vertebrado,mamifero,1,LC,,,,,,,,,,,,pendiente
+22,Lagartija de Curicó,Liolaemus curicensis,vertebrado,reptil,1,VU,,,,,,,,,,,,pendiente
+23,Ratón chinchilla común,Abrocoma bennetti,vertebrado,mamifero,1,LC,,,,,,,,,,,,pendiente
+24,Guayacán,Porlieria chilensis,planta,,1,VU,,,,,,,,,,,,pendiente
+25,Palo gordo,Carica chilensis,planta,,1,VU,,,,,,,,,,,,pendiente
+26,Chilenito (Cactus),Eriosyce chilensis,planta,,1,EN,,,,,,,,,,,,pendiente
+27,Araña de Hualpén,Acanthogonatus hualpen,invertebrado,aracnido,1,CR,,,,,,,,,,,,pendiente
+28,Camarón almeja,Lynceus huentelauquensis,invertebrado,crustaceo,1,EN,,,,,,,,,,,,pendiente
+29,Pancora de Concepción,Aegla concepcionensis,invertebrado,crustaceo,1,EN,,,,,,,,,,,,pendiente
+30,Seta del roble maule,Cortinarius roblemaulicola,hongo,,1,EN,,,,,,,,,,,,pendiente
+31,Loro tricahue,Cyanoliseus patagonus,vertebrado,ave,1,VU,,,,,,,,,,,,pendiente
+32,Orquídea de la zona central,Gavilea venosa,planta,,1,VU,,,,,,,,,,,,pendiente
+33,Pudú,Pudu pudu,vertebrado,mamifero,3,VU,,,,,,,,,,,,pendiente
+34,Alerce,Fitzroya cupressoides,planta,,3,EN,,,,,,,,,,,,pendiente
+35,Zorro de Chiloé / Darwin,Lycalopex fulvipes,vertebrado,mamifero,3,EN,,,,,,,,,,,,pendiente
+36,Rana de pecho espinoso,Alsodes valdiviensis,vertebrado,anfibio,3,EN,,,,,,,,,,,,pendiente
+37,Pitao,Pitavia punctata,planta,,3,EN,,,,,,,,,,,,pendiente
+38,Teresa,Scutellaria valdiviana,planta,,3,EN,,,,,,,,,,,,pendiente
+39,Calle-calle de Nahuelbuta,Libertia tricocca,planta,,3,LC,,,,,,,,,,,,pendiente
+40,Hongo subterráneo,Gautieria inapire,hongo,,3,VU,,,,,,,,,,,,pendiente
+41,Camarón de vega,Parastacus pugnax,invertebrado,crustaceo,3,LC,,,,,,,,,,,,pendiente
+42,Huairavillo,Ixobrychus involucris,vertebrado,ave,3,LC,,,,,,,,,,,,pendiente
+43,Mosca florícola valdiviana,Valdiviomyia ruficauda,invertebrado,insecto,3,VU,,,,,,,,,,,,pendiente
+44,Rana de Darwin,Rhinoderma darwinii,vertebrado,anfibio,3,EN,,,,,,,,,,,,pendiente
+45,Loro choroy,Enicognathus ferrugineus,vertebrado,ave,3,LC,,,,,,,,,,,,pendiente
+46,Quila,Chusquea quila,planta,,3,LC,,,,,,,,,,,,pendiente
+47,Arrayán,Luma apiculata,planta,,3,LC,,,,,,,,,,,,pendiente
+48,Luma,Amomyrtus luma,planta,,3,LC,,,,,,,,,,,,pendiente
+49,Huemul,Hippocamelus bisulcus,vertebrado,mamifero,4,EN,,,,,,,,,,,,pendiente
+50,Delfín austral,Lagenorhynchus australis,vertebrado,mamifero_marino,4,LC,,,,,,,,,,,,pendiente
+51,Gato montés argentino,Leopardus geoffroyi,vertebrado,mamifero,4,NT,,,,,,,,,,,,pendiente
+52,Sapo de cuatro ojos del sur,Pleurodema bufonina,vertebrado,anfibio,4,NT,,,,,,,,,,,,pendiente
+53,Cactus patagónico,Pterocactus australis,planta,,4,EN,,,,,,,,,,,,pendiente
+54,Chupa sangre / Maihuén,Maihuenia patagonica,planta,,4,EN,,,,,,,,,,,,pendiente
+55,Helecho película patagónico,Hymenophyllum dicranotrichum,planta,,4,LC,,,,,,,,,,,,pendiente
+56,Pancora alacalufi,Aegla alacalufi,invertebrado,crustaceo,4,LC,,,,,,,,,,,,pendiente
+57,Pancora patagónica,Aegla neuquensis,invertebrado,crustaceo,4,LC,,,,,,,,,,,,pendiente
+58,Camarón pintado austral,Campylonotus vagans,invertebrado,crustaceo,4,LC,,,,,,,,,,,,pendiente
+59,Camarón de río del sur,Samastacus spinifrons,invertebrado,crustaceo,4,LC,,,,,,,,,,,,pendiente
+60,Liquen de la estepa,Platismatia glauca,hongo,,4,LC,,,,,,,,,,,,pendiente
+61,Liquen de roca patagónico,Rhizoplaca melanophthalma,hongo,,4,LC,,,,,,,,,,,,pendiente
+62,Cometocino patagónico,Phrygilus patagonicus,vertebrado,ave,4,LC,,,,,,,,,,,,pendiente
+63,Lenga,Nothofagus pumilio,planta,,4,LC,,,,,,,,,,,,pendiente
+64,Calafate,Berberis microphylla,planta,,4,LC,,,,,,,,,,,,pendiente
+65,Fardela de Juan Fernández,Pterodroma externa,vertebrado,ave,5,EN,,,,,,,,,,,,pendiente
+66,Luma de Juan Fernández,Nothomyrcia fernandeziana,planta,,5,CR,,,,,,,,,,,,pendiente
+67,Abrojo de Más Afuera,Acaena masafuerana,planta,,5,CR,,,,,,,,,,,,pendiente
+68,Cortadera insular,Carex berteroniana,planta,,5,EN,,,,,,,,,,,,pendiente
+69,Caracol terrestre de J. F.,Fernandezia splendida,invertebrado,caracol_terrestre,5,EN,,,,,,,,,,,,pendiente
+70,Seudoescorpión insular,Chelanops pugil,invertebrado,aracnido,5,CR,,,,,,,,,,,,pendiente
+71,Caracol terrestre de Selkirk,Amphidoxa selkirki,invertebrado,caracol_terrestre,5,EN,,,,,,,,,,,,pendiente
+72,Gecko de escamas lisas,Lepidodactylus lugubris,vertebrado,reptil,5,LC,,,,,,,,,,,,pendiente
+73,Caracol terrestre gordo,Succinea pinguis,invertebrado,caracol_terrestre,5,EN,,,,,,,,,,,,pendiente
+74,Caracol de Más Afuera,Succinea masafuerae,invertebrado,caracol_terrestre,5,CR,,,,,,,,,,,,pendiente
+75,Caracol terrestre oculto,Ptychodon oculta,invertebrado,caracol_terrestre,5,EN,,,,,,,,,,,,pendiente
+76,Peperomia de Skottsberg,Peperomia skottsbergii,planta,,5,CR,,,,,,,,,,,,pendiente
+77,Toromiro (Rapa Nui),Sophora toromiro,planta,,5,EW,,,,,,,,,,,,pendiente
+78,Palma de Rapa Nui,Paschalococos disperta,planta,,5,EX,,,,,,,,,,,,pendiente
+79,Liquen insular gigante,Pseudocyphellaria imshaugii,hongo,,5,EN,,,,,,,,,,,,pendiente
+80,Serpiente marina pelágica,Hydrophis platurus,vertebrado,reptil_marino,5,LC,,,,,,,,,,,,pendiente

@@ -1,0 +1,74 @@
+id_regla,tipo_regla,nombre,especie_a,especie_b,efecto_en_el_juego,clasificacion,fuente,url,fecha_consulta,revisado_por,observaciones,estado_revision
+sinergia_0,sinergia,Aura de Humedad,Palma chilena,Orquídea de la zona central,+20% salud a Orquídea de la zona central,,,,,,,pendiente
+sinergia_1,sinergia,Sombra húmeda,Alerce,Teresa,+25% salud a Teresa,,,,,,,pendiente
+sinergia_2,sinergia,Aura de Humedad,Alerce,Luma,+20% salud a Luma,,,,,,,pendiente
+sinergia_3,sinergia,Aura de Humedad,Alerce,Arrayán,+20% salud a Arrayán,,,,,,,pendiente
+sinergia_4,sinergia,Mirtáceas hermanas,Luma,Arrayán,+15% salud a Arrayán,,,,,,,pendiente
+sinergia_5,sinergia,Mirtáceas hermanas,Arrayán,Luma,+15% salud a Luma,,,,,,,pendiente
+sinergia_6,sinergia,Sotobosque protegido,Luma,Quila,+20% salud a Quila,,,,,,,pendiente
+sinergia_7,sinergia,Red micorrícica,Luma,Hongo subterráneo,+25% salud a Hongo subterráneo,,,,,,,pendiente
+sinergia_8,sinergia,Sombra húmeda,Pitao,Teresa,+20% salud a Teresa,,,,,,,pendiente
+sinergia_9,sinergia,Ribera húmeda,Arrayán,Calle-calle de Nahuelbuta,+20% salud a Calle-calle de Nahuelbuta,,,,,,,pendiente
+sinergia_10,sinergia,Planta nodriza,Queñoa de altura,Cactus de la costa norte,+20% salud a Cactus de la costa norte,,,,,,,pendiente
+sinergia_11,sinergia,Planta nodriza,Queñoa de altura,Chayotillo del norte,+20% salud a Chayotillo del norte,,,,,,,pendiente
+sinergia_12,sinergia,Planta nodriza,Queñoa de altura,Sandillón de los Andes,+20% salud a Sandillón de los Andes,,,,,,,pendiente
+sinergia_13,sinergia,Gotas de camanchaca,Cactus de la costa norte,Ají de zorra,+15% salud a Ají de zorra,,,,,,,pendiente
+sinergia_14,sinergia,Suelo sombreado,Chayotillo del norte,Tintero del desierto,+15% salud a Tintero del desierto,,,,,,,pendiente
+sinergia_15,sinergia,Sombra protectora,Guayacán,Orquídea de la zona central,+20% salud a Orquídea de la zona central,,,,,,,pendiente
+sinergia_16,sinergia,Dosel estructurador,Palma chilena,Guayacán,+15% salud a Guayacán,,,,,,,pendiente
+sinergia_17,sinergia,Hojarasca húmeda,Guayacán,Seta del roble maule,+20% salud a Seta del roble maule,,,,,,,pendiente
+sinergia_18,sinergia,Ladera estabilizada,Palo gordo,Chilenito (Cactus),+20% salud a Chilenito (Cactus),,,,,,,pendiente
+sinergia_19,sinergia,Refugio del viento,Lenga,Calafate,+20% salud a Calafate,,,,,,,pendiente
+sinergia_20,sinergia,Sombra húmeda,Lenga,Helecho película patagónico,+25% salud a Helecho película patagónico,,,,,,,pendiente
+sinergia_21,sinergia,Corteza de lenga,Lenga,Liquen de la estepa,+20% salud a Liquen de la estepa,,,,,,,pendiente
+sinergia_22,sinergia,Planta nodriza,Chupa sangre / Maihuén,Cactus patagónico,+20% salud a Cactus patagónico,,,,,,,pendiente
+sinergia_23,sinergia,Aura de Humedad,Luma de Juan Fernández,Toromiro (Rapa Nui),+15% salud a Toromiro (Rapa Nui),,,,,,,pendiente
+sinergia_24,sinergia,Dosel cerrado,Luma de Juan Fernández,Peperomia de Skottsberg,+25% salud a Peperomia de Skottsberg,,,,,,,pendiente
+sinergia_25,sinergia,Corteza húmeda,Luma de Juan Fernández,Liquen insular gigante,+20% salud a Liquen insular gigante,,,,,,,pendiente
+sinergia_26,sinergia,Ladera retenida,Cortadera insular,Abrojo de Más Afuera,+20% salud a Abrojo de Más Afuera,,,,,,,pendiente
+atraccion_0,atraccion,,Arrayán,Camarón de vega,Camarón de vega llega al refugio,,,,,,,pendiente
+atraccion_1,atraccion,,Alerce + Luma,Loro choroy,Loro choroy llega al refugio,,,,,,,pendiente
+atraccion_2,atraccion,,Arrayán + Calle-calle de Nahuelbuta,Huairavillo,Huairavillo llega al refugio,,,,,,,pendiente
+atraccion_3,atraccion,,Quila + Arrayán,Pudú,Pudú llega al refugio,,,,,,,pendiente
+atraccion_4,atraccion,,Pitao + Luma,Mosca florícola valdiviana,Mosca florícola valdiviana llega al refugio,,,,,,,pendiente
+atraccion_5,atraccion,,Calle-calle de Nahuelbuta + Arrayán,Rana de pecho espinoso,Rana de pecho espinoso llega al refugio,,,,,,,pendiente
+atraccion_6,atraccion,,Quila + Luma,Monito del monte,Monito del monte llega al refugio,,,,,,,pendiente
+atraccion_7,atraccion,,Calle-calle de Nahuelbuta + Alerce + Teresa,Rana de Darwin,Rana de Darwin llega al refugio,,,,,,,pendiente
+atraccion_8,atraccion,,Hongo subterráneo + Luma + Alerce,Zorro de Chiloé / Darwin,Zorro de Chiloé / Darwin llega al refugio,,,,,,,pendiente
+atraccion_9,atraccion,,Ají de zorra,Balita de Barriga,Balita de Barriga llega al refugio,,,,,,,pendiente
+atraccion_10,atraccion,,Cactus de la costa norte,Lagartija de Constanza,Lagartija de Constanza llega al refugio,,,,,,,pendiente
+atraccion_11,atraccion,,Cactus de la costa norte + Sandillón de los Andes,Corredor de Tarapacá,Corredor de Tarapacá llega al refugio,,,,,,,pendiente
+atraccion_12,atraccion,,Chayotillo del norte + Queñoa de altura,Ratón chinchilla ceniciente,Ratón chinchilla ceniciente llega al refugio,,,,,,,pendiente
+atraccion_13,atraccion,,Chayotillo del norte + Tintero del desierto,Caracol de vertiente norte,Caracol de vertiente norte llega al refugio,,,,,,,pendiente
+atraccion_14,atraccion,,Queñoa de altura + Chayotillo del norte,Cuervo de pantano de la puna,Cuervo de pantano de la puna llega al refugio,,,,,,,pendiente
+atraccion_15,atraccion,,Queñoa de altura + Ají de zorra,Guanaco norteño,Guanaco norteño llega al refugio,,,,,,,pendiente
+atraccion_16,atraccion,,Queñoa de altura + Sandillón de los Andes,Vicuña,Vicuña llega al refugio,,,,,,,pendiente
+atraccion_17,atraccion,,Queñoa de altura + Cactus de la costa norte + Chayotillo del norte,Flamenco andino,Flamenco andino llega al refugio,,,,,,,pendiente
+atraccion_18,atraccion,,Queñoa de altura + Sandillón de los Andes + Ají de zorra,Chinchilla cordillerana,Chinchilla cordillerana llega al refugio,,,,,,,pendiente
+atraccion_19,atraccion,,Guayacán,Araña de Hualpén,Araña de Hualpén llega al refugio,,,,,,,pendiente
+atraccion_20,atraccion,,Orquídea de la zona central,Camarón almeja,Camarón almeja llega al refugio,,,,,,,pendiente
+atraccion_21,atraccion,,Guayacán + Seta del roble maule,Pancora de Concepción,Pancora de Concepción llega al refugio,,,,,,,pendiente
+atraccion_22,atraccion,,Chilenito (Cactus) + Palo gordo,Lagartija de Curicó,Lagartija de Curicó llega al refugio,,,,,,,pendiente
+atraccion_23,atraccion,,Chilenito (Cactus) + Guayacán,Ratón chinchilla común,Ratón chinchilla común llega al refugio,,,,,,,pendiente
+atraccion_24,atraccion,,Palma chilena + Guayacán,Loro tricahue,Loro tricahue llega al refugio,,,,,,,pendiente
+atraccion_25,atraccion,,Chilenito (Cactus) + Palo gordo + Guayacán,Chinchilla costina,Chinchilla costina llega al refugio,,,,,,,pendiente
+atraccion_26,atraccion,,Guayacán + Palma chilena,Zorro culpeo,Zorro culpeo llega al refugio,,,,,,,pendiente
+atraccion_27,atraccion,,Palma chilena + Guayacán + Palo gordo,Cóndor andino,Cóndor andino llega al refugio,,,,,,,pendiente
+atraccion_28,atraccion,,Calafate,Cometocino patagónico,Cometocino patagónico llega al refugio,,,,,,,pendiente
+atraccion_29,atraccion,,Lenga,Pancora alacalufi,Pancora alacalufi llega al refugio,,,,,,,pendiente
+atraccion_30,atraccion,,Lenga + Helecho película patagónico,Pancora patagónica,Pancora patagónica llega al refugio,,,,,,,pendiente
+atraccion_31,atraccion,,Lenga + Calafate,Camarón de río del sur,Camarón de río del sur llega al refugio,,,,,,,pendiente
+atraccion_32,atraccion,,Chupa sangre / Maihuén + Liquen de roca patagónico,Sapo de cuatro ojos del sur,Sapo de cuatro ojos del sur llega al refugio,,,,,,,pendiente
+atraccion_33,atraccion,,Helecho película patagónico + Liquen de la estepa,Camarón pintado austral,Camarón pintado austral llega al refugio,,,,,,,pendiente
+atraccion_34,atraccion,,Calafate + Chupa sangre / Maihuén + Cactus patagónico,Gato montés argentino,Gato montés argentino llega al refugio,,,,,,,pendiente
+atraccion_35,atraccion,,Lenga + Liquen de la estepa,Delfín austral,Delfín austral llega al refugio,,,,,,,pendiente
+atraccion_36,atraccion,,Lenga + Calafate,Huemul,Huemul llega al refugio,,,,,,,pendiente
+atraccion_37,atraccion,,Luma de Juan Fernández,Caracol terrestre de J. F.,Caracol terrestre de J. F. llega al refugio,,,,,,,pendiente
+atraccion_38,atraccion,,Peperomia de Skottsberg,Caracol terrestre gordo,Caracol terrestre gordo llega al refugio,,,,,,,pendiente
+atraccion_39,atraccion,,Luma de Juan Fernández + Liquen insular gigante,Caracol terrestre oculto,Caracol terrestre oculto llega al refugio,,,,,,,pendiente
+atraccion_40,atraccion,,Toromiro (Rapa Nui),Gecko de escamas lisas,Gecko de escamas lisas llega al refugio,,,,,,,pendiente
+atraccion_41,atraccion,,Cortadera insular + Luma de Juan Fernández,Caracol terrestre de Selkirk,Caracol terrestre de Selkirk llega al refugio,,,,,,,pendiente
+atraccion_42,atraccion,,Liquen insular gigante + Luma de Juan Fernández,Seudoescorpión insular,Seudoescorpión insular llega al refugio,,,,,,,pendiente
+atraccion_43,atraccion,,Luma de Juan Fernández + Peperomia de Skottsberg + Liquen insular gigante,Caracol de Más Afuera,Caracol de Más Afuera llega al refugio,,,,,,,pendiente
+atraccion_44,atraccion,,Cortadera insular,Fardela de Juan Fernández,Fardela de Juan Fernández llega al refugio,,,,,,,pendiente
+atraccion_45,atraccion,,Cortadera insular + Abrojo de Más Afuera,Serpiente marina pelágica,Serpiente marina pelágica llega al refugio,,,,,,,pendiente
