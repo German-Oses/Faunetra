@@ -32,11 +32,21 @@ var camara: Camera2D
 var _arrastrando := false
 ## Marca compartida: true mientras el gesto actual es un arrastre o pellizco (no un toque).
 static var arrastrando := false
-const UMBRAL_ARRASTRE := 12.0
+## Cuánto hay que moverse (px de pantalla) para que el gesto deje de ser un toque y pase a mover
+## la cámara. El dedo tiembla más que el mouse: con el mismo umbral, tocar una parcela movía el
+## mapa o el arrastre se volvía una acción sin querer.
+const UMBRAL_ARRASTRE := 8.0
+const UMBRAL_ARRASTRE_TACTIL := 22.0
+## Zoom por muesca de la rueda (se aplica una vez por muesca, al presionar).
+const PASO_ZOOM_RUEDA := 1.15
+## Desplazamiento por evento del gesto de dos dedos del trackpad.
+const VELOCIDAD_PAN_TRACKPAD := 8.0
 var _boton_izquierdo := false
 var _inicio_presion := Vector2.ZERO
+var _umbral_actual := UMBRAL_ARRASTRE
 var _toques: Dictionary = {}       # índice del dedo -> posición
 var _distancia_pellizco := 0.0
+var _centro_pellizco := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -128,8 +138,11 @@ func _encuadrar() -> void:
 
 ## Controles de cámara para mouse, trackpad y pantallas táctiles:
 ## - Arrastrar con un dedo o con el botón izquierdo (también derecho/central) mueve la cámara.
-## - Pellizcar con dos dedos, la rueda del mouse o el gesto de pellizco del trackpad hacen zoom.
-## Un toque solo cuenta como "clic" si no hubo arrastre (ver Bioma.arrastrando).
+## - Pellizcar con dos dedos, la rueda del mouse o el gesto de pellizco del trackpad hacen zoom
+##   hacia el punto que se señala (los dedos o el cursor), no hacia el centro de la pantalla.
+##   Mientras se pellizca, mover los dos dedos también desplaza el mapa.
+## Un toque solo cuenta como "clic" si no hubo arrastre (ver Bioma.arrastrando); el umbral es más
+## amplio para el dedo (los eventos emulados desde el táctil traen DEVICE_ID_EMULATION).
 func _unhandled_input(event: InputEvent) -> void:
 	if camara == null:
 		return
@@ -143,29 +156,37 @@ func _unhandled_input(event: InputEvent) -> void:
 		if _toques.size() >= 2:
 			arrastrando = true
 			_distancia_pellizco = _distancia_entre_toques()
+			_centro_pellizco = _centro_toques()
 	elif event is InputEventScreenDrag:
 		_toques[event.index] = event.position
 		if _toques.size() >= 2:
 			var d := _distancia_entre_toques()
+			var centro := _centro_toques()
 			if _distancia_pellizco > 0.0:
-				_zoom(d / _distancia_pellizco)
+				_mover(-(centro - _centro_pellizco) / camara.zoom)
+				_zoom(d / _distancia_pellizco, centro)
 			_distancia_pellizco = d
+			_centro_pellizco = centro
 	elif event is InputEventMagnifyGesture:
-		_zoom(event.factor)
+		_zoom(event.factor, event.position)
 	elif event is InputEventPanGesture:
-		_mover(event.delta * 12.0)
+		_mover(event.delta * VELOCIDAD_PAN_TRACKPAD / camara.zoom.x)
 	elif event is InputEventMouseButton:
 		match event.button_index:
 			MOUSE_BUTTON_WHEEL_UP:
-				_zoom(1.1)
+				if event.pressed:
+					_zoom(PASO_ZOOM_RUEDA, event.position)
 			MOUSE_BUTTON_WHEEL_DOWN:
-				_zoom(1.0 / 1.1)
+				if event.pressed:
+					_zoom(1.0 / PASO_ZOOM_RUEDA, event.position)
 			MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE:
 				_arrastrando = event.pressed
 			MOUSE_BUTTON_LEFT:
 				if event.pressed:
 					_boton_izquierdo = true
 					_inicio_presion = event.position
+					_umbral_actual = UMBRAL_ARRASTRE_TACTIL if event.device == InputEvent.DEVICE_ID_EMULATION \
+						else UMBRAL_ARRASTRE
 					arrastrando = false
 				else:
 					_boton_izquierdo = false
@@ -175,7 +196,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if _arrastrando:
 			_mover(-event.relative / camara.zoom)
 		elif _boton_izquierdo and _toques.size() < 2:
-			if not arrastrando and event.position.distance_to(_inicio_presion) > UMBRAL_ARRASTRE:
+			if not arrastrando and event.position.distance_to(_inicio_presion) > _umbral_actual:
 				arrastrando = true
 			if arrastrando:
 				_mover(-event.relative / camara.zoom)
@@ -192,12 +213,26 @@ func _distancia_entre_toques() -> float:
 	return (puntos[0] as Vector2).distance_to(puntos[1])
 
 
+func _centro_toques() -> Vector2:
+	var puntos := _toques.values()
+	return ((puntos[0] as Vector2) + (puntos[1] as Vector2)) * 0.5
+
+
 ## Mueve la cámara sin dejar que el refugio salga de la pantalla.
 func _mover(desplazamiento: Vector2) -> void:
 	var limite := terreno.rect_global().grow(200) if terreno else Rect2(camara.position - Vector2.ONE * 2000, Vector2.ONE * 4000)
 	camara.position = (camara.position + desplazamiento).clamp(limite.position, limite.end)
 
 
-func _zoom(factor: float) -> void:
-	var nuevo := clampf(camara.zoom.x * factor, ZOOM_MIN, ZOOM_MAX)
+## Zoom manteniendo fijo el punto del mundo que está bajo `foco` (posición de pantalla); sin foco,
+## hacia el centro de la pantalla.
+func _zoom(factor: float, foco := Vector2(-1, -1)) -> void:
+	var antes := camara.zoom.x
+	var nuevo := clampf(antes * factor, ZOOM_MIN, ZOOM_MAX)
+	if is_equal_approx(nuevo, antes):
+		return
 	camara.zoom = Vector2(nuevo, nuevo)
+	if foco.x < 0.0:
+		return
+	var desde_centro := foco - get_viewport_rect().size * 0.5
+	_mover(desde_centro / antes - desde_centro / nuevo)
