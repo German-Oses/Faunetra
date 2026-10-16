@@ -143,16 +143,33 @@ func _encuadrar() -> void:
 ##   Mientras se pellizca, mover los dos dedos también desplaza el mapa.
 ## Un toque solo cuenta como "clic" si no hubo arrastre (ver Bioma.arrastrando); el umbral es más
 ## amplio para el dedo (los eventos emulados desde el táctil traen DEVICE_ID_EMULATION).
+## Soltar un botón o levantar un dedo se atiende aquí, antes que la interfaz y el terreno: si no,
+## cuando el terreno usaba una herramienta (o el botón se soltaba sobre el HUD) se quedaba con el
+## evento, la cámara creía que el botón seguía apretado y el mapa quedaba "agarrado" al mouse.
+## Presionar sí se atiende en _unhandled_input, para que tocar un botón del HUD no mueva el mapa.
+func _input(event: InputEvent) -> void:
+	if camara == null:
+		return
+	if event is InputEventScreenTouch and not event.pressed:
+		_toques.erase(event.index)
+		if _toques.is_empty():
+			_terminar_arrastre.call_deferred()
+	elif event is InputEventMouseButton and not event.pressed:
+		match event.button_index:
+			MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE:
+				_arrastrando = false
+			MOUSE_BUTTON_LEFT:
+				_boton_izquierdo = false
+				# Se limpia al final del cuadro: el terreno y las especies leen la marca al soltar.
+				_terminar_arrastre.call_deferred()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if camara == null:
 		return
 	if event is InputEventScreenTouch:
 		if event.pressed:
 			_toques[event.index] = event.position
-		else:
-			_toques.erase(event.index)
-			if _toques.is_empty():
-				_terminar_arrastre.call_deferred()
 		if _toques.size() >= 2:
 			arrastrando = true
 			_distancia_pellizco = _distancia_entre_toques()
@@ -180,7 +197,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.pressed:
 					_zoom(1.0 / PASO_ZOOM_RUEDA, event.position)
 			MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE:
-				_arrastrando = event.pressed
+				if event.pressed:
+					_arrastrando = true
 			MOUSE_BUTTON_LEFT:
 				if event.pressed:
 					_boton_izquierdo = true
@@ -188,11 +206,14 @@ func _unhandled_input(event: InputEvent) -> void:
 					_umbral_actual = UMBRAL_ARRASTRE_TACTIL if event.device == InputEvent.DEVICE_ID_EMULATION \
 						else UMBRAL_ARRASTRE
 					arrastrando = false
-				else:
-					_boton_izquierdo = false
-					# Se limpia al final del cuadro: el terreno y las especies leen la marca al soltar.
-					_terminar_arrastre.call_deferred()
 	elif event is InputEventMouseMotion:
+		# Si el botón se soltó encima del HUD (o fuera de la ventana), ese evento se lo queda la
+		# interfaz y no llega aquí: el mapa quedaba "agarrado" siguiendo al mouse. Cada movimiento
+		# trae el estado real de los botones, así que se corrige con él.
+		if _boton_izquierdo and not (event.button_mask & MOUSE_BUTTON_MASK_LEFT):
+			_soltar_mouse()
+		if _arrastrando and not (event.button_mask & (MOUSE_BUTTON_MASK_RIGHT | MOUSE_BUTTON_MASK_MIDDLE)):
+			_arrastrando = false
 		if _arrastrando:
 			_mover(-event.relative / camara.zoom)
 		elif _boton_izquierdo and _toques.size() < 2:
@@ -200,6 +221,20 @@ func _unhandled_input(event: InputEvent) -> void:
 				arrastrando = true
 			if arrastrando:
 				_mover(-event.relative / camara.zoom)
+
+
+## Al perder el foco o salir el mouse de la ventana no llega el evento de soltar: se suelta todo.
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_WM_MOUSE_EXIT, NOTIFICATION_WM_WINDOW_FOCUS_OUT]:
+		_soltar_mouse()
+		_arrastrando = false
+		_toques.clear()
+
+
+func _soltar_mouse() -> void:
+	_boton_izquierdo = false
+	arrastrando = false
+	_distancia_pellizco = 0.0
 
 
 func _terminar_arrastre() -> void:
