@@ -1,18 +1,19 @@
 extends VentanaModal
 
 ## Tableta de Campo del Guardián: Biopedia, trivias (fuente principal de PR),
-## repasos de validación espaciada y los minijuegos Escáner de Especies (Lente Ancestral) y Paisaje Sonoro.
+## repasos de validación espaciada, el Escáner de Especies (Lente Ancestral) y la pestaña Juegos
+## (Paisaje Sonoro, Rompecabezas y Memorice).
 
-enum Pestana { BIOPEDIA, TRIVIAS, REPASOS, LENTE, SONIDO }
+enum Pestana { BIOPEDIA, TRIVIAS, REPASOS, LENTE, JUEGOS }
 
 const Biopedia := preload("res://ui/tableta/biopedia.gd")
 const EscanerEspecies := preload("res://ui/minijuegos/escaner_especies.gd")
-const AsociacionAcustica := preload("res://ui/minijuegos/asociacion_acustica.gd")
+const Juegos := preload("res://ui/minijuegos/juegos.gd")
 
 var _tabs: TabContainer
 var _biopedia: Biopedia
 var _escaner: EscanerEspecies
-var _sonido: AsociacionAcustica
+var _juegos: Juegos
 var _estado_tutor: Label
 var _lista_repasos: VBoxContainer
 
@@ -31,11 +32,12 @@ func _ready() -> void:
 	_tabs.add_child(_construir_repasos())
 	_escaner = EscanerEspecies.new()
 	_escaner.name = "Escáner de Especies"
-	_escaner.abrir_puzzle_acustico.connect(func() -> void: _tabs.current_tab = Pestana.SONIDO)
+	_escaner.abrir_puzzle_acustico.connect(func() -> void:
+		_tabs.current_tab = Pestana.JUEGOS
+		_juegos.mostrar(Juegos.Juego.SONIDO))
 	_tabs.add_child(_escaner)
-	_sonido = AsociacionAcustica.new()
-	_sonido.name = "Paisaje Sonoro"
-	_tabs.add_child(_sonido)
+	_juegos = Juegos.new()
+	_tabs.add_child(_juegos)
 
 	GameState.repasos_actualizados.connect(_on_repasos_actualizados)
 	Pantalla.orientacion_cambiada.connect(_titular_pestanas)
@@ -46,7 +48,7 @@ func _ready() -> void:
 ## quepan sin flechas de desplazamiento.
 func _titular_pestanas(vertical: bool) -> void:
 	_tabs.set_tab_title(Pestana.LENTE, "Escáner" if vertical else "Escáner de Especies")
-	_tabs.set_tab_title(Pestana.SONIDO, "Sonidos" if vertical else "Paisaje Sonoro")
+	_tabs.set_tab_title(Pestana.JUEGOS, "Juegos")
 
 
 func abrir(pestana: Pestana = Pestana.BIOPEDIA) -> void:
@@ -69,8 +71,8 @@ func _on_tab_changed(indice: int) -> void:
 			_refrescar_repasos()
 		Pestana.LENTE:
 			_escaner.al_mostrar()
-		Pestana.SONIDO:
-			_sonido.al_mostrar()
+		Pestana.JUEGOS:
+			_juegos.al_mostrar()
 
 
 func _on_repasos_actualizados() -> void:

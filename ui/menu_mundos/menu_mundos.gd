@@ -1,33 +1,39 @@
 extends Control
 
-## Menú principal de Faunetra: mapa de mundos (los 5 biomas como islas isométricas),
-## panel del bioma seleccionado con "Explorar" y especies cercanas, y barra de navegación
-## inferior hacia la Biopedia, Mis especies y el Perfil.
-## En vertical (teléfono) las islas se ordenan de norte a sur en zigzag sobre el panel del
-## bioma, la cabecera usa dos filas y la navegación muestra el ícono sobre el texto.
+## Menú principal de Faunetra: mapa de Chile dividido en los biomas del juego (y un recuadro con
+## las islas oceánicas), panel del bioma seleccionado con "Explorar" y especies cercanas, y barra
+## de navegación inferior hacia la Biopedia, Mis especies y el Perfil.
+## Cada bioma es una capa del mapa (Assets/UI/mapa_chile/zona_<id>.png, generada con
+## herramientas/aseprite/mapa_chile.lua): responde al toque por su forma, los bloqueados se ven
+## cubiertos por la niebla gris y los demás recuperan el color a medida que se restauran.
+## En vertical (teléfono) el mapa va sobre el panel del bioma, la cabecera usa dos filas y la
+## navegación muestra el ícono sobre el texto.
 
 const Biopedia := preload("res://ui/tableta/biopedia.gd")
 const Perfil := preload("res://ui/menu_mundos/perfil.gd")
 
-## Posición de cada isla en el mapa (fracción del área), de norte a sur y las islas mar adentro.
-const POSICION_ISLAS := {
-	2: Vector2(0.17, 0.30),
-	1: Vector2(0.43, 0.22),
-	3: Vector2(0.70, 0.36),
-	4: Vector2(0.40, 0.72),
-	5: Vector2(0.80, 0.78),
+const RUTA_ZONA := "res://Assets/UI/mapa_chile/zona_%d.png"
+## Tamaño del dibujo del mapa (px) y, por bioma, el borde oriental de su zona a media altura
+## (ahí se apoya su etiqueta) y dónde pasea su animal. Las anclas las imprime mapa_chile.lua.
+const TAM_MAPA := Vector2(200, 300)
+const ANCLA_ETIQUETA := {1: Vector2(121, 129), 2: Vector2(152, 54), 3: Vector2(102, 179), 4: Vector2(84, 247), 5: Vector2(3, 70)}
+const POSICION_ANIMAL := {1: Vector2(104, 132), 2: Vector2(133, 58), 3: Vector2(88, 182), 4: Vector2(66, 236), 5: Vector2(26, 118)}
+## Margen (px del dibujo) que se suma a la forma de cada zona para que sea fácil tocarla con el dedo.
+const MARGEN_TOQUE := 4
+## Color de cada zona: gris de niebla si está bloqueada; desbloqueada, desde COLOR_MINIMO hasta pleno
+## al alcanzar la meta de restauración.
+const COLOR_MINIMO := 0.62
+const SHADER_ZONA := """
+shader_type canvas_item;
+uniform float color = 1.0;   // 0 = cubierta por la niebla, 1 = color pleno
+uniform float brillo = 1.0;
+void fragment() {
+	vec4 c = COLOR;
+	float gris = dot(c.rgb, vec3(0.3, 0.59, 0.11));
+	vec3 niebla = mix(vec3(gris), vec3(0.80, 0.84, 0.88), 0.4);
+	COLOR = vec4(mix(niebla, c.rgb, color) * brillo, c.a);
 }
-## En vertical el mapa es alto y angosto, como Chile: de norte (arriba) a sur, con las islas
-## oceánicas al oeste (izquierda).
-const POSICION_ISLAS_VERTICAL := {
-	2: Vector2(0.62, 0.18),
-	1: Vector2(0.36, 0.37),
-	3: Vector2(0.66, 0.56),
-	4: Vector2(0.40, 0.79),
-	5: Vector2(0.17, 0.61),
-}
-const ESCALA_ISLA := 2.0
-const TAM_ISLA := Vector2(112, 96)
+"""
 
 var _seleccionado := -1
 var _contenido: Control
@@ -41,7 +47,7 @@ var _perfil: Perfil
 var _botones_nav: Dictionary = {}
 
 var _mapa: Control
-var _islas: Dictionary = {}          # id_bioma -> {"boton", "burbuja", "etiqueta", "textura"}
+var _zonas: Dictionary = {}          # id_bioma -> {"boton", "burbuja", "icono", "etiqueta", "animal"}
 var _barra_salud: ProgressBar
 var _texto_salud: Label
 var _texto_pr: Label
@@ -94,7 +100,7 @@ func _ready() -> void:
 
 	GameState.salud_actualizada.connect(_on_estado_cambiado.unbind(2))
 	GameState.bioma_desbloqueado.connect(_on_estado_cambiado.unbind(1))
-	resized.connect(_ubicar_islas)
+	resized.connect(_ubicar_zonas)
 	Pantalla.orientacion_cambiada.connect(func(_v: bool) -> void: _reacomodar())
 	_reacomodar()
 	hide()
@@ -114,7 +120,7 @@ func _reacomodar() -> void:
 	_tarjeta_salud.size_flags_horizontal = Control.SIZE_EXPAND_FILL if vertical else Control.SIZE_FILL
 	_cabecera_fila2.visible = vertical
 	_lema.visible = not vertical
-	# Página del mapa: islas arriba y panel del bioma abajo.
+	# Página del mapa: Chile arriba y panel del bioma abajo.
 	_pagina_refugio_caja.vertical = vertical
 	_mapa.size_flags_stretch_ratio = 1.7 if vertical else 2.3
 	_especies_cercanas.columns = 5 if vertical else 3
@@ -124,7 +130,7 @@ func _reacomodar() -> void:
 		(b as Button).vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP if vertical else VERTICAL_ALIGNMENT_CENTER
 		(b as Button).add_theme_font_size_override("font_size", 13 if vertical else 16)
 		(b as Button).custom_minimum_size.y = 58 if vertical else 46
-	_ubicar_islas.call_deferred()
+	_ubicar_zonas.call_deferred()
 
 
 func _on_estado_cambiado() -> void:
@@ -245,10 +251,12 @@ func _crear_pagina_refugio() -> Control:
 	_mapa.size_flags_stretch_ratio = 2.3
 	_mapa.clip_contents = true
 	fila.add_child(_mapa)
-	# Las islas se ubican según el tamaño del área del mapa, que se conoce recién tras el primer acomodo.
-	_mapa.resized.connect(_ubicar_islas)
+	# Las zonas se ubican según el tamaño del área del mapa, que se conoce recién tras el primer acomodo.
+	_mapa.resized.connect(_ubicar_zonas)
+	var shader := Shader.new()
+	shader.code = SHADER_ZONA
 	for id in GameState.ORDEN_BIOMAS:
-		_crear_isla(id)
+		_crear_zona(id, shader)
 
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -302,17 +310,19 @@ func _crear_pagina_refugio() -> Control:
 	return fila
 
 
-func _crear_isla(id_bioma: int) -> void:
+func _crear_zona(id_bioma: int, shader: Shader) -> void:
 	var boton := TextureButton.new()
-	boton.texture_normal = TemaFaunetra.isla(id_bioma)
+	boton.texture_normal = load(RUTA_ZONA % id_bioma)
 	boton.ignore_texture_size = true
 	boton.stretch_mode = TextureButton.STRETCH_SCALE
-	boton.size = TAM_ISLA * ESCALA_ISLA
-	boton.pivot_offset = boton.size * 0.5
+	boton.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	boton.texture_click_mask = _mascara(boton.texture_normal)
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	boton.material = material
 	boton.pressed.connect(_seleccionar.bind(id_bioma))
-	boton.mouse_entered.connect(_on_isla_hover.bind(id_bioma))
-	boton.mouse_exited.connect(_pintar_isla.bind(id_bioma))
+	boton.mouse_entered.connect(_on_zona_hover.bind(id_bioma))
+	boton.mouse_exited.connect(_pintar_zona.bind(id_bioma))
 	_mapa.add_child(boton)
 
 	var burbuja := PanelContainer.new()
@@ -321,61 +331,62 @@ func _crear_isla(id_bioma: int) -> void:
 	fila.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	burbuja.add_child(fila)
 	var icono := TextureRect.new()
-	icono.custom_minimum_size = Vector2(28, 28)
+	icono.custom_minimum_size = Vector2(24, 24)
 	icono.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icono.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	fila.add_child(icono)
 	var etiqueta := Label.new()
-	etiqueta.add_theme_font_size_override("font_size", 13)
+	etiqueta.add_theme_font_size_override("font_size", 12)
 	fila.add_child(etiqueta)
 	_mapa.add_child(burbuja)
 
-	# Un animal ya descubierto del bioma pasea por la isla.
+	# Un animal ya descubierto del bioma pasea por su zona.
 	var animal := AnimatedSprite2D.new()
 	animal.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	boton.add_child(animal)
-	_islas[id_bioma] = {"boton": boton, "burbuja": burbuja, "icono": icono, "etiqueta": etiqueta, "animal": animal}
+	_zonas[id_bioma] = {"boton": boton, "burbuja": burbuja, "icono": icono, "etiqueta": etiqueta, "animal": animal}
 
 
-func _on_isla_hover(id_bioma: int) -> void:
+func _on_zona_hover(id_bioma: int) -> void:
 	if GameState.esta_desbloqueado(id_bioma):
-		(_islas[id_bioma]["boton"] as TextureButton).self_modulate = Color(1.12, 1.12, 1.12)
+		((_zonas[id_bioma]["boton"] as TextureButton).material as ShaderMaterial).set_shader_parameter("brillo", 1.12)
 
 
-## Máscara de clic: solo la isla (píxeles opacos) responde, no el océano alrededor.
+## Máscara de toque: la forma de la zona (píxeles opacos) más un margen, no el océano alrededor.
 func _mascara(tex: Texture2D) -> BitMap:
 	var mapa := BitMap.new()
-	mapa.create_from_image_alpha(tex.get_image())
+	var imagen := tex.get_image()
+	mapa.create_from_image_alpha(imagen)
+	mapa.grow_mask(MARGEN_TOQUE, Rect2i(Vector2i.ZERO, imagen.get_size()))
 	return mapa
 
 
-func _ubicar_islas() -> void:
+func _ubicar_zonas() -> void:
 	if _mapa == null:
 		return
 	var area := _mapa.size
-	var vertical: bool = Pantalla.vertical
-	var posiciones: Dictionary = POSICION_ISLAS_VERTICAL if vertical else POSICION_ISLAS
-	# En vertical las islas se apilan: la escala la limita sobre todo el alto disponible.
-	var referencia := Vector2(330, 640) if vertical else Vector2(640, 470)
-	var escala := clampf(minf(area.x / referencia.x, area.y / referencia.y) * ESCALA_ISLA, 1.0, 3.0)
-	for id in _islas:
-		var isla: Dictionary = _islas[id]
-		var boton: TextureButton = isla["boton"]
-		boton.size = TAM_ISLA * escala
-		boton.pivot_offset = boton.size * 0.5
-		var centro: Vector2 = posiciones.get(id, Vector2(0.5, 0.5)) * area
-		boton.position = centro - boton.size * 0.5
-		var burbuja: PanelContainer = isla["burbuja"]
+	var escala := maxf(0.5, minf(area.x / TAM_MAPA.x, area.y / TAM_MAPA.y) * 0.97)
+	var origen := ((area - TAM_MAPA * escala) * 0.5).floor()
+	for id in _zonas:
+		var zona: Dictionary = _zonas[id]
+		var boton: TextureButton = zona["boton"]
+		boton.position = origen
+		boton.size = TAM_MAPA * escala
+		var burbuja: PanelContainer = zona["burbuja"]
 		burbuja.reset_size()
-		burbuja.position = Vector2(centro.x - burbuja.size.x * 0.5, boton.position.y - burbuja.size.y * 0.2)
-		var animal: AnimatedSprite2D = isla["animal"]
-		animal.position = boton.size * Vector2(0.62, 0.42)
-		animal.scale = Vector2.ONE * escala * 0.5
+		var ancla: Vector2 = origen + ANCLA_ETIQUETA[id] * escala
+		# Etiqueta al este de la zona (sobre el océano/Argentina); la insular, sobre su recuadro.
+		var pos := Vector2(ancla.x, ancla.y - burbuja.size.y - 4) if id == 5 \
+			else Vector2(ancla.x + 8, ancla.y - burbuja.size.y * 0.5)
+		burbuja.position = pos.clamp(Vector2.ZERO, (area - burbuja.size).max(Vector2.ZERO))
+		var animal: AnimatedSprite2D = zona["animal"]
+		animal.position = POSICION_ANIMAL[id] * escala
+		animal.scale = Vector2.ONE * maxf(1.0, escala * 0.45)
 
 
 func _refrescar_mapa() -> void:
-	for id in _islas:
-		_pintar_isla(id)
+	for id in _zonas:
+		_pintar_zona(id)
 	var id := _seleccionado
 	var estado: Dictionary = GameState.estado_bioma(id)
 	var salud: float = GameState.salud(id)
@@ -405,34 +416,38 @@ func _refrescar_mapa() -> void:
 	_refrescar_especies_cercanas(id)
 
 
-func _pintar_isla(id: int) -> void:
-	var isla: Dictionary = _islas[id]
-	var boton: TextureButton = isla["boton"]
+func _pintar_zona(id: int) -> void:
+	var zona: Dictionary = _zonas[id]
+	var boton: TextureButton = zona["boton"]
 	var desbloqueado: bool = GameState.esta_desbloqueado(id)
-	boton.self_modulate = Color.WHITE if desbloqueado else Color(0.55, 0.58, 0.6)
+	var material := boton.material as ShaderMaterial
+	var avance := clampf(GameState.salud(id) / GameState.umbral_desbloqueo(), 0.0, 1.0)
+	material.set_shader_parameter("color", lerpf(COLOR_MINIMO, 1.0, avance) if desbloqueado else 0.0)
+	material.set_shader_parameter("brillo", 1.0)
 	var seleccionado := id == _seleccionado
-	var burbuja: PanelContainer = isla["burbuja"]
+	var burbuja: PanelContainer = zona["burbuja"]
 	burbuja.add_theme_stylebox_override("panel", TemaFaunetra.caja(
 		TemaFaunetra.VERDE_CLARO if seleccionado else TemaFaunetra.CREMA,
-		TemaFaunetra.VERDE if seleccionado else TemaFaunetra.BORDE, 12, 3 if seleccionado else 2, 6))
-	(isla["icono"] as TextureRect).texture = TemaFaunetra.icono(TemaFaunetra.ICONO_BIOMA[id] if desbloqueado else "candado")
-	(isla["etiqueta"] as Label).text = "%s\n%s" % [GameState.nombre_bioma(id), ("%d%%" % int(GameState.salud(id))) if desbloqueado else "Bloqueado"]
+		TemaFaunetra.VERDE if seleccionado else TemaFaunetra.BORDE, 12, 3 if seleccionado else 2, 5))
+	(zona["icono"] as TextureRect).texture = TemaFaunetra.icono(TemaFaunetra.ICONO_BIOMA[id] if desbloqueado else "candado")
+	(zona["etiqueta"] as Label).text = "%s\n%s" % [GameState.nombre_bioma(id), ("%d%%" % int(GameState.salud(id))) if desbloqueado else "Bloqueado"]
 	_animar_seleccion(boton, seleccionado)
-	_poner_animal(id, isla["animal"])
-	_ubicar_islas.call_deferred()
+	_poner_animal(id, zona["animal"])
+	_ubicar_zonas.call_deferred()
 
 
+## La zona elegida late suavemente de brillo (no de tamaño: todas las capas comparten el rectángulo).
 func _animar_seleccion(boton: TextureButton, activo: bool) -> void:
 	if boton.has_meta("tween"):
 		var anterior: Tween = boton.get_meta("tween")
 		if anterior and anterior.is_valid():
 			anterior.kill()
-	boton.scale = Vector2.ONE
 	if not activo:
 		return
+	var material := boton.material as ShaderMaterial
 	var tween := boton.create_tween().set_loops()
-	tween.tween_property(boton, "scale", Vector2.ONE * 1.04, 0.8).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(boton, "scale", Vector2.ONE, 0.8).set_trans(Tween.TRANS_SINE)
+	tween.tween_method(func(v: float) -> void: material.set_shader_parameter("brillo", v), 1.0, 1.18, 0.8).set_trans(Tween.TRANS_SINE)
+	tween.tween_method(func(v: float) -> void: material.set_shader_parameter("brillo", v), 1.18, 1.0, 0.8).set_trans(Tween.TRANS_SINE)
 	boton.set_meta("tween", tween)
 
 

@@ -26,6 +26,7 @@ func _ready() -> void:
 	_grupos_fauna()
 	_guardado()
 	await _biomas_y_controles()
+	await _minijuegos_y_mapa()
 	print("RESULTADO %d/%d pruebas pasan" % [total - fallas, total])
 	get_tree().quit(fallas)
 
@@ -280,3 +281,60 @@ func _controles(b: Bioma) -> void:
 	await _evento_mouse(centro + Vector2(90, 0), false)
 	ok(antes.distance_to(cam.global_position) > 30.0 and not Bioma.arrastrando,
 		"arrastrar con el mouse mueve el mapa y se suelta bien", antes.distance_to(cam.global_position))
+
+
+# --- Minijuegos de la pestaña Juegos y mapa del menú -----------------------------------------
+
+func _minijuegos_y_mapa() -> void:
+	GS.bioma_actual_id = 3
+	var pr0: int = GS.obtener_pr(3)
+	var rc: Node = load("res://ui/minijuegos/rompecabezas.gd").new()
+	get_tree().root.add_child(rc)
+	await get_tree().process_frame
+	rc.nueva_ronda()
+	var desordenado: bool = rc._correctas() < rc._orden.size()
+	for i in rc._orden.size():
+		if rc._orden[i] != i:
+			rc._on_pieza(i)
+			rc._on_pieza(rc._orden.find(i))
+	ok(desordenado and rc._resuelto and GS.obtener_pr(3) > pr0, "rompecabezas: empieza desordenado, se resuelve y da PR",
+		"%d → %d PR" % [pr0, GS.obtener_pr(3)])
+	var pr1: int = GS.obtener_pr(3)
+	rc._resuelto = false
+	rc._orden.reverse()
+	for i in rc._orden.size():
+		if rc._orden[i] != i:
+			rc._on_pieza(i)
+			rc._on_pieza(rc._orden.find(i))
+	ok(GS.obtener_pr(3) - pr1 == rc.RECOMPENSA_REPETIDA, "rompecabezas: repetir la misma especie da la recompensa reducida", GS.obtener_pr(3) - pr1)
+	rc.queue_free()
+
+	var mm: Node = load("res://ui/minijuegos/memorice.gd").new()
+	get_tree().root.add_child(mm)
+	await get_tree().process_frame
+	mm.nueva_ronda()
+	var pr2: int = GS.obtener_pr(3)
+	var pares_ok := true
+	for d in mm._cartas.map(func(c): return c["especie"]):
+		pares_ok = pares_ok and mm._cartas.filter(func(c): return c["especie"] == d).size() == 2
+	for i in mm._cartas.size():
+		if mm._cartas[i]["descubierta"]:
+			continue
+		for j in mm._cartas.size():
+			if i != j and not mm._cartas[j]["descubierta"] and mm._cartas[i]["especie"] == mm._cartas[j]["especie"]:
+				mm._on_carta(i)
+				mm._on_carta(j)
+				break
+	ok(pares_ok and mm._terminado and GS.obtener_pr(3) > pr2, "memorice: cada especie tiene su pareja, se gana y da PR",
+		"%d parejas, %d → %d PR" % [mm._parejas, pr2, GS.obtener_pr(3)])
+	var eventos: Array = GS.registro.filter(func(e): return e.get("tipo") in ["rompecabezas", "memorice"])
+	ok(eventos.size() >= 3, "los minijuegos nuevos quedan en el registro de investigación", eventos.size())
+	mm.queue_free()
+
+	var menu := load("res://ui/menu_mundos/menu_mundos.gd")
+	var faltan: Array = []
+	for id in [1, 2, 3, 4, 5]:
+		var tex: Texture2D = load(menu.RUTA_ZONA % id)
+		if tex == null or Vector2(tex.get_size()) != menu.TAM_MAPA or not menu.ANCLA_ETIQUETA.has(id):
+			faltan.append(id)
+	ok(faltan.is_empty(), "mapa de Chile: las 5 zonas tienen imagen del tamaño del mapa y su etiqueta", faltan)
