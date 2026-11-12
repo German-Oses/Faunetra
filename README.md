@@ -1,7 +1,7 @@
-﻿# Faunetra
+# Faunetra
 
-Videojuego educativo sobre biodiversidad y restauraciÃ³n de refugios de Chile.
+Videojuego educativo sobre biodiversidad y restauración de refugios de Chile.
 
-El sitio de GitHub Pages sirve `index.html` y los archivos de la exportaciÃ³n Web de Godot. Esta rama contiene la distribuciÃ³n jugable.
+El sitio de GitHub Pages sirve `index.html` y los archivos de la exportación Web de Godot. Esta rama contiene la distribución jugable.
 
-[Fuentes y licencias de los audios](CREDITOS.md)
+[Fuentes y licencias del audio y de las fotografías](CREDITOS.md)
